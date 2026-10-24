@@ -215,6 +215,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.body.appendChild(picker);
   await wait(1000);
   check('Native picker has a favorites section even when it is empty', Boolean(picker.querySelector('#vortex-sec-favorites .vortex-favorites-empty')));
+  check('Native picker has a recent emotes section', Boolean(picker.querySelector('#vortex-sec-recent')));
+  const quickButton = document.querySelector('.vortex-quick-button');
+  quickButton?.click();
+  const quickPanel = document.querySelector('#vortex-quick-panel');
+  check('Quick settings opens from chat header', Boolean(quickPanel));
+  const palette = quickPanel?.querySelector('[data-quick-key="themePreset"]');
+  if (palette) { palette.value = 'orchid'; palette.dispatchEvent(new Event('change', { bubbles: true })); }
+  await wait();
+  check('Quick settings applies palette and persists it', document.documentElement.dataset.vortexPreset === 'orchid' &&
+    (await chrome.storage.local.get('vortexSettings')).vortexSettings.themePreset === 'orchid');
+  const density = quickPanel?.querySelector('[data-quick-key="chatDensity"]');
+  if (density) { density.value = 'compact'; density.dispatchEvent(new Event('change', { bubbles: true })); }
+  await wait();
+  check('Quick settings applies compact chat density', document.documentElement.dataset.vortexDensity === 'compact');
+  quickPanel?.querySelector('[data-quick-close]')?.click();
+  check('Quick settings closes and restores button state', !document.querySelector('#vortex-quick-panel') && quickButton?.getAttribute('aria-expanded') === 'false');
   picker.querySelector('[data-emote-code="TestEmote"]').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
   await wait();
   check('Right-click adds an available emote to the favorites section', picker.querySelectorAll('#vortex-sec-favorites [data-emote-code="TestEmote"]').length === 1);

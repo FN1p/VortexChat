@@ -21,7 +21,7 @@ window.chrome = {
     onChanged: { addListener: listener => listeners.push(listener) }
   },
   runtime: {
-    getManifest: () => ({ version: '3.5.10' }),
+    getManifest: () => ({ version: '4.0.0' }),
     onMessage: { addListener: listener => messageListeners.push(listener) }
   },
   tabs: {

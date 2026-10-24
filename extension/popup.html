@@ -40,10 +40,17 @@
         <label class="row"><span>Уведомления об изменении сета</span><input type="checkbox" data-key="showEventNotices" /><span class="switch" aria-hidden="true"></span></label>
       </div>
     </section>
+    <section aria-labelledby="appearance-heading">
+      <h2 id="appearance-heading">Оформление Twitch</h2>
+      <div class="card">
+        <label class="row"><span>Тема VortexChat на Twitch</span><input type="checkbox" data-key="themeEnabled" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Палитра</span><select data-key="themePreset" aria-label="Цветовая палитра"><option value="aurora">Аврора</option><option value="graphite">Графит</option><option value="orchid">Орхидея</option></select></label>
+        <label class="row"><span>Плотность чата</span><select data-key="chatDensity" aria-label="Плотность чата"><option value="comfortable">Обычная</option><option value="compact">Компактная</option></select></label>
+      </div>
+    </section>
     <section aria-labelledby="media-heading">
       <h2 id="media-heading">Видео и клипы</h2>
       <div class="card">
-        <label class="row"><span>Тема VortexChat на Twitch</span><input type="checkbox" data-key="themeEnabled" /><span class="switch" aria-hidden="true"></span></label>
         <label class="row"><span>Ambilight</span><input type="checkbox" data-key="ambilightEnabled" /><span class="switch" aria-hidden="true"></span></label>
         <div class="font-row"><label for="ambilight-brightness">Яркость</label><output id="ambilight-brightness-value" for="ambilight-brightness">70%</output></div>
         <input type="range" id="ambilight-brightness" data-key="ambilightBrightness" min="0" max="100" value="70" />

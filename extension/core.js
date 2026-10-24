@@ -8,7 +8,8 @@
     fontSize: 13, messageGap: 0, emoteGap: 2, showTimestamps: false,
     highlightWords: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
     ambilightEnabled: false, ambilightBrightness: 70, ambilightSpread: 65, ambilightResponse: 50,
-    ambilightDimUI: 0, openClipsOverlay: true, themeEnabled: true
+    ambilightDimUI: 0, openClipsOverlay: true, themeEnabled: true,
+    themePreset: 'aurora', chatDensity: 'comfortable'
   });
   const reserved = new Set(['directory', 'settings', 'subscriptions', 'videos', 'downloads',
     'inventory', 'wallet', 'drops', 'search', 'following', 'friends', 'messages',
@@ -36,6 +37,8 @@
       const number = Number(value?.[key] ?? defaults[key]);
       result[key] = Number.isFinite(number) ? Math.min(100, Math.max(0, Math.round(number))) : defaults[key];
     }
+    if (['aurora', 'graphite', 'orchid'].includes(value?.themePreset)) result.themePreset = value.themePreset;
+    if (['comfortable', 'compact'].includes(value?.chatDensity)) result.chatDensity = value.chatDensity;
     result.highlightWords = typeof value?.highlightWords === 'string' ? value.highlightWords.slice(0, 500) : '';
     return result;
   }
@@ -151,6 +154,11 @@
       /^(7TV|BTTV|FFZ):[^:]+:.+$/s.test(key) && key.length <= 300))].slice(0, 300) : [];
   }
 
+  function normalizeRecentEmotes(value) {
+    return Array.isArray(value) ? [...new Set(value.filter(key => typeof key === 'string' &&
+      /^(7TV|BTTV|FFZ):[^:]+:.+$/s.test(key) && key.length <= 300))].slice(0, 24) : [];
+  }
+
   function parseBackup(text) {
     if (typeof text !== 'string' || text.length > 100000) throw new Error('Файл настроек слишком большой');
     const data = JSON.parse(text);
@@ -188,7 +196,7 @@
   }
 
   const api = { defaults, channelFromPath, normalizeSettings, providerEnabled, suggestEmotes, matchesHighlight, escapeHTML, parse7TV, clipSlug, videoLetterbox,
-    EmoteCatalog, favoriteKey, normalizeFavorites, MessageHistory, parseBackup };
+    EmoteCatalog, favoriteKey, normalizeFavorites, normalizeRecentEmotes, MessageHistory, parseBackup };
   root.VortexCore = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(globalThis);

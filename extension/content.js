@@ -33,12 +33,16 @@
 
   let chatTools = null;
   let favoriteCodes = new Set();
+  let recentEmoteKeys = [];
   let favoriteSaveQueue = Promise.resolve();
+  let recentSaveQueue = Promise.resolve();
+  let settingsSaveQueue = Promise.resolve();
 
   function loadSettings() {
     if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-      chrome.storage.local.get(['vortexSettings', 'vortexFavorites'], (res) => {
+      chrome.storage.local.get(['vortexSettings', 'vortexFavorites', 'vortexRecentEmotes'], (res) => {
         favoriteCodes = new Set(VortexCore.normalizeFavorites(res?.vortexFavorites));
+        recentEmoteKeys = VortexCore.normalizeRecentEmotes(res?.vortexRecentEmotes);
         if (res?.vortexSettings) {
           state.settings = normalizeSettings(res.vortexSettings);
           applySettings();
@@ -51,6 +55,10 @@
           favoriteCodes = new Set(VortexCore.normalizeFavorites(changes.vortexFavorites.newValue));
           refreshOpenEmotePickerUI();
           updateFavoriteCard();
+        }
+        if (changes.vortexRecentEmotes) {
+          recentEmoteKeys = VortexCore.normalizeRecentEmotes(changes.vortexRecentEmotes.newValue);
+          refreshOpenEmotePickerUI();
         }
         if (changes.vortexSettings?.newValue) {
           state.settings = normalizeSettings(changes.vortexSettings.newValue);
@@ -83,10 +91,14 @@
     }
   }
 
-  function saveSettings() {
-    if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-      chrome.storage.local.set({ vortexSettings: state.settings });
-    }
+  function saveSettings(patch) {
+    state.settings = normalizeSettings({ ...state.settings, ...patch });
+    applySettings();
+    if (typeof chrome === 'undefined' || !chrome.storage?.local) return;
+    settingsSaveQueue = settingsSaveQueue.then(async () => {
+      const saved = await chrome.storage.local.get('vortexSettings');
+      await chrome.storage.local.set({ vortexSettings: normalizeSettings({ ...saved.vortexSettings, ...patch }) });
+    }).catch(() => showToast('Не удалось сохранить настройки'));
   }
 
   // Only emotes actually returned by providers belong in the catalog.
@@ -200,8 +212,31 @@
     }).catch(() => showToast('Не удалось сохранить избранное'));
   }
 
+  function rememberEmote(emote) {
+    const key = VortexCore.favoriteKey(emote);
+    recentEmoteKeys = VortexCore.normalizeRecentEmotes([key, ...recentEmoteKeys]);
+    queueMicrotask(refreshOpenEmotePickerUI);
+    if (typeof chrome === 'undefined' || !chrome.storage?.local) return;
+    recentSaveQueue = recentSaveQueue.then(async () => {
+      const saved = await chrome.storage.local.get('vortexRecentEmotes');
+      await chrome.storage.local.set({ vortexRecentEmotes:
+        VortexCore.normalizeRecentEmotes([key, ...VortexCore.normalizeRecentEmotes(saved.vortexRecentEmotes)]) });
+    }).catch(() => showToast('Не удалось сохранить недавние смайлы'));
+  }
+
+  function clearRecentEmotes() {
+    recentEmoteKeys = [];
+    refreshOpenEmotePickerUI();
+    if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+      recentSaveQueue = recentSaveQueue.then(() => chrome.storage.local.set({ vortexRecentEmotes: [] }))
+        .catch(() => showToast('Не удалось очистить недавние смайлы'));
+    }
+  }
+
   function applySettings() {
     document.documentElement.toggleAttribute('data-vortex-theme', state.settings.themeEnabled);
+    document.documentElement.dataset.vortexPreset = state.settings.themePreset;
+    document.documentElement.dataset.vortexDensity = state.settings.chatDensity;
     document.documentElement.style.setProperty('--vortex-chat-font-size', `${state.settings.fontSize}px`);
     document.documentElement.style.setProperty('--vortex-message-gap', `${state.settings.messageGap}px`);
     document.documentElement.style.setProperty('--vortex-emote-gap', `${state.settings.emoteGap}px`);
@@ -212,6 +247,7 @@
       if (input.type === 'checkbox') input.checked = value;
       else input.value = value;
     });
+    syncQuickPanel();
     chatTools?.maintain();
     if (!state.settings.enable7TV) stop7TVEvents();
     else if (active7TVEmoteSetId && !active7TVEventSocket) connect7TVEventWebSocket(active7TVEmoteSetId);
@@ -604,6 +640,77 @@
   let lastSendText = '';
   let lastSendAt = 0;
 
+  function syncQuickPanel() {
+    const panel = document.getElementById('vortex-quick-panel');
+    if (!panel) return;
+    panel.querySelectorAll('[data-quick-key]').forEach(input => {
+      const value = state.settings[input.dataset.quickKey];
+      if (input.type === 'checkbox') input.checked = value;
+      else input.value = value;
+    });
+    panel.querySelector('[data-quick-font-value]').textContent = `${state.settings.fontSize} px`;
+  }
+
+  function closeQuickPanel() {
+    document.getElementById('vortex-quick-panel')?.remove();
+    document.querySelector('.vortex-quick-button')?.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('pointerdown', onQuickOutside, true);
+    document.removeEventListener('keydown', onQuickKey, true);
+    window.removeEventListener('resize', positionQuickPanel);
+  }
+
+  function onQuickOutside(event) {
+    if (event.target.closest?.('#vortex-quick-panel, .vortex-quick-button')) return;
+    closeQuickPanel();
+  }
+
+  function onQuickKey(event) {
+    if (event.key === 'Escape') closeQuickPanel();
+  }
+
+  function positionQuickPanel() {
+    const panel = document.getElementById('vortex-quick-panel');
+    const button = document.querySelector('.vortex-quick-button');
+    if (!panel || !button) return;
+    const rect = button.getBoundingClientRect();
+    panel.style.top = `${Math.max(8, Math.min(window.innerHeight - panel.offsetHeight - 8, rect.bottom + 8))}px`;
+    panel.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - panel.offsetWidth - 8))}px`;
+  }
+
+  function toggleQuickPanel(button) {
+    if (document.getElementById('vortex-quick-panel')) { closeQuickPanel(); return; }
+    const panel = document.createElement('aside');
+    panel.id = 'vortex-quick-panel';
+    panel.className = 'vortex-quick-panel';
+    panel.setAttribute('aria-label', 'Быстрые настройки VortexChat');
+    panel.innerHTML = `
+      <div class="vortex-quick-heading"><strong>Быстрые настройки</strong><button type="button" data-quick-close aria-label="Закрыть">✕</button></div>
+      <label class="vortex-quick-row"><span>Тема Twitch</span><input type="checkbox" data-quick-key="themeEnabled"></label>
+      <label class="vortex-quick-row"><span>Палитра</span><select data-quick-key="themePreset"><option value="aurora">Аврора</option><option value="graphite">Графит</option><option value="orchid">Орхидея</option></select></label>
+      <label class="vortex-quick-row"><span>Плотность чата</span><select data-quick-key="chatDensity"><option value="comfortable">Обычная</option><option value="compact">Компактная</option></select></label>
+      <label class="vortex-quick-row vortex-quick-font"><span>Размер текста <output data-quick-font-value></output></span><input type="range" min="11" max="24" data-quick-key="fontSize"></label>
+      <label class="vortex-quick-row"><span>Чередование строк</span><input type="checkbox" data-quick-key="alternatingRows"></label>
+      <label class="vortex-quick-row"><span>Кнопка копирования</span><input type="checkbox" data-quick-key="showCopyButton"></label>
+      <button type="button" class="vortex-quick-all">Все настройки ↗</button>`;
+    document.body.appendChild(panel);
+    button.setAttribute('aria-expanded', 'true');
+    syncQuickPanel();
+    positionQuickPanel();
+    panel.querySelector('[data-quick-close]').addEventListener('click', closeQuickPanel);
+    panel.querySelector('.vortex-quick-all').addEventListener('click', () => { closeQuickPanel(); open7TVSettingsModal(); });
+    panel.querySelectorAll('[data-quick-key]').forEach(input => {
+      if (input.type === 'range') input.addEventListener('input', () => {
+        panel.querySelector('[data-quick-font-value]').textContent = `${input.value} px`;
+      });
+      input.addEventListener('change', () => {
+        saveSettings({ [input.dataset.quickKey]: input.type === 'checkbox' ? input.checked : input.value });
+      });
+    });
+    document.addEventListener('pointerdown', onQuickOutside, true);
+    document.addEventListener('keydown', onQuickKey, true);
+    window.addEventListener('resize', positionQuickPanel);
+  }
+
   // =========================================================================
   // 1. 7TV Icon Button in Twitch Chat Header (Opens 7TV Settings Modal)
   // =========================================================================
@@ -624,16 +731,30 @@
     btn7tv.title = 'Настройки VortexChat';
     btn7tv.setAttribute('aria-label', 'Настройки VortexChat');
     btn7tv.innerHTML = `
-      ${SEVEN_TV_LOGO_SVG}
+      ${VORTEX_LOGO_SVG.replace('width="32" height="32"', 'width="24" height="24"')}
       <span class="seventv-live-dot"></span>
     `;
     btn7tv.onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
+      closeQuickPanel();
       open7TVSettingsModal();
     };
 
     group.appendChild(btn7tv);
+    const quickButton = document.createElement('button');
+    quickButton.type = 'button';
+    quickButton.className = 'seventv-header-btn vortex-quick-button';
+    quickButton.title = 'Быстрые настройки чата';
+    quickButton.setAttribute('aria-label', 'Быстрые настройки чата');
+    quickButton.setAttribute('aria-expanded', 'false');
+    quickButton.textContent = '☷';
+    quickButton.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleQuickPanel(quickButton);
+    });
+    group.appendChild(quickButton);
     chatTools?.mountHeader(group);
     chatHeader.prepend(group);
   }
@@ -794,8 +915,9 @@
       const token = `${em.code} `;
       if (state.settings.sendOnEmoteClick || e.shiftKey) {
         sendTextToTwitchChat(token);
+        rememberEmote(em);
       } else {
-        insertTextIntoTwitchChat(token);
+        if (insertTextIntoTwitchChat(token)) rememberEmote(em);
       }
     };
 
@@ -823,6 +945,11 @@
       : [];
 
     const sections = [
+      {
+        id: 'vortex-sec-recent', title: 'Недавние', badgeHtml: '<span aria-hidden="true">◷</span>',
+        items: recentEmoteKeys.map(key => EMOTE_LIBRARY.find(em => VortexCore.favoriteKey(em) === key))
+          .filter(em => em && matchesSearch(em)), showRefresh: false, showClear: true
+      },
       {
         id: 'vortex-sec-favorites', title: 'Избранное', badgeHtml: '<span aria-hidden="true">★</span>',
         items: EMOTE_LIBRARY.filter(em => isFavorite(em) && matchesSearch(em)), showRefresh: false
@@ -858,7 +985,7 @@
     ];
 
     sections.forEach(sec => {
-      if (sec.items.length === 0 && sec.id !== 'vortex-sec-favorites') return;
+      if (sec.items.length === 0 && sec.id !== 'vortex-sec-favorites' && sec.id !== 'vortex-sec-recent') return;
 
       const secEl = document.createElement('div');
       secEl.className = 'vortex-native-section';
@@ -872,6 +999,7 @@
           <span>${escapeHTML(sec.title)}</span>
           <span style="color:#adadb8; font-weight:400; font-size:11px;">(${sec.items.length})</span>
         </div>
+        ${sec.showClear && recentEmoteKeys.length ? '<button type="button" class="vortex-native-clear-recent" title="Очистить недавние смайлы" aria-label="Очистить недавние смайлы">Очистить</button>' : ''}
         ${sec.showRefresh ? `
           <button type="button" class="vortex-native-refresh-btn" title="Обновить сет смайликов 7TV" style="background:transparent; border:none; color:#adadb8; cursor:pointer; padding:2px; display:inline-flex; align-items:center;">
             ${ICONS.refresh}
@@ -880,6 +1008,11 @@
       `;
 
       const refreshBtn = headerEl.querySelector('.vortex-native-refresh-btn');
+      headerEl.querySelector('.vortex-native-clear-recent')?.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        clearRecentEmotes();
+      });
       if (refreshBtn) {
         refreshBtn.onclick = (e) => {
           e.preventDefault();
@@ -900,7 +1033,11 @@
       if (!sec.items.length) {
         const empty = document.createElement('p');
         empty.className = 'vortex-favorites-empty';
-        empty.textContent = q ? 'Нет совпадений в избранном' : favoriteCodes.size ? 'Избранные смайлы недоступны на этом канале или провайдер выключен' : 'Правый клик по смайлу или ★ в его карточке — добавить в избранное';
+        empty.textContent = sec.id === 'vortex-sec-recent'
+          ? (q ? 'Нет совпадений среди недавних' : 'Выбранные смайлы появятся здесь')
+          : q ? 'Нет совпадений в избранном' : favoriteCodes.size
+            ? 'Избранные смайлы недоступны на этом канале или провайдер выключен'
+            : 'Правый клик по смайлу или ★ в его карточке — добавить в избранное';
         gridEl.appendChild(empty);
       }
       secEl.appendChild(gridEl);
@@ -947,6 +1084,7 @@
       navGroup.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 0; border-top:1px solid #2f2f35; border-bottom:1px solid #2f2f35; margin:2px 0;';
 
       const navItems = [
+        { targetId: 'vortex-sec-recent', title: 'Недавние смайлы', html: '<span aria-hidden="true" style="font-size:20px;">◷</span>' },
         { targetId: 'vortex-sec-favorites', title: 'Избранное', html: '<span aria-hidden="true">★</span>' },
         { targetId: 'vortex-sec-7tv-channel', title: `7TV Канал #${state.currentChannel}`, html: SEVEN_TV_LOGO_SVG },
         { targetId: 'vortex-sec-7tv-global', title: 'Глобальные 7TV', html: `<span style="font-size:10px; font-weight:900; color:#29b6f6;">7TV</span>` },
@@ -1598,7 +1736,7 @@
             ${VORTEX_LOGO_SVG}
             <div>
               <div style="font-weight:800; font-size:14px; color:#fff;">VortexChat</div>
-              <div style="font-size:10px; color:#adadb8;">VortexChat v3.5.10</div>
+              <div style="font-size:10px; color:#adadb8;">VortexChat v4.0.0</div>
             </div>
           </div>
 
@@ -1778,6 +1916,8 @@
       body.innerHTML = `
         <div class="seventv-setting-group">
           <div class="seventv-setting-row"><div><div class="seventv-setting-title">Тема VortexChat на Twitch</div><div class="seventv-setting-desc">Оформление навигации, чата, полей ввода и окон расширения. Можно выключить в любой момент.</div></div><label class="vortex-switch"><input type="checkbox" data-key="themeEnabled" ${state.settings.themeEnabled ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><label for="vortex-theme-preset">Цветовая палитра</label><select id="vortex-theme-preset" class="vortex-setting-input" data-key="themePreset"><option value="aurora">Аврора · бирюзовый и фиолетовый</option><option value="graphite">Графит · спокойный тёмный</option><option value="orchid">Орхидея · фиолетовый и розовый</option></select></div>
+          <div class="seventv-setting-row"><label for="vortex-chat-density">Плотность сообщений</label><select id="vortex-chat-density" class="vortex-setting-input" data-key="chatDensity"><option value="comfortable">Обычная</option><option value="compact">Компактная</option></select></div>
           <div class="seventv-setting-row"><div><div class="seventv-setting-title">Ambilight вокруг плеера</div><div class="seventv-setting-desc">Кнопка ✦ в плеере. Цвета берутся из текущего кадра, если браузер разрешает чтение видео.</div></div><label class="vortex-switch"><input type="checkbox" data-key="ambilightEnabled" ${state.settings.ambilightEnabled ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
           <div class="seventv-setting-row"><label for="vortex-ambilight-brightness">Яркость Ambilight</label><input id="vortex-ambilight-brightness" type="range" min="0" max="100" data-key="ambilightBrightness" value="${state.settings.ambilightBrightness}" /></div>
           <div class="seventv-setting-row"><label for="vortex-ambilight-spread">Размах свечения</label><input id="vortex-ambilight-spread" type="range" min="0" max="100" data-key="ambilightSpread" value="${state.settings.ambilightSpread}" /></div>
@@ -1824,12 +1964,10 @@
     const highlights = body.querySelector('[data-key="highlightWords"]');
     if (highlights) highlights.value = state.settings.highlightWords;
     body.querySelectorAll('[data-key]').forEach(input => {
+      if (input.type !== 'checkbox') input.value = state.settings[input.dataset.key];
       input.onchange = () => {
         const key = input.getAttribute('data-key');
-        state.settings = normalizeSettings({ ...state.settings,
-          [key]: input.type === 'checkbox' ? input.checked : input.value });
-        saveSettings();
-        applySettings();
+        saveSettings({ [key]: input.type === 'checkbox' ? input.checked : input.value });
       };
       if (input.type === 'checkbox') input.setAttribute('aria-label', input.closest('.seventv-setting-row')?.querySelector('.seventv-setting-title')?.textContent || input.dataset.key);
     });

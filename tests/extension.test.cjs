@@ -31,6 +31,14 @@ test('stored settings validate types, bound font size and migrate old settings',
   assert.equal(core.normalizeSettings({ themeEnabled: false }).themeEnabled, false);
   assert.equal(core.normalizeSettings({ ambilightResponse: -5 }).ambilightResponse, 0);
   assert.equal(core.normalizeSettings({ ambilightDimUI: 75, openClipsOverlay: false }).openClipsOverlay, false);
+  assert.equal(core.normalizeSettings({ themePreset: 'invalid', chatDensity: 'invalid' }).themePreset, 'aurora');
+  assert.equal(core.normalizeSettings({ themePreset: 'orchid', chatDensity: 'compact' }).chatDensity, 'compact');
+});
+
+test('recent emotes validate provider, deduplicate and stay bounded', () => {
+  const key = '7TV:123:TestEmote';
+  assert.deepEqual(core.normalizeRecentEmotes([key, key, 'bad', 'Twitch:1:Kappa']), [key]);
+  assert.equal(core.normalizeRecentEmotes(Array.from({ length: 30 }, (_, i) => `BTTV:${i}:Emote`)).length, 24);
 });
 
 test('highlights are literal, case insensitive and support Cyrillic phrases', () => {
@@ -125,7 +133,7 @@ function harness(fetcher, runtimeChrome) {
     window: { location: { pathname: '/' } },
     document: { readyState: 'loading', addEventListener() {}, querySelector: () => null,
       querySelectorAll: () => [], getElementById: () => null,
-      documentElement: { style: { setProperty() {} }, toggleAttribute() {} } }
+      documentElement: { dataset: {}, style: { setProperty() {} }, toggleAttribute() {} } }
   });
   let source = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
   source = source.replace(/\}\)\(\);\s*$/, `globalThis.inspect = { state, catalog, loadLiveChannelEmotes, getExtensionStatus, applySettings };\n})();`);

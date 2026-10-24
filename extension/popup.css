@@ -72,3 +72,13 @@ button:hover { background: #304566; }
 #btn-open-settings { background: linear-gradient(115deg, #277fae, #7759c7); border-color: #799bd4; color: #fff; }
 #btn-open-settings:hover { filter: brightness(1.13); }
 footer { border-color: #34415e; color: #8fa2bf; }
+.row select { min-width: 112px; max-width: 145px; padding: 5px 6px; border: 1px solid #52617b; border-radius: 6px; background: #111a29; color: #f1f5ff; font: inherit; }
+.row select:focus-visible { outline: 2px solid #77d6ff; outline-offset: 2px; }
+html[data-vortex-preset="graphite"] body { background: #15171b; }
+html[data-vortex-preset="graphite"] header { background: linear-gradient(120deg, #282b31, #353941); }
+html[data-vortex-preset="graphite"] .card { background: #22252b; border-color: #484d57; }
+html[data-vortex-preset="graphite"] #btn-open-settings { background: linear-gradient(115deg, #54777b, #626a7d); }
+html[data-vortex-preset="orchid"] body { background: #170f20; }
+html[data-vortex-preset="orchid"] header { background: linear-gradient(120deg, #2e1d41, #482745); }
+html[data-vortex-preset="orchid"] .card { background: #261c35; border-color: #58416f; }
+html[data-vortex-preset="orchid"] #btn-open-settings { background: linear-gradient(115deg, #8553ba, #b24f94); }

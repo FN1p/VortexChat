@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     toastTimer = setTimeout(() => { $('toast').textContent = ''; }, 3500);
   }
   function syncUI() {
+    document.documentElement.dataset.vortexPreset = settings.themePreset;
     document.querySelectorAll('[data-key]').forEach(input => {
       if (input.type === 'checkbox') input.checked = settings[input.dataset.key];
       else input.value = settings[input.dataset.key];
