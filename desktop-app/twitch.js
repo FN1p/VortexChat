@@ -10,6 +10,8 @@ class VortexChatDesktopClient {
     this.activeChannel = 'xqc';
     this.emotesCache = new Map();
     this.isPinned = false;
+    this.reconnectTimer = null;
+    this.pingTimer = null;
 
     this.globalBadges = {
       broadcaster: { title: 'Стример', url: 'https://static-cdn.jtvnw.net/badges/v1/5527c08c-d341-4003-9691-e2b3003c4221/2' },
@@ -56,17 +58,33 @@ class VortexChatDesktopClient {
       pinBtn?.classList.toggle('pinned', state);
     });
 
+    window.electronAPI?.onObsServerError((code) => {
+      this.showToast(`OBS-сервер недоступен: порт 5222 (${code})`);
+    });
+
     document.getElementById('btn-obs-link')?.addEventListener('click', () => {
-      const obsUrl = `http://localhost:5222/overlay?channel=${this.activeChannel}&fade=15&fontSize=16`;
+      const obsUrl = `http://127.0.0.1:5222/overlay?channel=${this.activeChannel}&fade=15&fontSize=16`;
       navigator.clipboard.writeText(obsUrl);
       this.showToast(`Ссылка OBS скопирована: ${obsUrl}`);
     });
 
+    const channelForm = document.getElementById('add-channel-form');
+    const channelInput = document.getElementById('new-channel');
     document.getElementById('btn-add-tab')?.addEventListener('click', () => {
-      const channel = prompt('Введите имя канала Twitch (например: bratishkinoff, xqc, forsen):');
-      if (channel) {
-        this.addChannel(channel.trim().toLowerCase());
+      channelForm.hidden = !channelForm.hidden;
+      if (!channelForm.hidden) channelInput.focus();
+    });
+    document.getElementById('cancel-channel')?.addEventListener('click', () => { channelForm.hidden = true; });
+    channelForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const channel = channelInput.value.trim().replace(/^#/, '').toLowerCase();
+      if (this.addChannel(channel)) {
+        channelInput.value = '';
+        channelForm.hidden = true;
       }
+    });
+    channelForm?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') channelForm.hidden = true;
     });
   }
 
@@ -86,10 +104,15 @@ class VortexChatDesktopClient {
     this.channels.forEach((chan) => {
       const tab = document.createElement('div');
       tab.className = `tab ${chan === this.activeChannel ? 'active' : ''}`;
-      tab.innerHTML = `
-        <span>#${chan}</span>
-        ${this.channels.length > 1 ? '<span class="tab-close">×</span>' : ''}
-      `;
+      const label = document.createElement('span');
+      label.textContent = `#${chan}`;
+      tab.appendChild(label);
+      if (this.channels.length > 1) {
+        const close = document.createElement('span');
+        close.className = 'tab-close';
+        close.textContent = '×';
+        tab.appendChild(close);
+      }
 
       tab.addEventListener('click', (e) => {
         if (e.target.classList.contains('tab-close')) {
@@ -107,21 +130,20 @@ class VortexChatDesktopClient {
   renderSplits() {
     const container = document.getElementById('splits-container');
     if (!container) return;
-    container.innerHTML = '';
-
     this.channels.forEach((chan) => {
+      if (document.getElementById(`split-${chan}`)) return;
       const split = document.createElement('div');
       split.className = 'chat-split';
       split.id = `split-${chan}`;
       split.innerHTML = `
         <div class="split-header">
           <span>#${chan}</span>
-          <span style="color:#10b981;font-size:11px;">● LIVE</span>
+          <span style="color:#10b981;font-size:11px;">● Чат</span>
         </div>
         <div class="messages-container" id="messages-${chan}"></div>
         <form class="chat-input-bar" id="form-${chan}">
-          <input type="text" class="chat-input" placeholder="Отправить в #${chan}..." autocomplete="off">
-          <button type="submit" class="btn-send">Чат</button>
+          <input type="text" class="chat-input" placeholder="Отправка требует входа в Twitch" autocomplete="off" disabled>
+          <button type="submit" class="btn-send" disabled title="Вход в Twitch пока не подключён">Чат</button>
         </form>
       `;
 
@@ -137,9 +159,16 @@ class VortexChatDesktopClient {
 
       container.appendChild(split);
     });
+    container.querySelectorAll('.chat-split').forEach(split => {
+      if (!this.channels.includes(split.id.slice(6))) split.remove();
+    });
   }
 
   addChannel(chan) {
+    if (!/^[a-z0-9_]{3,25}$/.test(chan)) {
+      this.showToast('Имя канала: 3–25 латинских букв, цифр или _');
+      return false;
+    }
     if (!this.channels.includes(chan)) {
       this.channels.push(chan);
       this.activeChannel = chan;
@@ -148,6 +177,7 @@ class VortexChatDesktopClient {
       this.joinChannel(chan);
       this.loadChannelEmotes(chan);
     }
+    return true;
   }
 
   removeChannel(chan) {
@@ -163,6 +193,7 @@ class VortexChatDesktopClient {
   }
 
   initTwitchIRC() {
+    clearTimeout(this.reconnectTimer);
     this.ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
 
     this.ws.onopen = () => {
@@ -175,7 +206,8 @@ class VortexChatDesktopClient {
         this.loadChannelEmotes(chan);
       });
 
-      setInterval(() => {
+      clearInterval(this.pingTimer);
+      this.pingTimer = setInterval(() => {
         if (this.ws.readyState === WebSocket.OPEN) {
           this.ws.send('PING :tmi.twitch.tv');
         }
@@ -192,7 +224,8 @@ class VortexChatDesktopClient {
     };
 
     this.ws.onclose = () => {
-      setTimeout(() => this.initTwitchIRC(), 3000);
+      clearInterval(this.pingTimer);
+      this.reconnectTimer = setTimeout(() => this.initTwitchIRC(), 3000);
     };
   }
 
@@ -203,17 +236,7 @@ class VortexChatDesktopClient {
   }
 
   sendChatMessage(chan, text) {
-    const localMsg = {
-      channel: chan,
-      username: 'You',
-      displayName: 'You',
-      color: '#06b6d4',
-      badges: [],
-      text: text,
-      timestamp: Date.now()
-    };
-    this.appendMessage(localMsg);
-    window.electronAPI?.broadcastChatMessage(localMsg);
+    this.showToast('Для отправки сообщений потребуется вход в Twitch');
   }
 
   parseIrcMessages(raw) {
@@ -314,30 +337,52 @@ class VortexChatDesktopClient {
     const time = new Date(msg.timestamp);
     const timeStr = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
 
-    let html = `<span class="msg-time">${timeStr}</span>`;
+    const timeNode = document.createElement('span');
+    timeNode.className = 'msg-time';
+    timeNode.textContent = timeStr;
+    line.appendChild(timeNode);
 
     if (msg.badges && msg.badges.length > 0) {
       msg.badges.forEach((b) => {
-        const badgeInfo = this.globalBadges[b.name] || {
-          title: b.name,
-          url: `https://static-cdn.jtvnw.net/badges/v1/${b.name}/1`
-        };
-        html += `<img class="badge-img" src="${badgeInfo.url}" alt="${badgeInfo.title}" title="${badgeInfo.title}" onerror="this.style.display='none'">`;
+        const badgeInfo = this.globalBadges[b.name];
+        if (!badgeInfo) return;
+        const image = document.createElement('img');
+        image.className = 'badge-img';
+        image.src = badgeInfo.url;
+        image.alt = badgeInfo.title;
+        image.title = badgeInfo.title;
+        image.onerror = () => { image.style.display = 'none'; };
+        line.appendChild(image);
       });
     }
 
-    html += `<span class="msg-username" style="color:${msg.color}">${msg.displayName || msg.username}</span><span class="msg-colon">:</span>`;
+    const author = document.createElement('span');
+    author.className = 'msg-username';
+    author.style.color = /^#[0-9a-fA-F]{6}$/.test(msg.color) ? msg.color : '#38bdf8';
+    author.textContent = msg.displayName || msg.username;
+    line.appendChild(author);
+    const colon = document.createElement('span');
+    colon.className = 'msg-colon';
+    colon.textContent = ':';
+    line.appendChild(colon);
 
     const words = msg.text.split(' ');
-    const parsedWords = words.map((w) => {
+    const textNode = document.createElement('span');
+    textNode.className = 'msg-text';
+    words.forEach((w, index) => {
+      if (index) textNode.appendChild(document.createTextNode(' '));
       if (this.emotesCache.has(w)) {
-        return `<img class="chat-emote" src="${this.emotesCache.get(w)}" alt="${w}" title="${w}">`;
+        const image = document.createElement('img');
+        image.className = 'chat-emote';
+        image.src = this.emotesCache.get(w);
+        image.alt = w;
+        image.title = w;
+        textNode.appendChild(image);
+      } else {
+        textNode.appendChild(document.createTextNode(w));
       }
-      return this.escapeHtml(w);
     });
-
-    html += `<span class="msg-text">${parsedWords.join(' ')}</span>`;
-    line.innerHTML = html;
+    line.appendChild(textNode);
 
     container.appendChild(line);
     container.scrollTop = container.scrollHeight;

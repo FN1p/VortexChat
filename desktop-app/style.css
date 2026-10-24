@@ -333,3 +333,22 @@ html, body {
 .toast.show {
   opacity: 1;
 }
+.add-channel-form[hidden] { display: none !important; }
+.add-channel-form {
+  position: absolute;
+  z-index: 50;
+  top: 52px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #34516b;
+  border-radius: 10px;
+  background: #151c2a;
+  box-shadow: 0 12px 30px #0008;
+}
+.add-channel-form label { white-space: nowrap; font-size: 12px; }
+.add-channel-form input { flex: 1; min-width: 80px; padding: 7px; border: 1px solid #52617c; border-radius: 6px; color: #fff; background: #0e1521; }
+.add-channel-form button { padding: 7px 9px; border: 0; border-radius: 6px; color: #fff; background: #3279a0; cursor: pointer; }

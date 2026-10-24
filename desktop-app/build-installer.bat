@@ -1,6 +1,7 @@
 @echo off
 chcp 65001 > nul
 setlocal enabledelayedexpansion
+cd /d "%~dp0"
 
 title VortexChat by PFT Studio — Windows Installer (.exe) Builder
 color 0B
@@ -22,7 +23,7 @@ if %errorlevel% neq 0 (
 )
 
 echo [STEP 1/2] Installing VortexChat dependencies via npm...
-call npm install --no-audit
+call npm ci --no-audit --no-fund
 if %errorlevel% neq 0 (
     color 0C
     echo [ERROR] npm install failed.

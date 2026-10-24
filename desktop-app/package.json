@@ -54,6 +54,7 @@
         }
       ],
       "icon": "assets/icon.ico",
+      "signAndEditExecutable": false,
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {

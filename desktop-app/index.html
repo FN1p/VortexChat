@@ -36,6 +36,13 @@
     </div>
   </header>
 
+  <form id="add-channel-form" class="add-channel-form" hidden>
+    <label for="new-channel">Канал Twitch</label>
+    <input id="new-channel" name="channel" type="text" placeholder="Например, forsen" maxlength="25" autocomplete="off" required>
+    <button type="submit">Добавить</button>
+    <button type="button" id="cancel-channel" aria-label="Закрыть">×</button>
+  </form>
+
   <!-- Основная рабочая область мульти-сплитов -->
   <main id="splits-container" class="splits-layout">
     <!-- Сплиты каналов будут монтироваться сюда -->

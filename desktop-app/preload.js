@@ -9,5 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   broadcastChatMessage: (msg) => ipcRenderer.send('broadcast-chat-message', msg),
   onAlwaysOnTopChanged: (callback) => {
     ipcRenderer.on('always-on-top-changed', (event, val) => callback(val));
+  },
+  onObsServerError: (callback) => {
+    ipcRenderer.on('obs-server-error', (event, code) => callback(code));
   }
 });

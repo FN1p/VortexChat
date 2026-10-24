@@ -8,6 +8,7 @@ const { WebSocketServer, WebSocket } = require('ws');
 let mainWindow = null;
 let tray = null;
 let isAlwaysOnTop = false;
+let obsServerError = null;
 
 // ===================================================================
 // 1. Встроенный сервер для OBS Studio (localhost:5222)
@@ -44,6 +45,13 @@ wss.on('connection', (ws) => {
 server.listen(5222, '127.0.0.1', () => {
   console.log('[OBS Server] Локальный сервер запущен: http://127.0.0.1:5222/overlay');
 });
+server.on('error', (error) => {
+  obsServerError = error.code || 'UNKNOWN';
+  console.error(`[OBS Server] Не удалось запустить порт 5222: ${error.message}`);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('obs-server-error', obsServerError);
+  }
+});
 
 // ===================================================================
 // 2. Создание главного окна приложения
@@ -61,11 +69,17 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      sandbox: true
     }
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.webContents.on('did-finish-load', () => {
+    if (obsServerError) mainWindow.webContents.send('obs-server-error', obsServerError);
+  });
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  mainWindow.webContents.on('will-navigate', (event) => event.preventDefault());
 
   mainWindow.on('close', (event) => {
     if (!app.isQuitting) {
@@ -160,7 +174,7 @@ ipcMain.on('toggle-always-on-top', (event, state) => {
 });
 
 ipcMain.on('set-window-opacity', (event, opacity) => {
-  if (mainWindow) {
+  if (mainWindow && Number.isFinite(opacity)) {
     mainWindow.setOpacity(Math.max(0.3, Math.min(1.0, opacity)));
   }
 });
