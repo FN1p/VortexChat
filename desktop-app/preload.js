@@ -12,5 +12,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   onObsServerError: (callback) => {
     ipcRenderer.on('obs-server-error', (event, code) => callback(code));
-  }
+  },
+  getTwitchAuth: () => ipcRenderer.invoke('get-twitch-auth'),
+  startTwitchLogin: (clientId) => ipcRenderer.invoke('start-twitch-login', clientId),
+  logoutTwitch: () => ipcRenderer.invoke('logout-twitch'),
+  sendTwitchMessage: (channel, message) => ipcRenderer.invoke('send-twitch-message', channel, message),
+  fetchEmoteProvider: (url) => ipcRenderer.invoke('fetch-emote-provider', url),
+  copyText: (value) => ipcRenderer.invoke('copy-text', value),
+  onTwitchAuthChanged: (callback) => ipcRenderer.on('auth-changed', (_event, status) => callback(status)),
+  onTwitchAuthError: (callback) => ipcRenderer.on('auth-error', (_event, message) => callback(message))
 });

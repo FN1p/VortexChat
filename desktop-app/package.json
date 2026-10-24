@@ -1,7 +1,7 @@
 {
   "name": "vortexchat",
   "productName": "VortexChat",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "VortexChat standalone desktop chat client with integrated OBS Studio overlay server by PFT Studio",
   "main": "main.js",
   "author": {
@@ -27,6 +27,8 @@
     },
     "files": [
       "main.js",
+      "auth.js",
+      "provider.js",
       "preload.js",
       "index.html",
       "style.css",
@@ -68,10 +70,10 @@
       "uninstallDisplayName": "VortexChat by PFT Studio",
       "runAfterFinish": true,
       "deleteAppDataOnUninstall": false,
-      "artifactName": "${productName}-Setup.${ext}"
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "portable": {
-      "artifactName": "${productName}-Portable.${ext}"
+      "artifactName": "${productName}-Portable-${version}.${ext}"
     }
   },
   "dependencies": {

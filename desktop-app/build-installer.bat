@@ -32,7 +32,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [STEP 2/2] Building VortexChat-Setup.exe and VortexChat-Portable.exe...
+echo [STEP 2/2] Building versioned Setup and Portable EXE files...
 call npm run dist
 if %errorlevel% neq 0 (
     color 0C
@@ -47,8 +47,8 @@ echo ===========================================================================
 echo                VORTEXCHAT BUILD FINISHED SUCCESSFULLY!
 echo ==============================================================================
 echo   Output files in dist/:
-echo     - VortexChat-Setup.exe    (NSIS Windows Installer)
-echo     - VortexChat-Portable.exe (Standalone Portable)
+echo     - VortexChat-Setup-*.exe    (NSIS Windows Installer)
+echo     - VortexChat-Portable-*.exe (Standalone Portable)
 echo ==============================================================================
 
 if exist "%~dp0dist" (

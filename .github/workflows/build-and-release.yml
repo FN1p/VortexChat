@@ -31,6 +31,9 @@ jobs:
         working-directory: ./desktop-app
         run: npm ci
 
+      - name: Check Desktop Logic
+        run: node --test tests/desktop-auth.test.cjs tests/desktop-provider.test.cjs
+
       - name: Compile Windows Installer & Portable Executables
         working-directory: ./desktop-app
         run: npm run dist
@@ -47,8 +50,8 @@ jobs:
         with:
           name: VortexChat-Release-Bundle
           path: |
-            desktop-app/dist/VortexChat-Setup.exe
-            desktop-app/dist/VortexChat-Portable.exe
+            desktop-app/dist/VortexChat-Setup-*.exe
+            desktop-app/dist/VortexChat-Portable-*.exe
             desktop-app/dist/VortexChat-7TV-Extension.zip
 
       - name: Create GitHub Release
@@ -56,8 +59,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            desktop-app/dist/VortexChat-Setup.exe
-            desktop-app/dist/VortexChat-Portable.exe
+            desktop-app/dist/VortexChat-Setup-*.exe
+            desktop-app/dist/VortexChat-Portable-*.exe
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
@@ -66,8 +69,8 @@ jobs:
             Официальный релиз настольного чат-клиента **VortexChat** для Twitch со встроенным локальным сервером **OBS Studio (:5222)** и браузерного расширения **VortexChat (7TV v3 Extension)**.
 
             ### 📦 Загрузки для Windows 10 / 11 (x64):
-            - **`VortexChat-Setup.exe`** — Мастер установки NSIS (создаёт ярлыки на Рабочем столе и в меню «Пуск»).
-            - **`VortexChat-Portable.exe`** — Автономная переносная версия без необходимости установки.
+            - **`VortexChat-Setup-*.exe`** — Мастер установки NSIS (создаёт ярлыки на Рабочем столе и в меню «Пуск»).
+            - **`VortexChat-Portable-*.exe`** — Автономная переносная версия без необходимости установки.
 
             ### 🧩 Браузерное расширение `VortexChat-7TV-Extension.zip` (Manifest V3):
             - Нативное встраивание смайлов **7TV v3 / BetterTTV / FrankerFaceZ** прямо в стандартное меню смайликов Twitch (5 колонок + категории справа).

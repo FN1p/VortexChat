@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src wss://irc-ws.chat.twitch.tv:443">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VortexChat by PFT Studio</title>
   <link rel="stylesheet" href="style.css">
@@ -13,7 +14,6 @@
       <div class="app-logo">
         <span style="color:#06b6d4;font-size:16px;font-weight:900;">⚡</span>
         <span class="app-title">Vortex<span class="plus-accent" style="color:#06b6d4;">Chat</span></span>
-        <span style="font-size:9px;color:#888;margin-left:4px;">by PFT Studio</span>
       </div>
       
       <!-- Вкладки каналов -->
@@ -26,6 +26,7 @@
 
     <!-- Системные действия и контролы окна -->
     <div class="window-controls">
+      <button id="btn-account" class="ctrl-btn account-btn" title="Вход в Twitch">Войти</button>
       <button id="btn-obs-link" class="ctrl-btn obs-btn" title="Скопировать ссылку OBS Studio">
         <span class="obs-dot"></span> OBS
       </button>
@@ -43,6 +44,13 @@
     <button type="button" id="cancel-channel" aria-label="Закрыть">×</button>
   </form>
 
+  <nav class="chat-toolbar" aria-label="Инструменты чата">
+    <span id="connection-status" class="connection-status">● Подключение…</span>
+    <input id="chat-search" type="search" placeholder="Поиск в сообщениях" aria-label="Поиск в сообщениях">
+    <button id="btn-pause" type="button" title="Пауза прокрутки">Пауза</button>
+    <button id="btn-settings" type="button" title="Настройки чата">⚙</button>
+  </nav>
+
   <!-- Основная рабочая область мульти-сплитов -->
   <main id="splits-container" class="splits-layout">
     <!-- Сплиты каналов будут монтироваться сюда -->
@@ -50,6 +58,34 @@
 
   <!-- Всплывающее уведомление о копировании -->
   <div id="toast" class="toast">Ссылка для OBS скопирована!</div>
+
+  <dialog id="account-dialog" class="app-dialog">
+    <form method="dialog" class="dialog-heading"><strong>Вход в Twitch</strong><button aria-label="Закрыть">×</button></form>
+    <p id="account-info">Чтобы отправлять сообщения, нужен Client ID вашего приложения Twitch.</p>
+    <label for="client-id">Twitch Client ID</label>
+    <input id="client-id" type="text" autocomplete="off" spellcheck="false" placeholder="Client ID из Developer Console">
+    <button id="btn-login" type="button" class="primary-button">Получить код входа</button>
+    <p id="device-code" class="device-code" hidden></p>
+    <button id="btn-logout" type="button" hidden>Выйти из Twitch</button>
+  </dialog>
+
+  <dialog id="settings-dialog" class="app-dialog">
+    <form method="dialog" class="dialog-heading"><strong>Настройки чата</strong><button aria-label="Закрыть">×</button></form>
+    <label for="setting-theme">Палитра</label>
+    <select id="setting-theme"><option value="aurora">Аврора</option><option value="graphite">Графит</option><option value="orchid">Орхидея</option></select>
+    <label for="setting-font">Размер текста <output id="setting-font-value">13 px</output></label>
+    <input id="setting-font" type="range" min="11" max="22" value="13">
+    <label class="setting-check"><input id="setting-compact" type="checkbox"> Компактные сообщения</label>
+    <label class="setting-check"><input id="setting-timestamps" type="checkbox" checked> Показывать время</label>
+    <label for="setting-highlights">Подсветить слова или ники (через запятую)</label>
+    <input id="setting-highlights" type="text" maxlength="300" placeholder="Например, FN1p, привет">
+    <p class="settings-help">Каналы и эти настройки сохраняются на этом компьютере.</p>
+  </dialog>
+
+  <dialog id="user-dialog" class="app-dialog user-dialog">
+    <form method="dialog" class="dialog-heading"><strong id="user-dialog-name">Зритель</strong><button aria-label="Закрыть">×</button></form>
+    <div id="user-dialog-history"></div>
+  </dialog>
 
   <script src="twitch.js"></script>
 </body>

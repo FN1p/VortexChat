@@ -1,14 +1,17 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, shell, safeStorage, clipboard } = require('electron');
 const path = require('path');
 const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const { WebSocketServer, WebSocket } = require('ws');
+const { TwitchAuth } = require('./auth');
+const { fetchProviderJson } = require('./provider');
 
 let mainWindow = null;
 let tray = null;
 let isAlwaysOnTop = false;
 let obsServerError = null;
+let twitchAuth = null;
 
 // ===================================================================
 // 1. Встроенный сервер для OBS Studio (localhost:5222)
@@ -188,7 +191,28 @@ ipcMain.on('broadcast-chat-message', (event, messageData) => {
   });
 });
 
+ipcMain.handle('get-twitch-auth', () => twitchAuth?.status() || { connected: false, login: '', clientId: '' });
+ipcMain.handle('start-twitch-login', async (_event, clientId) => {
+  const challenge = await twitchAuth.startDeviceLogin(clientId);
+  await shell.openExternal(challenge.url);
+  return challenge;
+});
+ipcMain.handle('logout-twitch', () => { twitchAuth.logout(); return twitchAuth.status(); });
+ipcMain.handle('send-twitch-message', (_event, channel, message) => twitchAuth.sendMessage(channel, message));
+ipcMain.handle('fetch-emote-provider', (_event, url) => fetchProviderJson(url));
+ipcMain.handle('copy-text', (_event, value) => {
+  if (typeof value !== 'string' || value.length > 20000) return false;
+  clipboard.writeText(value);
+  return true;
+});
+
 app.whenReady().then(() => {
+  twitchAuth = new TwitchAuth({ directory: app.getPath('userData'), safeStorage,
+    notify: (name, payload) => {
+      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send(name, payload);
+    } });
+  twitchAuth.validate();
+  setInterval(() => twitchAuth.validate(), 60 * 60 * 1000).unref();
   createWindow();
   try {
     createTray();
