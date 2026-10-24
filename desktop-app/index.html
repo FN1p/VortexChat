@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VortexChat by PFT Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Безрамочный заголовок VortexChat -->
+  <header id="titlebar">
+    <div class="drag-region">
+      <div class="app-logo">
+        <span style="color:#06b6d4;font-size:16px;font-weight:900;">⚡</span>
+        <span class="app-title">Vortex<span class="plus-accent" style="color:#06b6d4;">Chat</span></span>
+        <span style="font-size:9px;color:#888;margin-left:4px;">by PFT Studio</span>
+      </div>
+      
+      <!-- Вкладки каналов -->
+      <div id="channel-tabs" class="tabs-container">
+        <!-- Генерируются динамически через twitch.js -->
+      </div>
+      
+      <button id="btn-add-tab" class="btn-tab-add" title="Добавить канал">+</button>
+    </div>
+
+    <!-- Системные действия и контролы окна -->
+    <div class="window-controls">
+      <button id="btn-obs-link" class="ctrl-btn obs-btn" title="Скопировать ссылку OBS Studio">
+        <span class="obs-dot"></span> OBS
+      </button>
+      <button id="btn-pin" class="ctrl-btn" title="Поверх всех окон (Always on Top)">📌</button>
+      <button id="btn-minimize" class="ctrl-btn" title="Свернуть">—</button>
+      <button id="btn-maximize" class="ctrl-btn" title="Развернуть">▢</button>
+      <button id="btn-close" class="ctrl-btn close-btn" title="Закрыть">✕</button>
+    </div>
+  </header>
+
+  <!-- Основная рабочая область мульти-сплитов -->
+  <main id="splits-container" class="splits-layout">
+    <!-- Сплиты каналов будут монтироваться сюда -->
+  </main>
+
+  <!-- Всплывающее уведомление о копировании -->
+  <div id="toast" class="toast">Ссылка для OBS скопирована!</div>
+
+  <script src="twitch.js"></script>
+</body>
+</html>

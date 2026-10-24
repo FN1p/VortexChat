@@ -1,0 +1,74 @@
+{
+  "manifest_version": 3,
+  "name": "VortexChat — Twitch Chat",
+  "author": "PFT Studio",
+  "version": "3.5.10",
+  "description": "Чат Twitch: 7TV, BTTV и FFZ, пауза чтения, история пользователей, избранные смайлы, подсветка слов и перенос настроек.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "*://*.twitch.tv/*",
+    "https://gql.twitch.tv/*",
+    "https://*.7tv.app/*",
+    "https://*.7tv.io/*",
+    "https://api.ivr.fi/*",
+    "https://api.betterttv.net/*",
+    "https://cdn.betterttv.net/*",
+    "https://api.frankerfacez.com/*",
+    "https://cdn.frankerfacez.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.twitch.tv/*"
+      ],
+      "js": [
+        "page-bridge.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://*.twitch.tv/*"
+      ],
+      "js": [
+        "core.js",
+        "chat-tools.js",
+        "content.js",
+        "media.js"
+      ],
+      "css": [
+        "content.css",
+        "media.css",
+        "theme.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*",
+        "page-bridge.js"
+      ],
+      "matches": [
+        "*://*.twitch.tv/*"
+      ]
+    }
+  ]
+}

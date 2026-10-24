@@ -1,0 +1,608 @@
+/**
+ * 7TV v3 (VortexChat Edition) — Content Script Styles for Twitch.tv
+ * 1:1 Authentic 7TV Web Extension UI, Native Emote Picker Integration, Tooltips, Emote Cards & Settings
+ */
+
+/* 1. 7TV Chat Header Icon Button (Native Twitch Icon Button Style) */
+.vortex-header-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 4px;
+}
+
+.seventv-header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  color: #efeff1;
+  cursor: pointer;
+  transition: background-color 0.12s ease, transform 0.1s ease;
+  position: relative;
+}
+
+.seventv-header-btn:hover {
+  background-color: rgba(255, 255, 255, 0.13);
+}
+
+.seventv-header-btn .seventv-live-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #29b6f6;
+  box-shadow: 0 0 6px #29b6f6;
+}
+
+/* 2. In-Chat 7TV / BTTV / FFZ Emotes & Zero-Width Stacking */
+.vortex-chat-emote {
+  height: calc(var(--vortex-chat-font-size, 13px) * 2.15);
+  width: auto;
+  vertical-align: middle;
+  margin: -4px var(--vortex-emote-gap, 2px);
+  display: inline-block;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+/* Only actual chat messages receive reading styles. */
+.vortex-chat-line { font-size: var(--vortex-chat-font-size, 13px) !important; line-height: 1.4; }
+[data-vortex-message-spacing] .vortex-chat-line { padding-block: var(--vortex-message-gap, 0px) !important; }
+.vortex-chat-speed { margin-right: 4px; color: #adadb8; font: 11px/1.3 "Segoe UI", sans-serif; white-space: nowrap; }
+.vortex-chat-line.vortex-highlight-line { background: rgba(41, 182, 246, .16) !important; box-shadow: inset 3px 0 #29b6f6; }
+.vortex-chat-line.vortex-duplicate-line { display: none !important; }
+.vortex-message-time { color: var(--color-text-alt-2, #adadb8); font-size: .8em; margin-right: 7px; font-variant-numeric: tabular-nums; }
+.vortex-setting-input { background: #18181b; color: #efeff1; border: 1px solid #53535f; border-radius: 5px; padding: 7px; font: inherit; }
+.vortex-setting-input:focus-visible { outline: 2px solid #29b6f6; outline-offset: 2px; }
+.seventv-header-btn .seventv-live-dot[data-connected="false"] { background: #72727e; box-shadow: none; }
+
+/* Session history and a frozen reading viewport, independent of Twitch's live DOM. */
+.vortex-user-history-button { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin: 0 4px 0 1px; padding: 0; color: inherit; opacity: .5; border: 0; border-radius: 4px; background: transparent; cursor: pointer; font: 14px/1 sans-serif; vertical-align: middle; }
+.vortex-user-history-button:hover, .vortex-user-history-button:focus-visible { opacity: 1; background: rgba(128,128,128,.2); outline: 2px solid #29b6f6; }
+.vortex-paused-view { position: fixed; z-index: 9000; display: flex; flex-direction: column; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(41,182,246,.5); font-family: inherit; }
+.vortex-paused-scroll { overflow: auto; flex: 1; min-height: 0; overscroll-behavior: contain; scrollbar-width: thin; padding: 0 1px; }
+.vortex-pause-toolbar { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; color: #efeff1; background: #20202b; border-top: 1px solid #414157; font: 12px/1.4 "Segoe UI", sans-serif; }
+.vortex-tool-button { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #414151; border-radius: 6px; background: #292935; color: #efeff1; padding: 7px 10px; cursor: pointer; font: 12px/1.3 "Segoe UI", sans-serif; text-decoration: none; }
+.vortex-tool-button:hover { background: #383849; color: #fff; }
+.vortex-tool-button:disabled { opacity: .4; cursor: default; }
+.vortex-tool-button:focus-visible, .vortex-user-card input:focus-visible { outline: 2px solid #77d6ff; outline-offset: 2px; }
+.vortex-user-card-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,.65); z-index: 10000000; }
+.vortex-user-card { width: 500px; max-width: 100%; max-height: 85vh; display: flex; flex-direction: column; padding: 20px; border: 1px solid #3b3b4b; border-radius: 12px; background: #18181f; color: #ededf2; box-shadow: 0 20px 80px rgba(0,0,0,.55); font: 13px/1.5 "Segoe UI", sans-serif; }
+.vortex-user-card header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.vortex-user-card h2 { margin: 0; font-size: 19px; overflow-wrap: anywhere; }
+.vortex-history-note { margin: 10px 0; color: #a7a7b8; font-size: 11px; }
+.vortex-user-actions { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.vortex-user-card input { width: 100%; border: 1px solid #414151; border-radius: 6px; padding: 9px 11px; background: #101014; color: #efeff1; font: inherit; }
+.vortex-history-list { overflow: auto; min-height: 60px; overscroll-behavior: contain; scrollbar-width: thin; }
+.vortex-history-message { padding: 12px 0; border-top: 1px solid #30303e; }
+.vortex-history-message time { color: #9393a8; font-size: 10px; font-variant-numeric: tabular-nums; }
+.vortex-history-message p { margin: 5px 0; white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; }
+.vortex-history-copy { border: 0; padding: 2px 0; background: transparent; color: #77d6ff; cursor: pointer; font: 11px/1.4 inherit; }
+.vortex-history-empty { color: #a7a7b8; margin: 12px 0; }
+.vortex-native-emote-btn[data-favorite="true"]::after { content: "★"; position: absolute; bottom: 0; right: 1px; color: #ffd97a; font-size: 10px; text-shadow: 0 1px 3px #000; pointer-events: none; }
+.vortex-favorites-empty { grid-column: 1 / -1; margin: 3px 0 10px; color: #adadb8; font-size: 11px; line-height: 1.5; }
+
+.vortex-zw-stack {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  margin: -4px var(--vortex-emote-gap, 2px);
+}
+
+.vortex-zw-stack > .vortex-chat-emote {
+  margin: 0;
+}
+
+.vortex-zw-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 3. 7TV Emote Hover Tooltip */
+.vortex-emote-tooltip {
+  position: fixed;
+  z-index: 9999999;
+  background: #18181b;
+  border: 1px solid #2f2f35;
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  font-family: Inter, Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-width: 120px;
+}
+
+.vortex-emote-tooltip img {
+  max-width: 96px;
+  max-height: 76px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 2px;
+}
+
+.vortex-emote-tooltip-code {
+  font-size: 13px;
+  font-weight: 700;
+  color: #efeff1;
+}
+
+.vortex-emote-tooltip-author {
+  font-size: 11px;
+  color: #adadb8;
+}
+
+.vortex-emote-tooltip-provider {
+  font-size: 10px;
+  font-weight: 700;
+  color: #29b6f6;
+  background: rgba(41, 182, 246, 0.14);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+/* 4. Native Twitch Emote Picker Integration (5-Column Seamless Grid + Right Sidebar) */
+.vortex-7tv-native-sections {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 10px;
+  font-family: Inter, Roobert, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #efeff1;
+}
+
+.vortex-native-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
+  margin-top: 6px;
+}
+
+.vortex-native-sec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 0 2px;
+  user-select: none;
+}
+
+.vortex-native-sec-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #adadb8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.vortex-native-emote-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding-bottom: 6px;
+}
+
+.vortex-native-emote-btn {
+  position: relative;
+  height: 36px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  user-select: none;
+}
+
+.vortex-native-emote-btn:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.vortex-native-emote-btn img {
+  max-height: 28px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.vortex-native-zw-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #29b6f6;
+  pointer-events: none;
+}
+
+.vortex-native-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #18181b;
+  border-top: 1px solid #2f2f35;
+  height: 40px;
+  box-sizing: border-box;
+  font-family: Inter, Roobert, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #efeff1;
+  flex-shrink: 0;
+}
+
+.vortex-native-bottom-bar-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.vortex-native-bottom-bar-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.vortex-native-bottom-bar-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #efeff1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vortex-native-bottom-bar-sub {
+  font-size: 10px;
+  color: #adadb8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vortex-native-nav-btn {
+  width: 30px;
+  height: 30px;
+  margin: 2px auto;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  color: #adadb8;
+  font-size: 9px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.vortex-native-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* 5. 7TV Emote Card Modal (Clicked Emote in Chat) */
+.seventv-card-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seventv-emote-card {
+  width: 380px;
+  background: #18181b;
+  border: 1px solid #2f2f35;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+  font-family: Inter, Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #efeff1;
+}
+
+.seventv-card-header {
+  padding: 10px 14px;
+  background: #1f1f23;
+  border-bottom: 1px solid #2f2f35;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.seventv-card-sizes {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 16px;
+  padding: 18px 14px;
+  background: #0e0e10;
+  border-bottom: 1px solid #26262c;
+}
+
+.seventv-size-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.seventv-size-label {
+  font-size: 10px;
+  color: #adadb8;
+  font-family: monospace;
+}
+
+/* 6. 7TV Settings Modal (1:1 7TV v3 Settings Window) */
+.seventv-settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seventv-settings-modal {
+  width: 720px;
+  max-width: 95vw;
+  height: 500px;
+  max-height: 88vh;
+  background: #18181b;
+  border: 1px solid #2f2f35;
+  border-radius: 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+  display: flex;
+  overflow: hidden;
+  font-family: Inter, Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #efeff1;
+}
+
+.seventv-settings-sidebar {
+  width: 210px;
+  background: #141417;
+  border-right: 1px solid #26262c;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px;
+  flex-shrink: 0;
+}
+
+.seventv-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 14px;
+  border-bottom: 1px solid #26262c;
+  margin-bottom: 10px;
+}
+
+.seventv-nav-btn {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #adadb8;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  transition: background 0.12s, color 0.12s;
+}
+
+.seventv-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #efeff1;
+}
+
+.seventv-nav-btn.active {
+  background: rgba(41, 182, 246, 0.15);
+  color: #29b6f6;
+  font-weight: 700;
+}
+
+.seventv-settings-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.seventv-main-header {
+  padding: 14px 20px;
+  background: #18181b;
+  border-bottom: 1px solid #26262c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.seventv-main-body {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.seventv-setting-group {
+  background: #1f1f23;
+  border: 1px solid #2b2b33;
+  border-radius: 6px;
+  padding: 4px 14px;
+  margin-bottom: 14px;
+}
+
+.seventv-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #2b2b33;
+  gap: 12px;
+}
+
+.seventv-setting-row:last-child {
+  border-bottom: none;
+}
+
+.seventv-setting-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #efeff1;
+}
+
+.seventv-setting-desc {
+  font-size: 11px;
+  color: #adadb8;
+  margin-top: 2px;
+}
+
+/* EventAPI notices, alternating rows and repeat badges */
+.vortex-alt-row-even {
+  background-color: rgba(255, 255, 255, 0.028) !important;
+}
+
+.vortex-repeat-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(41, 182, 246, 0.18);
+  border: 1px solid rgba(41, 182, 246, 0.45);
+  color: #29b6f6;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: monospace;
+  vertical-align: middle;
+}
+
+.vortex-7tv-event-line {
+  margin: 4px 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background: rgba(41, 182, 246, 0.1);
+  border-left: 3px solid #29b6f6;
+  font-size: 11.5px;
+  color: #efeff1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Switch Toggle */
+.vortex-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.vortex-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.vortex-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #323239;
+  transition: .18s;
+  border-radius: 20px;
+}
+
+.vortex-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .18s;
+  border-radius: 50%;
+}
+
+input:checked + .vortex-slider {
+  background-color: #29b6f6;
+}
+
+input:checked + .vortex-slider:before {
+  transform: translateX(16px);
+}
+
+/* Toast */
+.vortex-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #18181b;
+  color: #efeff1;
+  border: 1px solid #29b6f6;
+  padding: 9px 14px;
+  border-radius: 6px;
+  font-family: Inter, Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85);
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vortex-zw-stack:focus-visible { outline: 2px solid #77d6ff; outline-offset: 2px; border-radius: 3px; }
+
+.vortex-message-copy { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin: 0 0 0 2px; padding: 0; vertical-align: middle; background: transparent; color: inherit; border: 0; border-radius: 3px; opacity: .4; cursor: pointer; font: 12px/1 sans-serif; }
+.vortex-message-copy[hidden] { display: none; }
+.vortex-message-copy:hover, .vortex-message-copy:focus-visible { opacity: 1; outline: 2px solid #77d6ff; }
+.vortex-chat-mention { display: inline; padding: 0; border: 0; background: none; color: #bf94ff; font: inherit; line-height: inherit; cursor: pointer; }
+.vortex-chat-mention:hover { text-decoration: underline; }
+.vortex-chat-mention:focus-visible { outline: 2px solid #77d6ff; outline-offset: 2px; border-radius: 2px; }
+.vortex-chat-line .mention-fragment, .vortex-chat-line [data-a-target="chat-message-mention"] { cursor: pointer; }
+.vortex-chat-line .mention-fragment:hover, .vortex-chat-line [data-a-target="chat-message-mention"]:hover { text-decoration: underline; }
+.vortex-ac-hint { flex: 0 0 auto; color: #aab6cc; font: 10px/1.2 "Segoe UI", sans-serif; white-space: nowrap; padding: 0 4px; }
+.vortex-user-card, .seventv-settings-modal, .seventv-emote-card { color-scheme: dark; }
+.vortex-history-copy { font-family: inherit; font-size: 11px; line-height: 1.4; }

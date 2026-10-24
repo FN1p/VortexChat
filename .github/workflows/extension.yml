@@ -1,0 +1,32 @@
+name: Browser extension checks and package
+
+on:
+  push:
+    paths: ['extension/**', 'tests/**', '.github/workflows/extension.yml']
+  pull_request:
+    paths: ['extension/**', 'tests/**', '.github/workflows/extension.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check scripts
+        run: |
+          for file in extension/*.js; do node --check "$file"; done
+      - name: Run regression tests
+        run: node --test tests/extension.test.cjs
+      - name: Package extension independently of desktop app
+        working-directory: extension
+        run: zip -r ../VortexChat-Extension.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VortexChat-Extension
+          path: VortexChat-Extension.zip

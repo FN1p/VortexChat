@@ -1,0 +1,80 @@
+name: Build and Release VortexChat Windows Executables & 7TV Extension
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'desktop-app/package.json'
+
+      - name: Install Desktop Dependencies
+        working-directory: ./desktop-app
+        run: npm ci
+
+      - name: Compile Windows Installer & Portable Executables
+        working-directory: ./desktop-app
+        run: npm run dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package VortexChat (7TV v3) Browser Extension (.zip)
+        shell: pwsh
+        run: |
+          Compress-Archive -Path ./extension/* -DestinationPath ./desktop-app/dist/VortexChat-7TV-Extension.zip -Force
+
+      - name: Upload Build Artifacts (.exe + Extension .zip)
+        uses: actions/upload-artifact@v4
+        with:
+          name: VortexChat-Release-Bundle
+          path: |
+            desktop-app/dist/VortexChat-Setup.exe
+            desktop-app/dist/VortexChat-Portable.exe
+            desktop-app/dist/VortexChat-7TV-Extension.zip
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            desktop-app/dist/VortexChat-Setup.exe
+            desktop-app/dist/VortexChat-Portable.exe
+            desktop-app/dist/VortexChat-7TV-Extension.zip
+          name: VortexChat ${{ github.ref_name }} (PFT Studio)
+          body: |
+            ## ⚡ VortexChat Release by PFT Studio
+
+            Официальный релиз настольного чат-клиента **VortexChat** для Twitch со встроенным локальным сервером **OBS Studio (:5222)** и браузерного расширения **VortexChat (7TV v3 Extension)**.
+
+            ### 📦 Загрузки для Windows 10 / 11 (x64):
+            - **`VortexChat-Setup.exe`** — Мастер установки NSIS (создаёт ярлыки на Рабочем столе и в меню «Пуск»).
+            - **`VortexChat-Portable.exe`** — Автономная переносная версия без необходимости установки.
+
+            ### 🧩 Браузерное расширение `VortexChat-7TV-Extension.zip` (Manifest V3):
+            - Нативное встраивание смайлов **7TV v3 / BetterTTV / FrankerFaceZ** прямо в стандартное меню смайликов Twitch (5 колонок + категории справа).
+            - Мост **React Fiber / Slate.js** (`page-bridge.js`) для мгновенной вставки смайликов в чат.
+            - Наложение слоёв **Zero-Width**, живая синхронизация **7TV EventAPI v3 WebSocket**, тултип 4x, карточка смайла `1x/2x/3x/4x` и автодополнение по `Tab`.
+            - Устанавливается через распаковку архива и выбор папки в `chrome://extensions` (включив «Режим разработчика»).
+
+            Разработано студией **PFT Studio**.
+          draft: false
+          prerelease: false

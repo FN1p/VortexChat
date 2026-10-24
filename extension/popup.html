@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="color-scheme" content="dark" />
+  <title>VortexChat</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div class="brand"><img src="icons/icon48.png" alt="" width="34" height="34" /><div><h1>VortexChat <span id="version"></span></h1><p>Твой чат. Твой ритм.</p></div></div>
+    <div class="channel"><strong id="detected-channel">Подключение…</strong><span id="connection-state" data-connected="false">Проверка связи</span></div>
+    <p id="emote-status" aria-live="polite">Проверка активной вкладки…</p>
+  </header>
+  <main>
+    <section aria-labelledby="reading-heading">
+      <h2 id="reading-heading">Удобство чтения</h2>
+      <div class="card">
+        <div class="font-row"><label for="font-size">Размер текста</label><output id="font-size-value" for="font-size">13 px</output></div>
+        <input type="range" id="font-size" data-key="fontSize" min="11" max="24" value="13" />
+        <label class="row"><span>Отступ сообщений</span><input type="number" data-key="messageGap" min="0" max="12" value="0" /></label>
+        <label class="row"><span>Отступ смайлов</span><input type="number" data-key="emoteGap" min="0" max="8" value="2" /></label>
+        <label class="row"><span>Скорость чата в шапке</span><input type="checkbox" data-key="showChatSpeed" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Кнопка копирования сообщений</span><input type="checkbox" data-key="showCopyButton" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Время сообщений<small>Время появления в расширении</small></span><input type="checkbox" data-key="showTimestamps" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Чередование фона строк</span><input type="checkbox" data-key="alternatingRows" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Пауза при наведении<small>Ручная пауза — кнопкой Ⅱ в шапке чата</small></span><input type="checkbox" data-key="pauseOnHover" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Группировать повторы<small>Одинаковые сообщения одного автора подряд</small></span><input type="checkbox" data-key="collapseSpam" /><span class="switch" aria-hidden="true"></span></label>
+        <div class="highlight-field"><label for="highlight-words">Подсветка слов и упоминаний</label><input id="highlight-words" data-key="highlightWords" maxlength="500" placeholder="твой ник, слово, фраза" /><small>Через запятую · без учёта регистра</small></div>
+      </div>
+    </section>
+    <section aria-labelledby="emote-heading">
+      <h2 id="emote-heading">Смайлы и ввод</h2>
+      <div class="card">
+        <label class="row"><span>7TV</span><input type="checkbox" data-key="enable7TV" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>BetterTTV</span><input type="checkbox" data-key="enableBTTV" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>FrankerFaceZ</span><input type="checkbox" data-key="enableFFZ" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Наложение Zero-Width</span><input type="checkbox" data-key="enableZeroWidth" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Автодополнение по Tab<small>Enter отправляет сообщение как обычно</small></span><input type="checkbox" data-key="enableAutocomplete" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Уведомления об изменении сета</span><input type="checkbox" data-key="showEventNotices" /><span class="switch" aria-hidden="true"></span></label>
+      </div>
+    </section>
+    <section aria-labelledby="media-heading">
+      <h2 id="media-heading">Видео и клипы</h2>
+      <div class="card">
+        <label class="row"><span>Тема VortexChat на Twitch</span><input type="checkbox" data-key="themeEnabled" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Ambilight</span><input type="checkbox" data-key="ambilightEnabled" /><span class="switch" aria-hidden="true"></span></label>
+        <div class="font-row"><label for="ambilight-brightness">Яркость</label><output id="ambilight-brightness-value" for="ambilight-brightness">70%</output></div>
+        <input type="range" id="ambilight-brightness" data-key="ambilightBrightness" min="0" max="100" value="70" />
+        <div class="font-row"><label for="ambilight-spread">Размах свечения</label><output id="ambilight-spread-value" for="ambilight-spread">65%</output></div>
+        <input type="range" id="ambilight-spread" data-key="ambilightSpread" min="0" max="100" value="65" />
+        <label class="row"><span>Клипы поверх страницы</span><input type="checkbox" data-key="openClipsOverlay" /><span class="switch" aria-hidden="true"></span></label>
+      </div>
+    </section>
+    <div class="actions"><button id="btn-open-settings" disabled>Все настройки</button><button id="btn-reload-emotes" disabled>Обновить смайлы</button></div>
+    <div class="actions backup-actions"><button id="btn-export">Экспорт настроек</button><button id="btn-import">Импорт настроек</button></div>
+    <input id="backup-file" type="file" accept=".json,application/json" hidden aria-label="Файл настроек VortexChat" />
+    <p id="toast" role="status" aria-live="polite"></p>
+  </main>
+  <footer><span>PFT Studio</span><span>Twitch · 7TV · BTTV · FFZ</span></footer>
+  <script src="core.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

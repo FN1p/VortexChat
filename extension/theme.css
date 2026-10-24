@@ -1,0 +1,109 @@
+/* VortexChat visual layer: paint only, without changing Twitch's layout or video tree. */
+html[data-vortex-theme] {
+  --vortex-surface: #111722;
+  --vortex-panel: #171d2a;
+  --vortex-panel-raised: #20283a;
+  --vortex-edge: #35415b;
+  --vortex-accent: #55d9f8;
+  --vortex-accent-2: #a68aff;
+  --vortex-muted: #aab6cc;
+}
+
+html[data-vortex-theme] body { background-color: #0c111b; }
+html[data-vortex-theme] .top-nav {
+  background: linear-gradient(105deg, #161b2a 0%, #172238 60%, #211b36 100%) !important;
+  border-bottom: 1px solid var(--vortex-edge);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .24);
+}
+html[data-vortex-theme] .side-nav {
+  background: linear-gradient(180deg, #141b29, #111722 68%) !important;
+  border-right: 1px solid var(--vortex-edge);
+}
+html[data-vortex-theme] .side-nav a:hover,
+html[data-vortex-theme] .top-nav a:hover {
+  background-color: rgba(85, 217, 248, .10);
+}
+html[data-vortex-theme] .right-column,
+html[data-vortex-theme] .stream-chat,
+html[data-vortex-theme] .chat-room {
+  background: var(--vortex-surface) !important;
+  color: #eef3ff;
+}
+html[data-vortex-theme] .stream-chat-header,
+html[data-vortex-theme] .chat-room__header {
+  background: linear-gradient(100deg, #202b41, #26213d) !important;
+  border-bottom: 1px solid var(--vortex-edge) !important;
+  color: #f4f7ff;
+}
+html[data-vortex-theme] .chat-scrollable-area__message-container {
+  background: linear-gradient(180deg, rgba(36, 47, 70, .17), transparent 25%), var(--vortex-surface);
+}
+html[data-vortex-theme] .vortex-chat-line {
+  border-radius: 5px;
+  transition: background-color .14s ease;
+}
+html[data-vortex-theme] .vortex-chat-line:hover {
+  background: rgba(85, 217, 248, .075) !important;
+}
+html[data-vortex-theme] .vortex-chat-line.vortex-highlight-line,
+html[data-vortex-theme] .vortex-chat-line.vortex-highlight-line:hover {
+  background: rgba(85, 217, 248, .16) !important;
+  box-shadow: inset 3px 0 var(--vortex-accent);
+}
+html[data-vortex-theme] .chat-input,
+html[data-vortex-theme] [data-a-target="chat-input-container"] {
+  background: var(--vortex-panel) !important;
+  border-top: 1px solid var(--vortex-edge);
+}
+html[data-vortex-theme] [data-a-target="chat-input"],
+html[data-vortex-theme] .chat-input textarea,
+html[data-vortex-theme] .chat-input [contenteditable="true"] {
+  background: #0e1420 !important;
+  color: #f4f7ff !important;
+  border-color: #52617b !important;
+  border-radius: 9px !important;
+}
+html[data-vortex-theme] [data-a-target="chat-input"]:focus,
+html[data-vortex-theme] .chat-input textarea:focus,
+html[data-vortex-theme] .chat-input [contenteditable="true"]:focus {
+  border-color: var(--vortex-accent) !important;
+  box-shadow: 0 0 0 2px rgba(85, 217, 248, .16);
+}
+html[data-vortex-theme] [data-a-target="chat-send-button"] {
+  background: linear-gradient(120deg, #3677c8, #7854c5) !important;
+  border-color: #8da7e6 !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+html[data-vortex-theme] [data-a-target="chat-send-button"]:hover {
+  filter: brightness(1.15);
+}
+html[data-vortex-theme] [data-a-target="emote-picker"] {
+  background: var(--vortex-panel) !important;
+  border: 1px solid var(--vortex-edge);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .48);
+}
+html[data-vortex-theme] .vortex-native-section { border-color: var(--vortex-edge); }
+html[data-vortex-theme] .vortex-native-emote-btn:hover { background: rgba(85, 217, 248, .13); }
+html[data-vortex-theme] .vortex-native-bottom-bar { background: var(--vortex-panel-raised); border-color: var(--vortex-edge); }
+html[data-vortex-theme] .vortex-pause-toolbar,
+html[data-vortex-theme] .vortex-user-card,
+html[data-vortex-theme] .seventv-settings-modal,
+html[data-vortex-theme] .seventv-emote-card {
+  background: var(--vortex-panel);
+  border-color: var(--vortex-edge);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .55), 0 0 0 1px rgba(85, 217, 248, .06);
+}
+html[data-vortex-theme] .seventv-settings-sidebar,
+html[data-vortex-theme] .seventv-main-header,
+html[data-vortex-theme] .seventv-card-header { background: #151d2c; border-color: var(--vortex-edge); }
+html[data-vortex-theme] .seventv-setting-group { background: #1b2434; border-color: var(--vortex-edge); }
+html[data-vortex-theme] .seventv-nav-btn.active { background: rgba(85, 217, 248, .16); color: var(--vortex-accent); }
+html[data-vortex-theme] .vortex-tool-button,
+html[data-vortex-theme] .vortex-setting-input { background: var(--vortex-panel-raised); border-color: var(--vortex-edge); }
+html[data-vortex-theme] .vortex-tool-button:hover { background: #2a3650; }
+html[data-vortex-theme] .vortex-repeat-badge { color: var(--vortex-accent); border-color: rgba(85, 217, 248, .42); }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-vortex-theme] .vortex-chat-line { transition: none; }
+}

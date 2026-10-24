@@ -1,0 +1,58 @@
+.vortex-ambilight-light {
+  position: fixed;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  background: transparent;
+  transition-property: box-shadow, opacity;
+  transition-duration: 350ms;
+}
+.vortex-ambilight-light[hidden] { display: none; }
+.vortex-ambilight-bar { position: fixed; z-index: 91; pointer-events: none; transition: background 350ms, opacity 350ms; }
+.vortex-ambilight-bar[hidden] { display: none; }
+.vortex-ambilight-button {
+  position: fixed;
+  z-index: 92;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #7778;
+  border-radius: 7px;
+  background: #15151dcc;
+  color: #eee;
+  font-size: 21px;
+  cursor: pointer;
+}
+.vortex-ambilight-button[aria-pressed="true"] { color: #92d6ff; border-color: #92d6ff; }
+html[data-vortex-ambilight] .side-nav,
+html[data-vortex-ambilight] .top-nav { filter: brightness(calc(1 - var(--vortex-ambilight-dim, 0))); }
+#vortex-clip-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483640;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #08080bd9;
+  color: #efeff1;
+}
+.vortex-clip-window {
+  width: min(1250px, 96vw);
+  max-height: 94vh;
+  overflow: auto;
+  border: 1px solid #40404a;
+  border-radius: 12px;
+  background: #18181b;
+  box-shadow: 0 24px 80px #000b;
+}
+.vortex-clip-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+.vortex-clip-close { border: 0; background: transparent; color: inherit; cursor: pointer; font-size: 20px; }
+.vortex-clip-layout { display: grid; grid-template-columns: minmax(400px, 1fr) 230px; gap: 16px; padding: 0 16px 16px; }
+.vortex-clip-player { aspect-ratio: 16 / 9; min-height: 300px; background: #000; }
+.vortex-clip-player iframe { display: block; width: 100%; height: 100%; border: 0; }
+.vortex-clip-info { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.vortex-clip-title { overflow-wrap: anywhere; font-weight: 700; }
+.vortex-clip-source { color: #bf94ff; }
+@media (max-width: 800px) {
+  .vortex-clip-layout { grid-template-columns: 1fr; }
+  .vortex-clip-player { min-height: 225px; }
+}

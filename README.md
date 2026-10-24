@@ -44,4 +44,3 @@ desktop-app/     Отдельный прототип Electron-клиента и 
 ## Лицензия
 
 [MIT](LICENSE). PFT Studio · artempft@gmail.com.
-
