@@ -9,7 +9,7 @@
     highlightWords: '', highlightUsers: '', highlightBadges: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
     ambilightEnabled: false, ambilightBrightness: 70, ambilightSpread: 65, ambilightResponse: 50,
     ambilightDimUI: 0, openClipsOverlay: true, themeEnabled: true,
-    themePreset: 'aurora', chatDensity: 'comfortable', chatOpacity: 100, visualBlurEnabled: false, visualBlur: 8, visualAmbilightEnabled: false, visualAmbilightIntensity: 50, performanceMode: false
+    themePreset: 'aurora', chatDensity: 'comfortable', chatOpacity: 100, visualBlurEnabled: false, visualBlur: 8, visualAmbilightEnabled: false, visualAmbilightIntensity: 50, performanceMode: false, visualAccentEnabled: false, visualAccent: '#32d4da', visualCornerRadius: 8
   });
   const reserved = new Set(['directory', 'settings', 'subscriptions', 'videos', 'downloads',
     'inventory', 'wallet', 'drops', 'search', 'following', 'friends', 'messages',
@@ -38,6 +38,8 @@
       result[key] = Number.isFinite(number) ? Math.min(100, Math.max(0, Math.round(number))) : defaults[key];
     }
     { const blur = Number(value?.visualBlur ?? defaults.visualBlur); result.visualBlur = Number.isFinite(blur) ? Math.min(24,Math.max(0,Math.round(blur))) : defaults.visualBlur; }
+    { const radius=Number(value?.visualCornerRadius??defaults.visualCornerRadius);result.visualCornerRadius=Number.isFinite(radius)?Math.min(28,Math.max(0,Math.round(radius))):defaults.visualCornerRadius; }
+    if (typeof value?.visualAccent === 'string' && /^#[a-f0-9]{6}$/i.test(value.visualAccent)) result.visualAccent=value.visualAccent;
     if (['aurora', 'graphite', 'orchid'].includes(value?.themePreset)) result.themePreset = value.themePreset;
     if (['comfortable', 'compact'].includes(value?.chatDensity)) result.chatDensity = value.chatDensity;
     result.highlightWords = typeof value?.highlightWords === 'string' ? value.highlightWords.slice(0, 500) : '';
