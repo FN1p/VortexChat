@@ -6,6 +6,7 @@ const cors = require('cors');
 const { WebSocketServer, WebSocket } = require('ws');
 const { TwitchAuth } = require('./auth');
 const { fetchProviderJson } = require('./provider');
+const updater = require('./updater');
 
 // Prevent a second VortexChat process from binding the fixed OBS bridge port.
 const ownsSingleInstance = app.requestSingleInstanceLock();
@@ -200,6 +201,9 @@ ipcMain.on('broadcast-chat-message', (event, messageData) => {
   });
 });
 
+ipcMain.handle('check-for-updates', () => updater.check(app.getVersion()));
+ipcMain.handle('open-update-releases', () => shell.openExternal(updater.RELEASES));
+
 ipcMain.handle('get-twitch-auth', () => twitchAuth?.status() || { connected: false, login: '', clientId: '' });
 ipcMain.handle('start-twitch-login', async (_event, clientId) => {
   const challenge = await twitchAuth.startDeviceLogin(clientId);
@@ -223,6 +227,10 @@ app.whenReady().then(() => {
   twitchAuth.validate();
   setInterval(() => twitchAuth.validate(), 60 * 60 * 1000).unref();
   createWindow();
+  setTimeout(async () => {
+    const result = await updater.check(app.getVersion());
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update-check-result', result);
+  }, 8000).unref();
   try {
     createTray();
   } catch (e) {
