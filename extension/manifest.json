@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "VortexChat — Twitch & YouTube Live",
   "author": "PFT Studio",
-  "version": "4.3.0",
-  "description": "Twitch + YouTube Live visual features: opacity, blur, theater, PiP, hotkeys and performance controls.",
+  "version": "4.4.0",
+  "description": "VortexChat Beta for Twitch and YouTube Live: customizable opacity, blur, neon accents, theater mode, PiP and performance controls.",
   "permissions": [
     "storage",
     "tabs",
@@ -87,5 +87,6 @@
         "*://*.twitch.tv/*"
       ]
     }
-  ]
+  ],
+  "version_name": "4.4.0 Beta 1"
 }
