@@ -22,6 +22,11 @@
 <label class="row"><span>Режим производительности<small>Отключает новую подсветку и размытие</small></span><input type="checkbox" data-key="performanceMode"/><span class="switch" aria-hidden="true"></span></label>
 <div class="actions"><button id="btn-theater" type="button">Кинотеатр</button><button id="btn-pip" type="button">PiP</button></div>
 <small>Горячие клавиши: Alt+Shift+T — кинотеатр, Alt+Shift+P — PiP, Alt+Shift+O — прозрачность.</small>
+</div></section><section aria-labelledby="custom-heading"><h2 id="custom-heading">Кастомизация Beta</h2><div class="card">
+<label class="row"><span>Неоновая рамка</span><input type="checkbox" data-key="visualAccentEnabled"/><span class="switch" aria-hidden="true"></span></label>
+<label class="row"><span>Цвет акцента</span><input type="color" data-key="visualAccent" value="#32d4da" aria-label="Цвет рамки"/></label>
+<div class="font-row"><label for="visual-corners">Скругление панелей</label><output id="visual-corners-value">8 px</output></div>
+<input type="range" id="visual-corners" data-key="visualCornerRadius" min="0" max="28" value="8"/>
 </div></section><section aria-labelledby="reading-heading">
       <h2 id="reading-heading">Удобство чтения</h2>
       <div class="card">
