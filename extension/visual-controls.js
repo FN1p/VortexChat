@@ -3,7 +3,7 @@
 'use strict';
 if(globalThis.__vortexVisualControls)return;
 globalThis.__vortexVisualControls=true;
-const yt=/(^|\\.)youtube\\.com$/.test(location.hostname),tw=/(^|\\.)twitch\\.tv$/.test(location.hostname);
+const yt=/(^|\.)youtube\.com$/.test(location.hostname),tw=/(^|\.)twitch\.tv$/.test(location.hostname);
 if(!yt&&!tw)return;
 const frame=yt&&location.pathname.startsWith('/live_chat');
 const topPage=window===window.top;
