@@ -14,7 +14,15 @@
   </header>
   <main>
     <section aria-labelledby="opacity-heading"><h2 id="opacity-heading">Прозрачность чата · Twitch / YouTube</h2><div class="card"><div class="font-row"><label for="chat-opacity">Непрозрачность фона</label><output id="chat-opacity-value" for="chat-opacity">100%</output></div><input type="range" id="chat-opacity" data-key="chatOpacity" min="0" max="100" value="100"/><small>100% — обычный фон; 0% — прозрачный. Текст остаётся видимым.</small></div></section>
-    <section aria-labelledby="reading-heading">
+    <section aria-labelledby="visual-heading"><h2 id="visual-heading">Плеер и производительность</h2><div class="card">
+<label class="row"><span>Размытие фона чата</span><input type="checkbox" data-key="visualBlurEnabled"/><span class="switch" aria-hidden="true"></span></label>
+<div class="font-row"><label for="visual-blur">Сила размытия</label><output id="visual-blur-value">8 px</output></div><input type="range" id="visual-blur" data-key="visualBlur" min="0" max="24" value="8"/>
+<label class="row"><span>Дополнительная подсветка видео</span><input type="checkbox" data-key="visualAmbilightEnabled"/><span class="switch" aria-hidden="true"></span></label>
+<div class="font-row"><label for="visual-intensity">Интенсивность свечения</label><output id="visual-intensity-value">50%</output></div><input type="range" id="visual-intensity" data-key="visualAmbilightIntensity" min="0" max="100" value="50"/>
+<label class="row"><span>Режим производительности<small>Отключает новую подсветку и размытие</small></span><input type="checkbox" data-key="performanceMode"/><span class="switch" aria-hidden="true"></span></label>
+<div class="actions"><button id="btn-theater" type="button">Кинотеатр</button><button id="btn-pip" type="button">PiP</button></div>
+<small>Горячие клавиши: Alt+Shift+T — кинотеатр, Alt+Shift+P — PiP, Alt+Shift+O — прозрачность.</small>
+</div></section><section aria-labelledby="reading-heading">
       <h2 id="reading-heading">Удобство чтения</h2>
       <div class="card">
         <div class="font-row"><label for="font-size">Размер текста</label><output id="font-size-value" for="font-size">13 px</output></div>

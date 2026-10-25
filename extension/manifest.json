@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "VortexChat — Twitch & YouTube Live",
   "author": "PFT Studio",
-  "version": "4.2.0",
-  "description": "Twitch emote tools and optional YouTube Live background transparency; chat message behavior unchanged.",
+  "version": "4.3.0",
+  "description": "Twitch + YouTube Live visual features: opacity, blur, theater, PiP, hotkeys and performance controls.",
   "permissions": [
     "storage",
     "tabs",
@@ -53,7 +53,8 @@
         "cosmetics.js",
         "chat-tools.js",
         "content.js",
-        "media.js"
+        "media.js",
+        "visual-controls.js"
       ],
       "css": [
         "content.css",
@@ -70,7 +71,8 @@
       "all_frames": true,
       "js": [
         "core.js",
-        "youtube-chat.js"
+        "youtube-chat.js",
+        "visual-controls.js"
       ],
       "run_at": "document_idle"
     }

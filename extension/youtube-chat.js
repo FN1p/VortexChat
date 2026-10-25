@@ -11,7 +11,8 @@
   style.id = 'vortex-youtube-appearance';
 
   function render(settings) {
-    const opacity = VortexCore.normalizeSettings(settings).chatOpacity / 100;
+    // Appearance settings are applied by the isolated visual-controls module.
+    return;
     // YouTube Live is often embedded in a same-origin iframe. Only its
     // containers' backgrounds change; text and chat content remain intact.
     if (inChatFrame) {

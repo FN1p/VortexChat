@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (input.type === 'checkbox') input.checked = settings[input.dataset.key];
       else input.value = settings[input.dataset.key];
     });
+    $('visual-blur-value').textContent = `${settings.visualBlur} px`;
+    $('visual-intensity-value').textContent = `${settings.visualAmbilightIntensity}%`;
     $('chat-opacity-value').textContent = `${settings.chatOpacity}%`;
     $('font-size-value').textContent = `${settings.fontSize} px`;
     $('ambilight-brightness-value').textContent = `${settings.ambilightBrightness}%`;
@@ -60,6 +62,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).catch(() => { toast('Не удалось сохранить настройки'); });
     });
   });
+  $('visual-blur').addEventListener('input', e => $('visual-blur-value').textContent = e.target.value + ' px');
+  $('visual-intensity').addEventListener('input', e => $('visual-intensity-value').textContent = e.target.value + '%');
+  for (const [id,action] of [['btn-theater','VORTEX_VISUAL_TOGGLE_THEATER'],['btn-pip','VORTEX_VISUAL_PIP']]) {
+    $(id).addEventListener('click',async()=>{ if(!tabId)return toast('Открой Twitch или YouTube');try{const res=await chrome.tabs.sendMessage(tabId,{action});toast(res?.ok?'Готово':'Недоступно на этой странице');}catch{toast('Обнови страницу и попробуй снова');}});
+  }
   $('chat-opacity').addEventListener('input', event => { $('chat-opacity-value').textContent = `${event.target.value}%`; });
   $('font-size').addEventListener('input', event => { $('font-size-value').textContent = `${event.target.value} px`; });
   for (const key of ['ambilight-brightness', 'ambilight-spread']) {

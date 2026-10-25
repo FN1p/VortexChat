@@ -9,7 +9,7 @@
     highlightWords: '', highlightUsers: '', highlightBadges: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
     ambilightEnabled: false, ambilightBrightness: 70, ambilightSpread: 65, ambilightResponse: 50,
     ambilightDimUI: 0, openClipsOverlay: true, themeEnabled: true,
-    themePreset: 'aurora', chatDensity: 'comfortable', chatOpacity: 100
+    themePreset: 'aurora', chatDensity: 'comfortable', chatOpacity: 100, visualBlurEnabled: false, visualBlur: 8, visualAmbilightEnabled: false, visualAmbilightIntensity: 50, performanceMode: false
   });
   const reserved = new Set(['directory', 'settings', 'subscriptions', 'videos', 'downloads',
     'inventory', 'wallet', 'drops', 'search', 'following', 'friends', 'messages',
@@ -33,10 +33,11 @@
       const number = Number(value?.[key] ?? defaults[key]);
       result[key] = Number.isFinite(number) ? Math.min(maximum, Math.max(0, Math.round(number))) : defaults[key];
     }
-    for (const key of ['ambilightBrightness', 'ambilightSpread', 'ambilightResponse', 'ambilightDimUI', 'chatOpacity']) {
+    for (const key of ['ambilightBrightness', 'ambilightSpread', 'ambilightResponse', 'ambilightDimUI', 'chatOpacity', 'visualAmbilightIntensity']) {
       const number = Number(value?.[key] ?? defaults[key]);
       result[key] = Number.isFinite(number) ? Math.min(100, Math.max(0, Math.round(number))) : defaults[key];
     }
+    { const blur = Number(value?.visualBlur ?? defaults.visualBlur); result.visualBlur = Number.isFinite(blur) ? Math.min(24,Math.max(0,Math.round(blur))) : defaults.visualBlur; }
     if (['aurora', 'graphite', 'orchid'].includes(value?.themePreset)) result.themePreset = value.themePreset;
     if (['comfortable', 'compact'].includes(value?.chatDensity)) result.chatDensity = value.chatDensity;
     result.highlightWords = typeof value?.highlightWords === 'string' ? value.highlightWords.slice(0, 500) : '';
