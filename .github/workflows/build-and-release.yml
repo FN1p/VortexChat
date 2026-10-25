@@ -34,6 +34,10 @@ jobs:
       - name: Check Desktop Logic
         run: node --test tests/desktop-auth.test.cjs tests/desktop-provider.test.cjs
 
+      - name: Generate Branded Windows Installer Artwork
+        shell: pwsh
+        run: ./desktop-app/scripts/generate-installer-art.ps1
+
       - name: Compile Windows Installer & Portable Executables
         working-directory: ./desktop-app
         run: npm run dist
@@ -55,14 +59,16 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
 
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release VortexChat v1.3.1'))
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.1' }}
+          target_commitish: ${{ github.sha }}
           files: |
             desktop-app/dist/VortexChat-Setup-*.exe
             desktop-app/dist/VortexChat-Portable-*.exe
             desktop-app/dist/VortexChat-7TV-Extension.zip
-          name: VortexChat ${{ github.ref_name }} (PFT Studio)
+          name: VortexChat ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.1' }} (PFT Studio)
           body: |
             ## ⚡ VortexChat Release by PFT Studio
 
