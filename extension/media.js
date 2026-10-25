@@ -58,7 +58,16 @@
       rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth;
     const visible = settings.ambilightEnabled && !clipDialog && onScreen;
     light.hidden = !visible;
-    button.hidden = !onScreen || Boolean(clipDialog);
+    const twitchControls = video?.closest('[data-a-target="video-player"], .video-player, .video-player__container, [data-test-selector="video-player__container"]');
+    const controlsHidden = twitchControls?.classList.contains('video-player--inactive') ||
+      twitchControls?.querySelector('[data-a-target="player-controls"][style*="opacity: 0"]');
+    button.hidden = !onScreen || Boolean(clipDialog) || Boolean(controlsHidden);
+    if (!button.hidden && twitchControls) {
+      const hovering = twitchControls.matches(':hover') || button.matches(':hover') || button.matches(':focus');
+      button.style.opacity = hovering ? '1' : '0';
+      button.style.pointerEvents = hovering ? 'auto' : 'none';
+      button.style.transition = 'opacity 180ms ease';
+    } else if (!button.hidden) { button.style.opacity = '1'; button.style.pointerEvents = 'auto'; }
     light.style.left = `${rect.left}px`;
     light.style.top = `${rect.top}px`;
     light.style.width = `${rect.width}px`;
