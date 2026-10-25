@@ -244,5 +244,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   check('Disabling a provider hides its favorites without deleting them', !picker.querySelector('#vortex-sec-favorites .vortex-native-emote-btn') && (await chrome.storage.local.get('vortexFavorites')).vortexFavorites.length === 1);
   await fixtureSettings({ enable7TV: true });
   picker.remove();
+  const firstMessage = document.createElement('div');
+  firstMessage.className = 'chat-line__message';
+  firstMessage.dataset.firstMsg = 'true';
+  firstMessage.innerHTML = '<span class="chat-line__username">newcomer</span><span data-a-target="chat-line-message-body">Hello</span>';
+  chat.appendChild(firstMessage);
+  await wait();
+  check('First message has FM badge', firstMessage.querySelector('.vortex-first-message-badge')?.textContent === 'FM');
+
+  const moderated = document.createElement('div');
+  moderated.className = 'chat-line__message';
+  moderated.dataset.id = 'moderated-1';
+  moderated.innerHTML = '<span class="chat-line__username">viewer</span><span data-a-target="chat-line-message-body">Original text</span>';
+  chat.appendChild(moderated);
+  await wait();
+  moderated.querySelector('[data-a-target="chat-line-message-body"]').textContent = 'сообщение удалено модератором';
+  await wait();
+  check('Moderated message keeps original text and dims the line',
+    moderated.classList.contains('vortex-moderated-line') && moderated.textContent.includes('Original text') &&
+    !moderated.textContent.includes('сообщение удалено'));
   document.getElementById('summary').textContent = `${results.children.length - failures}/${results.children.length} passed${failures ? `; ${failures} failed` : ''}`;
 });

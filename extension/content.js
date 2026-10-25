@@ -1453,6 +1453,7 @@
   const parsedFragments = new WeakMap();
   const seenLines = new WeakMap();
   const seenMessageIds = new WeakMap();
+  const originalMessages = new Map();
   let observedChatList = null;
   let chatObserver = null;
   let pendingChatFrame = null;
@@ -1471,6 +1472,52 @@
     clone.querySelectorAll('.vortex-message-time, .vortex-repeat-badge, .vortex-user-history-button, .vortex-message-copy, .chat-line__timestamp, [data-a-target="chat-message-username"], .chat-line__username').forEach(el => el.remove());
     clone.querySelectorAll('img[alt]').forEach(img => img.replaceWith(document.createTextNode(img.alt)));
     return (clone.textContent || '').trim();
+  }
+
+  function messageKey(line) {
+    const carrier = line.closest('[data-id], [data-message-id]') || line;
+    return carrier.getAttribute('data-id') || carrier.getAttribute('data-message-id') || '';
+  }
+
+  function preserveModeratedMessage(line) {
+    const key = messageKey(line);
+    const body = line.querySelector('[data-a-target="chat-line-message-body"], .chat-line__message--content, .text-fragment');
+    if (body?.querySelector('.vortex-restored-message')) return;
+    const text = body?.textContent || line.textContent || '';
+    const deleted = /message deleted by a moderator|message deleted|сообщение удалено модератором|сообщение удалено/i.test(text) ||
+      line.matches('[data-deleted="true"], .chat-line__message--deleted') ||
+      Boolean(line.querySelector('[data-a-target="chat-deleted-message"]'));
+    if (!deleted) {
+      if (key && body && text.trim()) {
+        originalMessages.delete(key);
+        originalMessages.set(key, body.cloneNode(true));
+        if (originalMessages.size > 500) originalMessages.delete(originalMessages.keys().next().value);
+      }
+      line.classList.remove('vortex-moderated-line');
+      return;
+    }
+    line.classList.add('vortex-moderated-line');
+    if (!key || !body || !originalMessages.has(key) || body.querySelector('.vortex-restored-message')) return;
+    const restored = document.createElement('span');
+    restored.className = 'vortex-restored-message';
+    restored.append(...originalMessages.get(key).cloneNode(true).childNodes);
+    body.replaceChildren(restored);
+  }
+
+  function markFirstMessage(line) {
+    const indicator = line.querySelector('[data-a-target*="first-message"], [data-test-selector*="first-message"], .first-time-chatter, .first-message-highlight');
+    const first = Boolean(indicator) || line.matches('[data-first-msg="true"], [data-first-message="true"]') ||
+      Boolean(line.parentElement?.matches('.first-time-chatter, [data-first-msg="true"], [data-first-message="true"]'));
+    let badge = line.querySelector(':scope > .vortex-first-message-badge');
+    if (!first) { badge?.remove(); return; }
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'vortex-first-message-badge';
+      badge.textContent = 'FM';
+      badge.title = 'Первое сообщение в чате';
+      const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username');
+      username?.after(badge);
+    }
   }
 
   function scanExistingChatMessages() {
@@ -1545,6 +1592,8 @@
 
   function enrichChatLine(node) {
     if (!node?.matches?.(CHAT_LINE_SELECTOR)) return;
+    preserveModeratedMessage(node);
+    markFirstMessage(node);
     const messageId = node.getAttribute('data-id') || node.getAttribute('data-message-id');
     if (!seenLines.has(node) || seenMessageIds.get(node) !== messageId) {
       seenLines.set(node, new Date());
@@ -1736,7 +1785,7 @@
             ${VORTEX_LOGO_SVG}
             <div>
               <div style="font-weight:800; font-size:14px; color:#fff;">VortexChat</div>
-              <div style="font-size:10px; color:#adadb8;">VortexChat v4.0.0</div>
+              <div style="font-size:10px; color:#adadb8;">VortexChat v4.0.1</div>
             </div>
           </div>
 

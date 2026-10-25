@@ -58,6 +58,9 @@
 .vortex-chat-speed { margin-right: 4px; color: #adadb8; font: 11px/1.3 "Segoe UI", sans-serif; white-space: nowrap; }
 .vortex-chat-line.vortex-highlight-line { background: rgba(41, 182, 246, .16) !important; box-shadow: inset 3px 0 #29b6f6; }
 .vortex-chat-line.vortex-duplicate-line { display: none !important; }
+.vortex-chat-line.vortex-moderated-line { opacity: .48; }
+.vortex-chat-line.vortex-moderated-line:hover { opacity: .8; }
+.vortex-first-message-badge { display: inline-block; margin: 0 5px; padding: 1px 4px; border-radius: 3px; background: #8246af; color: white; font: 700 10px/1.4 sans-serif; vertical-align: middle; }
 .vortex-message-time { color: var(--color-text-alt-2, #adadb8); font-size: .8em; margin-right: 7px; font-variant-numeric: tabular-nums; }
 .vortex-setting-input { background: #18181b; color: #efeff1; border: 1px solid #53535f; border-radius: 5px; padding: 7px; font: inherit; }
 .vortex-setting-input:focus-visible { outline: 2px solid #29b6f6; outline-offset: 2px; }
