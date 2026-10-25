@@ -70,7 +70,12 @@
       "uninstallDisplayName": "VortexChat by PFT Studio",
       "runAfterFinish": true,
       "deleteAppDataOnUninstall": false,
-      "artifactName": "${productName}-Setup-${version}.${ext}"
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "installerSidebar": "assets/installerSidebar.bmp",
+      "installerHeader": "assets/installerHeader.bmp",
+      "uninstallerSidebar": "assets/uninstallerSidebar.bmp",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
     },
     "portable": {
       "artifactName": "${productName}-Portable-${version}.${ext}"
