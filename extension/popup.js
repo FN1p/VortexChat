@@ -19,15 +19,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (input.type === 'checkbox') input.checked = settings[input.dataset.key];
       else input.value = settings[input.dataset.key];
     });
+    $('visual-blur-value').textContent = `${settings.visualBlur} px`;
+    $('visual-intensity-value').textContent = `${settings.visualAmbilightIntensity}%`;
+    $('chat-opacity-value').textContent = `${settings.chatOpacity}%`;
     $('font-size-value').textContent = `${settings.fontSize} px`;
     $('ambilight-brightness-value').textContent = `${settings.ambilightBrightness}%`;
     $('ambilight-spread-value').textContent = `${settings.ambilightSpread}%`;
   }
   function showUnavailable() {
     $('detected-channel').textContent = 'Нет активного канала';
-    $('connection-state').textContent = 'Нет связи с Twitch';
+    $('connection-state').textContent = 'Нет связи с чатом';
     $('connection-state').dataset.connected = 'false';
-    $('emote-status').textContent = 'Открой Twitch. После установки обнови вкладку.';
+    $('emote-status').textContent = 'Открой Twitch или YouTube Live и обнови вкладку.';
     $('btn-reload-emotes').disabled = true;
     $('btn-open-settings').disabled = true;
   }
@@ -36,12 +39,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const status = await chrome.tabs.sendMessage(tabId, { action: 'GET_VORTEXCHAT_STATUS' });
       if (!status) return showUnavailable();
-      $('detected-channel').textContent = status.channel ? `#${status.channel}` : 'Открой канал Twitch';
-      $('connection-state').textContent = labels[status.eventState] || labels.idle;
+      $('detected-channel').textContent = status.channel ? `${status.platform === 'youtube' ? 'YouTube' : '#'}${status.channel}` : 'Открой чат';
+      $('connection-state').textContent = status.platform === 'youtube' ? 'YouTube Live' : (labels[status.eventState] || labels.idle);
       $('connection-state').dataset.connected = String(status.eventState === 'connected');
-      $('emote-status').textContent = `${loadLabels[status.loadState] || ''}${status.error ? ` · ${status.error}` : ''}${status.emoteCount ? ` · ${status.emoteCount} смайлов` : ''}${status.cachedSources ? ` · из кэша: ${status.cachedSources}` : ''}`;
-      $('btn-reload-emotes').disabled = !status.channel || status.loadState === 'loading';
-      $('btn-open-settings').disabled = false;
+      $('emote-status').textContent = `${status.platform === 'youtube' ? 'Прозрачность чата активна' : (loadLabels[status.loadState] || '')}${status.error ? ` · ${status.error}` : ''}${status.emoteCount ? ` · ${status.emoteCount} смайлов` : ''}${status.cachedSources ? ` · из кэша: ${status.cachedSources}` : ''}`;
+      $('btn-reload-emotes').disabled = status.platform === 'youtube' || !status.channel || status.loadState === 'loading';
+      $('btn-open-settings').disabled = status.platform === 'youtube';
     } catch { showUnavailable(); }
   }
   document.querySelectorAll('[data-key]').forEach(input => {
@@ -59,6 +62,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).catch(() => { toast('Не удалось сохранить настройки'); });
     });
   });
+  $('visual-blur').addEventListener('input', e => $('visual-blur-value').textContent = e.target.value + ' px');
+  $('visual-intensity').addEventListener('input', e => $('visual-intensity-value').textContent = e.target.value + '%');
+  for (const [id,action] of [['btn-theater','VORTEX_VISUAL_TOGGLE_THEATER'],['btn-pip','VORTEX_VISUAL_PIP']]) {
+    $(id).addEventListener('click',async()=>{ if(!tabId)return toast('Открой Twitch или YouTube');try{const res=await chrome.tabs.sendMessage(tabId,{action});toast(res?.ok?'Готово':'Недоступно на этой странице');}catch{toast('Обнови страницу и попробуй снова');}});
+  }
+  $('chat-opacity').addEventListener('input', event => { $('chat-opacity-value').textContent = `${event.target.value}%`; });
   $('font-size').addEventListener('input', event => { $('font-size-value').textContent = `${event.target.value} px`; });
   for (const key of ['ambilight-brightness', 'ambilight-spread']) {
     $(key).addEventListener('input', event => { $(`${key}-value`).textContent = `${event.target.value}%`; });
@@ -117,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab?.url) {
       const host = new URL(tab.url).hostname;
-      if (host === 'twitch.tv' || host.endsWith('.twitch.tv')) tabId = tab.id;
+      if (host === 'twitch.tv' || host.endsWith('.twitch.tv') || host === 'youtube.com' || host === 'www.youtube.com') tabId = tab.id;
     }
   } catch { toast('Не удалось прочитать настройки'); }
   $('version').textContent = `v${chrome.runtime.getManifest().version}`;
