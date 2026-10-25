@@ -91,7 +91,7 @@ function cssApply(){
  .vortex-yt-panel input[type=range]{width:112px;accent-color:#39d8d0}
  .vortex-yt-panel button{border:1px solid #39d8d077;background:#1e2c3b;color:#fff;padding:7px;border-radius:7px;cursor:pointer}
  `;
- if(settings.visualAmbilightEnabled&&!settings.performanceMode&&!matchMedia('(prefers-reduced-motion:reduce)').matches)startLight();else stopLight();
+ if((yt?settings.youtubeAmbientEnabled:settings.visualAmbilightEnabled)&&!settings.performanceMode&&!matchMedia('(prefers-reduced-motion:reduce)').matches)startLight();else stopLight();
  updatePanelValues();
 }
 function save(key,value){
@@ -100,10 +100,10 @@ function save(key,value){
 }
 function updatePanelValues(){
  if(!panel)return;
- const toggle=panel.querySelector('[data-setting=visualAmbilightEnabled]');
+ const toggle=panel.querySelector('[data-setting=youtubeAmbientEnabled]');
  const power=panel.querySelector('[data-setting=visualAmbilightIntensity]');
  const perf=panel.querySelector('[data-setting=performanceMode]');
- if(toggle)toggle.checked=settings.visualAmbilightEnabled;
+ if(toggle)toggle.checked=settings.youtubeAmbientEnabled;
  if(power)power.value=settings.visualAmbilightIntensity;
  if(perf)perf.checked=settings.performanceMode;
  const out=panel.querySelector('output');if(out)out.textContent=settings.visualAmbilightIntensity+'%';
@@ -122,7 +122,7 @@ function initButton(){
 function openPanel(player){
  panel=document.createElement('section');panel.className='vortex-yt-panel';panel.setAttribute('aria-label','VortexChat — настройки YouTube');
  panel.innerHTML=`<strong style="color:#39d8d0;font-size:16px">✦ VortexChat Beta</strong>
- <label>Ambilight <input type="checkbox" data-setting="visualAmbilightEnabled"></label>
+ <label>Ambilight <input type="checkbox" data-setting="youtubeAmbientEnabled"></label>
  <label>Интенсивность <input type="range" min="0" max="100" data-setting="visualAmbilightIntensity"></label>
  <output>50%</output>
  <label>Экономия ресурсов <input type="checkbox" data-setting="performanceMode"></label>
