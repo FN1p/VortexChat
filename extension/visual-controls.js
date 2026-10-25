@@ -116,8 +116,20 @@ function initButton(){
  settingsButton=document.createElement('button');settingsButton.type='button';settingsButton.className='vortex-yt-settings';
  settingsButton.textContent='✦ Vortex';settingsButton.title='Настройки VortexChat';
  Object.assign(settingsButton.style,{position:'absolute',right:'15px',top:'15px',padding:'8px 12px',zIndex:'2147483645'});
- settingsButton.addEventListener('click',e=>{e.stopPropagation();if(panel){panel.remove();panel=null;return;}openPanel(player);});
+ // Synchronize our button with the YouTube player control fade state.
+ function syncControlsVisibility(){
+   const controlsVisible=player.classList.contains('ytp-autohide')===false && player.classList.contains('ytp-hide-controls')===false;
+   const shouldShow=controlsVisible || Boolean(panel);
+   settingsButton.style.opacity=shouldShow?'1':'0';
+   settingsButton.style.pointerEvents=shouldShow?'auto':'none';
+ }
+ settingsButton.style.transition='opacity 170ms ease';
+ new MutationObserver(syncControlsVisibility).observe(player,{attributes:true,attributeFilter:['class']});
+ player.addEventListener('mousemove',syncControlsVisibility,{passive:true});
+ player.addEventListener('mouseleave',syncControlsVisibility,{passive:true});
+ settingsButton.addEventListener('click',e=>{e.stopPropagation();if(panel){panel.remove();panel=null;settingsButton.style.opacity=player.classList.contains('ytp-autohide')?'0':'1';return;}openPanel(player);});
  player.append(settingsButton);
+ syncControlsVisibility();
 }
 function openPanel(player){
  panel=document.createElement('section');panel.className='vortex-yt-panel';panel.setAttribute('aria-label','VortexChat — настройки YouTube');
