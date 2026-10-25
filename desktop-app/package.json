@@ -27,6 +27,8 @@
     },
     "files": [
       "main.js",
+      "updater.js",
+      "updater-ui.js",
       "auth.js",
       "provider.js",
       "preload.js",

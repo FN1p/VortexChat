@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  openUpdateReleases: () => ipcRenderer.invoke('open-update-releases'),
+  onUpdateCheckResult: (callback) => ipcRenderer.on('update-check-result', (_event, result) => callback(result)),
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
   close: () => ipcRenderer.send('window-close'),

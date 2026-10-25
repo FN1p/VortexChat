@@ -398,3 +398,9 @@ html, body {
 body.compact .messages-container { font-size: 12px; line-height: 1.2; }
 body.compact .message-line { margin-bottom: 1px; }
 body.hide-times .msg-time { display: none; }
+
+/* Native desktop update notification (does not affect chat content) */
+.vortex-update-banner{position:fixed;left:14px;right:14px;bottom:15px;z-index:99999;background:#101b2cf2;color:#edf9ff;border:1px solid #39d9dd;border-radius:13px;padding:12px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 36px #000a;font:13px Arial,sans-serif}
+.vortex-update-banner[hidden]{display:none!important}
+.vortex-update-banner strong{color:#4ee2e8}.vortex-update-banner span{flex:1}
+.vortex-update-banner button{cursor:pointer;color:#fff;background:#17647b;border:1px solid #409bad;border-radius:8px;padding:8px}
