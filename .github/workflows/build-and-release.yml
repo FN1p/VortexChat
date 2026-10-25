@@ -34,6 +34,10 @@ jobs:
       - name: Check Desktop Logic
         run: node --test tests/desktop-auth.test.cjs tests/desktop-provider.test.cjs
 
+      - name: Generate Branded Windows Installer Artwork
+        shell: pwsh
+        run: ./desktop-app/scripts/generate-installer-art.ps1
+
       - name: Compile Windows Installer & Portable Executables
         working-directory: ./desktop-app
         run: npm run dist
