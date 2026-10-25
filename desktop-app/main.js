@@ -7,6 +7,12 @@ const { WebSocketServer, WebSocket } = require('ws');
 const { TwitchAuth } = require('./auth');
 const { fetchProviderJson } = require('./provider');
 
+// Prevent a second VortexChat process from binding the fixed OBS bridge port.
+const ownsSingleInstance = app.requestSingleInstanceLock();
+if (!ownsSingleInstance) {
+  app.quit();
+} else {
+
 let mainWindow = null;
 let tray = null;
 let isAlwaysOnTop = false;
@@ -45,15 +51,18 @@ wss.on('connection', (ws) => {
   });
 });
 
-server.listen(5222, '127.0.0.1', () => {
-  console.log('[OBS Server] Локальный сервер запущен: http://127.0.0.1:5222/overlay');
-});
 server.on('error', (error) => {
   obsServerError = error.code || 'UNKNOWN';
   console.error(`[OBS Server] Не удалось запустить порт 5222: ${error.message}`);
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('obs-server-error', obsServerError);
   }
+});
+
+// Register the error handler *before* attempting to bind the socket.
+// EADDRINUSE must not terminate Electron even when another program owns 5222.
+server.listen(5222, '127.0.0.1', () => {
+  console.log('[OBS Server] Локальный сервер запущен: http://127.0.0.1:5222/overlay');
 });
 
 // ===================================================================
@@ -228,3 +237,12 @@ app.on('activate', () => {
 app.on('before-quit', () => {
   app.isQuitting = true;
 });
+
+
+app.on('second-instance', () => {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+});
+}
