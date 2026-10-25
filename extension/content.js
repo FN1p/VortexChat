@@ -1453,6 +1453,21 @@
   const parsedFragments = new WeakMap();
   const seenLines = new WeakMap();
   const seenMessageIds = new WeakMap();
+  const originalUsernameStyles = new WeakMap();
+  function lineLogin(line) {
+    const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username');
+    return (username?.getAttribute('data-a-user') || username?.querySelector('[data-a-user]')?.getAttribute('data-a-user') ||
+      username?.textContent || '').trim().toLowerCase();
+  }
+  const cosmetics = VortexCosmetics.create(async login => {
+    const reply = await chrome.runtime.sendMessage({ action: 'VORTEX_GET_COSMETICS', login });
+    if (!reply?.ok) throw new Error(reply?.error || '7TV cosmetics unavailable');
+    return reply.data;
+  }, login => {
+    document.querySelectorAll(CHAT_LINE_SELECTOR).forEach(line => {
+      if (lineLogin(line) === login) render7TVCosmetics(line);
+    });
+  });
   const originalMessages = new Map();
   let observedChatList = null;
   let chatObserver = null;
@@ -1518,6 +1533,50 @@
       const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username');
       username?.after(badge);
     }
+  }
+
+  function render7TVCosmetics(line) {
+    const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username');
+    if (!username) return;
+    const oldBadge = line.querySelector('.vortex-7tv-badge');
+    if (!state.settings.enable7TV || !state.settings.enable7TVCosmetics) {
+      oldBadge?.remove();
+      if (originalUsernameStyles.has(username)) {
+        username.style.cssText = originalUsernameStyles.get(username);
+        originalUsernameStyles.delete(username);
+      }
+      username.classList.remove('vortex-7tv-paint');
+      return;
+    }
+    const login = lineLogin(line);
+    const data = cosmetics.get(login);
+    if (!data) return;
+    const paint = VortexCosmetics.paintStyle(data.paint);
+    if (paint && !username.classList.contains('seventv-paint')) {
+      if (!originalUsernameStyles.has(username)) originalUsernameStyles.set(username, username.style.cssText);
+      username.classList.add('vortex-7tv-paint');
+      username.style.backgroundImage = paint.backgroundImage;
+      username.style.backgroundClip = paint.backgroundImage ? 'text' : '';
+      username.style.webkitBackgroundClip = paint.backgroundImage ? 'text' : '';
+      username.style.webkitTextFillColor = paint.backgroundImage ? 'transparent' : '';
+      if (paint.color) username.style.color = paint.color;
+      username.style.textShadow = paint.textShadow;
+      username.style.fontWeight = paint.fontWeight;
+      username.style.textTransform = paint.textTransform;
+      username.style.webkitTextStroke = paint.stroke;
+    }
+    const badgeUrl = VortexCosmetics.badgeUrl(data.badge);
+    if (badgeUrl && !line.querySelector('.seventv-badge')) {
+      let badge = oldBadge;
+      if (!badge) {
+        badge = document.createElement('img');
+        badge.className = 'vortex-7tv-badge';
+        badge.alt = '7TV';
+        username.before(badge);
+      }
+      if (badge.src !== badgeUrl) badge.src = badgeUrl;
+      badge.title = data.badge.tooltip || data.badge.name || '7TV Badge';
+    } else oldBadge?.remove();
   }
 
   function scanExistingChatMessages() {
@@ -1594,6 +1653,7 @@
     if (!node?.matches?.(CHAT_LINE_SELECTOR)) return;
     preserveModeratedMessage(node);
     markFirstMessage(node);
+    render7TVCosmetics(node);
     const messageId = node.getAttribute('data-id') || node.getAttribute('data-message-id');
     if (!seenLines.has(node) || seenMessageIds.get(node) !== messageId) {
       seenLines.set(node, new Date());
@@ -1628,7 +1688,12 @@
     const textFragments = [...messageBody.querySelectorAll(TEXT_SELECTOR)]
       .filter(fragment => !fragment.querySelector(TEXT_SELECTOR));
     const fullText = messageText(node);
-    node.classList.toggle('vortex-highlight-line', VortexCore.matchesHighlight(fullText, state.settings.highlightWords));
+    const usernameLogin = lineLogin(node);
+    const matchingBadge = [...node.querySelectorAll('.chat-badge img, [data-a-target*="chat-badge"] img, .vortex-7tv-badge')]
+      .some(badge => VortexCore.matchesExactList(badge.title || badge.alt, state.settings.highlightBadges));
+    node.classList.toggle('vortex-highlight-line',
+      VortexCore.matchesHighlight(fullText, state.settings.highlightWords) ||
+      VortexCore.matchesExactList(usernameLogin, state.settings.highlightUsers) || matchingBadge);
     let timestamp = node.querySelector('.vortex-message-time');
     const nativeTimestamp = node.querySelector('.chat-line__timestamp, [data-a-target="chat-timestamp"]');
     if (state.settings.showTimestamps && !nativeTimestamp) {
@@ -1785,7 +1850,7 @@
             ${VORTEX_LOGO_SVG}
             <div>
               <div style="font-weight:800; font-size:14px; color:#fff;">VortexChat</div>
-              <div style="font-size:10px; color:#adadb8;">VortexChat v4.0.1</div>
+              <div style="font-size:10px; color:#adadb8;">VortexChat v4.1.0</div>
             </div>
           </div>
 
@@ -1843,6 +1908,16 @@
             </div>
             <label class="vortex-switch">
               <input type="checkbox" data-key="enable7TV" ${state.settings.enable7TV ? 'checked' : ''} />
+              <span class="vortex-slider"></span>
+            </label>
+          </div>
+          <div class="seventv-setting-row">
+            <div>
+              <div class="seventv-setting-title">Пейнты и бейджи пользователей 7TV</div>
+              <div class="seventv-setting-desc">Показывать выбранную косметику 7TV рядом с именами пользователей в чате Twitch</div>
+            </div>
+            <label class="vortex-switch">
+              <input type="checkbox" data-key="enable7TVCosmetics" ${state.settings.enable7TVCosmetics ? 'checked' : ''} />
               <span class="vortex-slider"></span>
             </label>
           </div>
@@ -1954,6 +2029,16 @@
             <div class="seventv-setting-desc">Слова или фразы через запятую, например: твой ник, привет</div>
             <input id="vortex-highlight-words" class="vortex-setting-input" data-key="highlightWords" maxlength="500" placeholder="ник, слово, фраза" style="width:100%; margin-top:8px;" />
           </div>
+          <div class="seventv-setting-row" style="display:block;">
+            <label for="vortex-highlight-users" class="seventv-setting-title">Подсветка пользователей</label>
+            <div class="seventv-setting-desc">Точные Twitch-имена через запятую</div>
+            <input id="vortex-highlight-users" class="vortex-setting-input" data-key="highlightUsers" maxlength="500" placeholder="ник1, ник2" style="width:100%; margin-top:8px;" />
+          </div>
+          <div class="seventv-setting-row" style="display:block;">
+            <label for="vortex-highlight-badges" class="seventv-setting-title">Подсветка бейджей</label>
+            <div class="seventv-setting-desc">Названия бейджей через запятую</div>
+            <input id="vortex-highlight-badges" class="vortex-setting-input" data-key="highlightBadges" maxlength="500" placeholder="VIP, Модератор" style="width:100%; margin-top:8px;" />
+          </div>
           <div class="seventv-setting-row">
             <div><div class="seventv-setting-title">Пауза чата при наведении</div><div class="seventv-setting-desc">Фиксировать видимую ленту для чтения. Кнопка Ⅱ в шапке включает ручную паузу.</div></div>
             <label class="vortex-switch"><input type="checkbox" data-key="pauseOnHover" ${state.settings.pauseOnHover ? 'checked' : ''} /><span class="vortex-slider"></span></label>
@@ -2010,8 +2095,10 @@
       }
     }
 
-    const highlights = body.querySelector('[data-key="highlightWords"]');
-    if (highlights) highlights.value = state.settings.highlightWords;
+    for (const key of ['highlightWords', 'highlightUsers', 'highlightBadges']) {
+      const field = body.querySelector(`[data-key="${key}"]`);
+      if (field) field.value = state.settings[key];
+    }
     body.querySelectorAll('[data-key]').forEach(input => {
       if (input.type !== 'checkbox') input.value = state.settings[input.dataset.key];
       input.onchange = () => {

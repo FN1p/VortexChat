@@ -4,6 +4,21 @@
 const CACHE_NAME = 'vortex-provider-json-v1';
 const CACHE_LIMIT = 90;
 const CACHE_AGE_MS = 14 * 24 * 60 * 60 * 1000;
+const COSMETICS_QUERY = 'query VortexUserCosmetics($login:String!){ users(query:$login,limit:5){ connections{platform username} style{paint{id name color function angle shape repeat image_url stops{at color} gradients{function angle repeat image_url stops{at color}} shadows{x_offset y_offset radius color} text{weight transform stroke{color width}}} badge{id name tooltip host{url files{name}}}}}}';
+
+async function requestCosmetics(login, fetcher = fetch) {
+  if (typeof login !== 'string' || !/^[a-z0-9_]{1,25}$/i.test(login)) return { ok: false, error: 'Invalid login' };
+  const body = JSON.stringify({ query: COSMETICS_QUERY, variables: { login: login.toLowerCase() } });
+  try {
+    const response = await fetcher('https://7tv.io/v3/gql', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, body,
+      signal: AbortSignal.timeout(12000), credentials: 'omit' });
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    const result = await response.json();
+    if (result.errors?.length) return { ok: false, error: '7TV GraphQL error' };
+    return { ok: true, data: result.data };
+  } catch (error) { return { ok: false, error: error?.message || 'Network error' }; }
+}
 
 function allowedRequest(rawUrl, method = 'GET', body = '') {
   let url;
@@ -100,10 +115,14 @@ async function requestProvider(message, deps = { fetch, caches }) {
 
 if (typeof chrome !== 'undefined' && chrome.runtime?.onMessage) {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message?.action !== 'VORTEX_FETCH_PROVIDER') return;
+    if (!['VORTEX_FETCH_PROVIDER', 'VORTEX_GET_COSMETICS'].includes(message?.action)) return;
     if (!trustedSender(sender, chrome.runtime.id)) {
       sendResponse({ ok: false, error: 'Invalid sender' });
       return;
+    }
+    if (message.action === 'VORTEX_GET_COSMETICS') {
+      requestCosmetics(message.login).then(sendResponse);
+      return true;
     }
     requestProvider(message).then(sendResponse, error => sendResponse({ ok: false, error: error?.message || 'Network error' }));
     return true;
@@ -111,4 +130,4 @@ if (typeof chrome !== 'undefined' && chrome.runtime?.onMessage) {
 }
 
 if (typeof module !== 'undefined' && module.exports)
-  module.exports = { allowedRequest, candidates, trustedSender, requestProvider };
+  module.exports = { allowedRequest, candidates, trustedSender, requestProvider, requestCosmetics };

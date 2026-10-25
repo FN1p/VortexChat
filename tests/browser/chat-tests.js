@@ -263,5 +263,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   check('Moderated message keeps original text and dims the line',
     moderated.classList.contains('vortex-moderated-line') && moderated.textContent.includes('Original text') &&
     !moderated.textContent.includes('сообщение удалено'));
+  const cosmeticLine = line('viewer', 'Cosmetics test');
+  chat.appendChild(cosmeticLine);
+  await wait();
+  check('7TV paint and badge render for the linked Twitch user',
+    cosmeticLine.querySelector('.chat-line__username')?.classList.contains('vortex-7tv-paint') &&
+    cosmeticLine.querySelector('.vortex-7tv-badge')?.src.includes('cdn.7tv.app/badge/fixture/2x.webp'));
+  await fixtureSettings({ enable7TVCosmetics: false });
+  await wait();
+  check('Turning cosmetics off removes paint and badge',
+    !cosmeticLine.querySelector('.vortex-7tv-badge') &&
+    !cosmeticLine.querySelector('.chat-line__username')?.classList.contains('vortex-7tv-paint'));
+  await fixtureSettings({ highlightWords: '', highlightUsers: 'viewer' });
+  await wait();
+  check('Highlighting a user marks their messages without matching message text', cosmeticLine.classList.contains('vortex-highlight-line'));
   document.getElementById('summary').textContent = `${results.children.length - failures}/${results.children.length} passed${failures ? `; ${failures} failed` : ''}`;
 });

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "VortexChat — Twitch Chat",
   "author": "PFT Studio",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "Чат Twitch: 7TV, BTTV и FFZ, пауза чтения, история пользователей, избранные смайлы, подсветка слов и перенос настроек.",
   "permissions": [
     "storage",
@@ -48,6 +48,7 @@
       ],
       "js": [
         "core.js",
+        "cosmetics.js",
         "chat-tools.js",
         "content.js",
         "media.js"

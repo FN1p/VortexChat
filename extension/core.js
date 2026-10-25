@@ -2,11 +2,11 @@
 (function (root) {
   'use strict';
   const defaults = Object.freeze({
-    enable7TV: true, enableZeroWidth: true, enableBTTV: true, enableFFZ: true,
+    enable7TV: true, enable7TVCosmetics: true, enableZeroWidth: true, enableBTTV: true, enableFFZ: true,
     enableAutocomplete: true, alternatingRows: true, collapseSpam: false,
     showEventNotices: true, sendOnEmoteClick: false,
     fontSize: 13, messageGap: 0, emoteGap: 2, showTimestamps: false,
-    highlightWords: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
+    highlightWords: '', highlightUsers: '', highlightBadges: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
     ambilightEnabled: false, ambilightBrightness: 70, ambilightSpread: 65, ambilightResponse: 50,
     ambilightDimUI: 0, openClipsOverlay: true, themeEnabled: true,
     themePreset: 'aurora', chatDensity: 'comfortable'
@@ -40,6 +40,8 @@
     if (['aurora', 'graphite', 'orchid'].includes(value?.themePreset)) result.themePreset = value.themePreset;
     if (['comfortable', 'compact'].includes(value?.chatDensity)) result.chatDensity = value.chatDensity;
     result.highlightWords = typeof value?.highlightWords === 'string' ? value.highlightWords.slice(0, 500) : '';
+    for (const key of ['highlightUsers', 'highlightBadges'])
+      result[key] = typeof value?.[key] === 'string' ? value[key].slice(0, 500) : '';
     return result;
   }
 
@@ -63,6 +65,11 @@
     const normalized = text.toLocaleLowerCase();
     return words.split(/[,\n]/).map(word => word.trim().toLocaleLowerCase()).filter(Boolean)
       .some(word => normalized.includes(word));
+  }
+
+  function matchesExactList(value, list) {
+    const target = String(value || '').trim().toLocaleLowerCase();
+    return Boolean(target) && String(list || '').split(/[;,\n]/).some(item => item.trim().toLocaleLowerCase() === target);
   }
 
   function escapeHTML(value) {
@@ -195,7 +202,7 @@
     }
   }
 
-  const api = { defaults, channelFromPath, normalizeSettings, providerEnabled, suggestEmotes, matchesHighlight, escapeHTML, parse7TV, clipSlug, videoLetterbox,
+  const api = { defaults, channelFromPath, normalizeSettings, providerEnabled, suggestEmotes, matchesHighlight, matchesExactList, escapeHTML, parse7TV, clipSlug, videoLetterbox,
     EmoteCatalog, favoriteKey, normalizeFavorites, normalizeRecentEmotes, MessageHistory, parseBackup };
   root.VortexCore = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

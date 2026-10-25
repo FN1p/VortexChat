@@ -21,7 +21,19 @@ window.chrome = {
     onChanged: { addListener: listener => listeners.push(listener) }
   },
   runtime: {
-    getManifest: () => ({ version: '4.0.0' }),
+    getManifest: () => ({ version: '4.1.0' }),
+    sendMessage: (message, callback) => {
+      if (message.action !== 'VORTEX_GET_COSMETICS') {
+        callback?.({ ok: false, error: 'Fixture uses direct provider fetch' });
+        return;
+      }
+      return Promise.resolve({ ok: true, data: { users: [
+      { connections: [{ platform: 'TWITCH', username: message.login }], style: message.login === 'viewer' ? {
+        paint: { id: 'paint-1', name: 'Fixture paint', function: 'URL', image_url: 'https://cdn.7tv.app/paint/fixture/1x.webp' },
+        badge: { id: 'badge-1', name: 'Fixture badge', host: { url: '//cdn.7tv.app/badge/fixture', files: [{ name: '2x.webp' }] } }
+      } : {} }
+    ] } });
+    },
     onMessage: { addListener: listener => messageListeners.push(listener) }
   },
   tabs: {

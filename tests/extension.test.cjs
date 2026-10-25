@@ -5,6 +5,34 @@ const vm = require('node:vm');
 const path = require('node:path');
 const core = require('../extension/core.js');
 const network = require('../extension/background.js');
+const cosmetics = require('../extension/cosmetics.js');
+
+test('7TV cosmetics only use the exact linked Twitch user and safe CDN assets', () => {
+  const data = { users: [{ connections: [{ platform: 'TWITCH', username: 'other' }], style: { badge: { name: 'Wrong' } } },
+    { connections: [{ platform: 'TWITCH', username: 'Viewer' }], style: { badge: { name: 'Right' } } }] };
+  assert.equal(cosmetics.normalizeUser(data, 'viewer').badge.name, 'Right');
+  assert.equal(cosmetics.normalizeUser(data, 'missing'), null);
+  assert.equal(cosmetics.badgeUrl({ host: { url: '//cdn.7tv.app/badge/abc', files: [{ name: '2x.webp' }] } }),
+    'https://cdn.7tv.app/badge/abc/2x.webp');
+  assert.equal(cosmetics.badgeUrl({ host: { url: 'https://evil.example/badge', files: [{ name: '2x.webp' }] } }), '');
+  assert.match(cosmetics.paintStyle({ function: 'LINEAR_GRADIENT', stops: [{ at: 0, color: -1 }, { at: 1, color: 255 }] }).backgroundImage, /linear-gradient/);
+});
+
+test('user and badge highlights require exact names', () => {
+  assert.equal(core.matchesExactList('Viewer', 'other, viewer'), true);
+  assert.equal(core.matchesExactList('view', 'viewer'), false);
+  assert.equal(core.matchesExactList('VIP', 'Moderator, vip'), true);
+  assert.equal(core.normalizeSettings({ highlightUsers: 'x'.repeat(600) }).highlightUsers.length, 500);
+});
+
+test('cosmetics relay accepts a Twitch login and rejects malformed names', async () => {
+  let calls = 0;
+  const fetcher = async (_url, options) => { calls++; assert.equal(JSON.parse(options.body).variables.login, 'viewer');
+    return response({ data: { users: [] } }); };
+  assert.equal((await network.requestCosmetics('bad/name', fetcher)).ok, false);
+  assert.equal((await network.requestCosmetics('VIEWER', fetcher)).ok, true);
+  assert.equal(calls, 1);
+});
 
 test('channel routes exclude navigation and handle popout/moderator', () => {
   for (const route of ['/', '/directory/game', '/inventory', '/search', '/videos/123', '/popout', '/moderator', '/a-b']) {
@@ -126,7 +154,7 @@ function harness(fetcher, runtimeChrome) {
     send(data) { this.sent = JSON.parse(data); }
   }
   const context = vm.createContext({
-    VortexCore: core, URL, AbortController, AbortSignal, console,
+    VortexCore: core, VortexCosmetics: cosmetics, URL, AbortController, AbortSignal, console,
     fetch: fetcher, WebSocket: Socket, chrome: runtimeChrome,
     setTimeout: (fn, delay) => { const timer = { fn, delay }; timers.push(timer); return timer; },
     clearTimeout: timer => { if (timer) timer.cancelled = true; },
