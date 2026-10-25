@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (input.type === 'checkbox') input.checked = settings[input.dataset.key];
       else input.value = settings[input.dataset.key];
     });
+    $('visual-corners-value').textContent = settings.visualCornerRadius + ' px';
     $('visual-blur-value').textContent = `${settings.visualBlur} px`;
     $('visual-intensity-value').textContent = `${settings.visualAmbilightIntensity}%`;
     $('chat-opacity-value').textContent = `${settings.chatOpacity}%`;
@@ -62,6 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).catch(() => { toast('Не удалось сохранить настройки'); });
     });
   });
+  $('visual-corners').addEventListener('input',e=>$('visual-corners-value').textContent=e.target.value+' px');
   $('visual-blur').addEventListener('input', e => $('visual-blur-value').textContent = e.target.value + ' px');
   $('visual-intensity').addEventListener('input', e => $('visual-intensity-value').textContent = e.target.value + '%');
   for (const [id,action] of [['btn-theater','VORTEX_VISUAL_TOGGLE_THEATER'],['btn-pip','VORTEX_VISUAL_PIP']]) {
