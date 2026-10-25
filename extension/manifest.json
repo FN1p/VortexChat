@@ -3,7 +3,7 @@
   "name": "VortexChat — Twitch & YouTube Live",
   "author": "PFT Studio",
   "version": "4.2.0",
-  "description": "VortexChat for Twitch and YouTube Live: chat customization, transparency and Twitch 7TV/BTTV/FFZ tools.",
+  "description": "Twitch emote tools and optional YouTube Live background transparency; chat message behavior unchanged.",
   "permissions": [
     "storage",
     "tabs",
@@ -71,16 +71,6 @@
       "js": [
         "core.js",
         "youtube-chat.js"
-      ],
-      "run_at": "document_idle"
-    },
-    {
-      "matches": [
-        "*://*.twitch.tv/*"
-      ],
-      "js": [
-        "core.js",
-        "chat-opacity.js"
       ],
       "run_at": "document_idle"
     }
