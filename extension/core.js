@@ -9,7 +9,7 @@
     highlightWords: '', highlightUsers: '', highlightBadges: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
     ambilightEnabled: false, ambilightBrightness: 70, ambilightSpread: 65, ambilightResponse: 50,
     ambilightDimUI: 0, openClipsOverlay: true, themeEnabled: true,
-    themePreset: 'aurora', chatDensity: 'comfortable', chatOpacity: 100, visualBlurEnabled: false, visualBlur: 8, visualAmbilightEnabled: false, visualAmbilightIntensity: 50, performanceMode: false, visualAccentEnabled: false, visualAccent: '#32d4da', visualCornerRadius: 8
+    themePreset: 'aurora', chatDensity: 'comfortable', chatOpacity: 100, visualBlurEnabled: false, visualBlur: 8, visualAmbilightEnabled: false, youtubeAmbientEnabled: true, visualAmbilightIntensity: 50, performanceMode: false, visualAccentEnabled: false, visualAccent: '#32d4da', visualCornerRadius: 8
   });
   const reserved = new Set(['directory', 'settings', 'subscriptions', 'videos', 'downloads',
     'inventory', 'wallet', 'drops', 'search', 'following', 'friends', 'messages',
