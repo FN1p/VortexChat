@@ -12,7 +12,7 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win nsis portable",
+    "dist": "electron-builder --win nsis portable --publish never",
     "build:installer": "electron-builder --win nsis",
     "build:portable": "electron-builder --win portable"
   },
@@ -84,5 +84,9 @@
   "devDependencies": {
     "electron": "^34.0.0",
     "electron-builder": "^25.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FN1p/vortexchat-extension.git"
   }
 }
