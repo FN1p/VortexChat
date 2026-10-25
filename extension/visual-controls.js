@@ -14,33 +14,66 @@ function getVideo(){
  return [...document.querySelectorAll('video')].filter(v=>{const r=v.getBoundingClientRect();return r.width>200&&r.height>110})
  .sort((a,b)=>b.clientWidth*b.clientHeight-a.clientWidth*a.clientHeight)[0]||null;
 }
-function stopLight(){clearInterval(timer);timer=0;light?.remove();light=null;currentVideo=null;}
+function stopLight(){
+ clearInterval(timer);timer=0;
+ light?.remove();light=null;currentVideo=null;
+}
 function startLight(){
  if(timer||!topPage)return;
+ // The older glow used z-index:1, leaving it *behind* YouTube's opaque player.
+ // The new transparent, pointer-events-none layer floats above page backgrounds.
  light=document.createElement('div');light.className='vortex-ambient-layer';
- Object.assign(light.style,{position:'fixed',pointerEvents:'none',zIndex:'1',borderRadius:'14px',display:'none',willChange:'box-shadow',transition:'box-shadow 320ms ease'});
+ Object.assign(light.style,{position:'fixed',pointerEvents:'none',zIndex:'2147483000',
+  borderRadius:'12px',display:'none',willChange:'box-shadow',transition:'box-shadow 400ms ease'});
  document.documentElement.append(light);
- const canvas=document.createElement('canvas');canvas.width=12;canvas.height=8;const ctx=canvas.getContext('2d',{willReadFrequently:true});
- let sampled=false;let color=[35,166,230];
+ const canvas=document.createElement('canvas');canvas.width=24;canvas.height=14;
+ const ctx=canvas.getContext('2d',{willReadFrequently:true});
+ let samplingBlocked=false;
+ let edges=[[48,134,218],[48,134,218],[48,134,218],[48,134,218]];
+ function average(data,x0,x1,y0,y1){
+  let r=0,g=0,b=0,n=0;
+  for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){
+   const i=(y*24+x)*4;r+=data[i];g+=data[i+1];b+=data[i+2];n++;
+  }
+  return [Math.round(r/n),Math.round(g/n),Math.round(b/n)];
+ }
  timer=setInterval(()=>{
   const v=getVideo();
-  if(!v||document.hidden||v.readyState<2||v.paused||document.pictureInPictureElement===v){light.style.display='none';return;}
+  if(!v||document.hidden||v.readyState<2||document.pictureInPictureElement===v){
+   if(light)light.style.display='none';return;
+  }
   const rect=v.getBoundingClientRect();
-  if(rect.bottom<0||rect.top>innerHeight){light.style.display='none';return;}
+  if(rect.bottom<0||rect.top>innerHeight||rect.width<200){
+   light.style.display='none';return;
+  }
   currentVideo=v;
-  // Video pixels may be inaccessible due to video origin/DRM. Fall back gracefully.
-  if(!sampled||v.currentTime>0){
+  if(!samplingBlocked){
    try{
-    ctx.drawImage(v,0,0,12,8);
-    const pixels=ctx.getImageData(0,0,12,8).data;let r=0,g=0,b=0,n=0;
-    for(let i=0;i<pixels.length;i+=16){r+=pixels[i];g+=pixels[i+1];b+=pixels[i+2];n++;}
-    color=[Math.round(r/n),Math.round(g/n),Math.round(b/n)];sampled=true;
-   }catch{sampled=false;const phase=Date.now()/3500;color=[Math.round(45+25*Math.sin(phase)),75,175];}
+    ctx.drawImage(v,0,0,24,14);
+    const pixels=ctx.getImageData(0,0,24,14).data;
+    edges=[
+     average(pixels,1,23,0,3), average(pixels,21,24,1,13),
+     average(pixels,1,23,11,14),average(pixels,0,3,1,13)
+    ];
+   }catch(error){
+    // Protected/cross-origin video cannot be sampled. Keep the effect visible
+    // using a calm fallback rather than hiding it or logging continuously.
+    samplingBlocked=true;
+   }
   }
   const power=clamp(settings.visualAmbilightIntensity,0,100)/100;
-  Object.assign(light.style,{display:'block',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',
-   boxShadow:`0 0 ${Math.round(35+power*95)}px ${Math.round(10+power*42)}px rgba(${color.join(',')},${(.18+power*.48).toFixed(2)})`});
- },350);
+  const alpha=(.13+power*.48).toFixed(2);
+  const spread=Math.round(5+power*26),blur=Math.round(28+power*65);
+  const rgba=index=>'rgba('+edges[index].join(',')+','+alpha+')';
+  Object.assign(light.style,{display:'block',left:rect.left+'px',top:rect.top+'px',
+    width:rect.width+'px',height:rect.height+'px',
+    boxShadow:[
+      '0 -'+spread+'px '+blur+'px '+spread+'px '+rgba(0),
+      spread+'px 0 '+blur+'px '+spread+'px '+rgba(1),
+      '0 '+spread+'px '+blur+'px '+spread+'px '+rgba(2),
+      '-'+spread+'px 0 '+blur+'px '+spread+'px '+rgba(3)
+    ].join(',')});
+ },250);
 }
 function cssApply(){
  const opacity=settings.chatOpacity/100,blur=settings.visualBlurEnabled&&!settings.performanceMode?settings.visualBlur:0;
