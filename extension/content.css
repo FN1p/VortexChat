@@ -741,3 +741,11 @@ input:checked + .vortex-slider:before {
 @media (forced-colors: active) {
   .vortex-first-message-line { outline: 2px solid Highlight; outline-offset: -2px; }
 }
+
+/* Compact message quote action; scoped to Vortex chat rows only. */
+.vortex-chat-line .vortex-message-quote {opacity:.25;background:transparent;color:#c5f7fb;border:0;border-radius:5px;padding:2px 5px;cursor:pointer}
+.vortex-chat-line:hover .vortex-message-quote,
+.vortex-chat-line .vortex-message-quote:focus-visible{opacity:1}
+.vortex-chat-line .vortex-message-quote:hover{background:rgba(64,220,226,.17)}
+.vortex-chat-line .vortex-message-quote:focus-visible{outline:2px solid #40dce2;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.vortex-chat-line .vortex-message-quote{transition:none!important}}
