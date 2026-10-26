@@ -534,9 +534,18 @@ test('hover preview is local, delayed and closes when full card opens', () => {
  const source=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
  const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
  assert.match(source,/function previewUser\(name, target\)/);
- assert.match(source,/setTimeout\(\(\) => previewUser\(name, node\), 420\)/);
+ assert.match(source,/setTimeout\(\(\) => previewUser\(name, node\), 280\)/);
  assert.match(source,/function openCard\(user, channel, trigger\) \{\s*closePreview\(\)/);
  assert.match(source,/previewTimer = setTimeout/);
  assert.match(css,/\.vortex-user-preview/);
  assert.doesNotMatch(source,/chat\.eblo\.id/);
+});
+
+test('hover preview recognizes native Twitch chat rows before enhancement', () => {
+ const source=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ assert.match(source,/previewRowSelector = .*chat-line__message/);
+ assert.match(source,/previewRowSelector = .*chat-line-message/);
+ assert.match(source,/rect\.bottom \+ 4/);
+ assert.match(source,/hoveredName !== target/);
+ assert.match(source,/closePreview\(\);\s*resume\(false\)/);
 });

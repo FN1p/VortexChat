@@ -151,6 +151,7 @@
 
     function attach(nextList) {
       if (list === nextList) return;
+      closePreview();
       resume(false);
       list?.removeEventListener('mouseenter', hoverStart);
       list = nextList;
@@ -231,18 +232,26 @@
       if (restore?.isConnected) restore.focus();
     }
 
-    // Compact preview uses only local DOM data; no profile requests or external services.
+    // Use Twitch's native message selectors; preview works before Vortex enhances the row.
     let preview = null;
     let previewTimer = null;
-    function closePreview() {
-      clearTimeout(previewTimer);
+    let hoveredName = null;
+    const previewSelector = '[data-a-target="chat-message-username"], .chat-line__username';
+    const previewRowSelector = '.chat-line__message, [data-a-target="chat-line-message"], .vortex-chat-line';
+    function clearPreviewTimer() {
+      if (previewTimer !== null) clearTimeout(previewTimer);
       previewTimer = null;
+    }
+    function closePreview() {
+      clearPreviewTimer();
+      hoveredName = null;
       preview?.remove();
       preview = null;
     }
     function previewUser(name, target) {
-      closePreview();
-      if (card || !target?.isConnected || !/^[a-z0-9_]{1,25}$/i.test(name)) return;
+      clearPreviewTimer();
+      if (card || hoveredName !== target || !target?.isConnected || !/^[a-z0-9_]{1,25}$/i.test(name)) return;
+      preview?.remove();
       const box = document.createElement('section');
       box.className = 'vortex-user-preview';
       box.setAttribute('role', 'group');
@@ -260,33 +269,37 @@
       }, 'vortex-tool-button');
       actions.append(mention, historyAction);
       box.append(heading, actions);
-      box.addEventListener('pointerenter', () => clearTimeout(previewTimer));
+      box.addEventListener('pointerenter', clearPreviewTimer);
       box.addEventListener('pointerleave', closePreview);
       document.body.appendChild(box);
       const rect = target.getBoundingClientRect();
-      const width = box.getBoundingClientRect().width;
-      const left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.left));
-      box.style.left = left + 'px';
-      box.style.top = Math.max(8, rect.top - box.offsetHeight - 8) + 'px';
+      const width = box.offsetWidth;
+      const height = box.offsetHeight;
+      box.style.left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.left)) + 'px';
+      // Prefer directly underneath the username, where the pointer can reach the actions.
+      const below = rect.bottom + 4;
+      box.style.top = (below + height <= window.innerHeight - 8 ? below : Math.max(8, rect.top - height - 4)) + 'px';
       preview = box;
     }
     document.addEventListener('pointerover', event => {
       if (event.pointerType === 'touch' || card || preview?.contains(event.target)) return;
-      const node = event.target.closest?.('[data-a-target="chat-message-username"], .chat-line__username');
-      if (!node?.closest('.vortex-chat-line')) return;
+      const node = event.target.closest?.(previewSelector);
+      if (!node?.closest(previewRowSelector) || !node.closest('body')) return;
+      if (node.contains(event.relatedTarget)) return;
       const name = (node.getAttribute('data-a-user') || node.getAttribute('data-user') || node.textContent || '').trim();
       if (!/^[a-z0-9_]{1,25}$/i.test(name)) return;
-      clearTimeout(previewTimer);
-      previewTimer = setTimeout(() => previewUser(name, node), 420);
+      if (hoveredName === node && preview) return;
+      clearPreviewTimer();
+      hoveredName = node;
+      previewTimer = setTimeout(() => previewUser(name, node), 280);
     }, true);
     document.addEventListener('pointerout', event => {
-      const node = event.target.closest?.('[data-a-target="chat-message-username"], .chat-line__username');
-      if (!node?.closest('.vortex-chat-line')) return;
-      if (node.contains(event.relatedTarget)) return;
-      clearTimeout(previewTimer);
+      const node = event.target.closest?.(previewSelector);
+      if (!node?.closest(previewRowSelector) || node.contains(event.relatedTarget)) return;
+      clearPreviewTimer();
       previewTimer = setTimeout(() => {
         if (!preview?.matches(':hover')) closePreview();
-      }, 220);
+      }, 320);
     }, true);
     function renderHistory() {
       if (!card) return;
