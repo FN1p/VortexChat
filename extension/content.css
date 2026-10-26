@@ -749,3 +749,10 @@ input:checked + .vortex-slider:before {
 .vortex-chat-line .vortex-message-quote:hover{background:rgba(64,220,226,.17)}
 .vortex-chat-line .vortex-message-quote:focus-visible{outline:2px solid #40dce2;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.vortex-chat-line .vortex-message-quote{transition:none!important}}
+
+/* Recent local chat excerpts on a username hover card. */
+.vortex-user-preview{width:310px}
+.vortex-user-preview-messages{display:grid;gap:5px;max-height:170px;overflow:auto;border-top:1px solid #42637a;padding-top:8px}
+.vortex-user-preview-label{font-size:11px;font-weight:700;letter-spacing:.02em;color:#8fdfe6}
+.vortex-user-preview-messages p{margin:0;padding:5px 7px;border-radius:6px;background:#ffffff0a;color:#dfedf5;overflow-wrap:anywhere;white-space:pre-wrap;max-height:55px;overflow:hidden}
+.vortex-user-history-heading{font-size:14px;line-height:1.4;margin:12px 0 6px;color:#83e3e8}
