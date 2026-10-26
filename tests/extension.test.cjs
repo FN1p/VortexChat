@@ -589,3 +589,12 @@ test('clicking Twitch username opens Vortex profile while native card remains ac
   assert.match(source, /passThroughNativeUserClick = true/);
   assert.match(source, /finally \{ passThroughNativeUserClick = false; \}/);
 });
+
+test('profile hover shows bounded session messages and full card labels history', () => {
+ const source=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(source,/history\.forUser\(options\.channel\(\), name\)\.slice\(-3\)/);
+ assert.match(source,/line\.textContent = String\(entry\.text \|\| ''\)\.slice\(0, 240\)/);
+ assert.match(source,/historyHeading\.textContent = 'Что писал ' \+ user/);
+ assert.match(css,/\.vortex-user-preview-messages/);
+});
