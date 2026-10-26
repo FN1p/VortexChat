@@ -560,3 +560,13 @@ test('FM first-message highlighting applies to entire Twitch chat row', () => {
  assert.match(css,/background-color: rgba\(166, 95, 242, \.25\)/);
  assert.match(script,/if \(!first\) \{ badge\?\.remove\(\); return; \}/);
 });
+
+test('user card can manage local highlighted user settings', () => {
+ const source=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const content=fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+ assert.match(content,/toast: showToast, saveSettings,/);
+ assert.match(source,/options\.saveSettings\?\.\(\{ highlightUsers: next\.join\(', '\) \}\)/);
+ assert.match(source,/Убрать подсветку/);
+ assert.match(source,/Подсвечивать ник/);
+ assert.match(source,/next\.join\(', '\)\.length > 500/);
+});
