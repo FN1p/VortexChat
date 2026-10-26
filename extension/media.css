@@ -56,3 +56,9 @@ html[data-vortex-ambilight] .top-nav { filter: brightness(calc(1 - var(--vortex-
   .vortex-clip-layout { grid-template-columns: 1fr; }
   .vortex-clip-player { min-height: 225px; }
 }
+
+/* Player action follows visibility and keyboard focus, without affecting video. */
+.vortex-ambilight-button { transition: opacity 180ms ease, background-color 160ms ease, border-color 160ms ease !important; }
+.vortex-ambilight-button:hover { background-color: rgba(31, 74, 100, .95); border-color: #59e2e8; }
+.vortex-ambilight-button:focus-visible { outline: 2px solid #59e2e8; outline-offset: 3px; opacity: 1 !important; pointer-events: auto !important; }
+@media (prefers-reduced-motion: reduce) { .vortex-ambilight-button { transition: none !important; } }
