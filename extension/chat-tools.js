@@ -293,6 +293,14 @@
       }, 'vortex-tool-button');
       mention.disabled = !validLogin;
       actions.appendChild(mention);
+      // Local-only quick actions: no account lookup or external service.
+      const copyUsername = button('Копировать ник', async () => {
+        if (!validLogin) return;
+        try { await navigator.clipboard.writeText(user); options.toast('Ник скопирован'); }
+        catch { options.toast('Не удалось скопировать ник'); }
+      }, 'vortex-tool-button');
+      copyUsername.disabled = !validLogin;
+      actions.appendChild(copyUsername);
       const findNativeUsername = () => [...(list?.querySelectorAll(USER) || [])].find(node =>
         (node.getAttribute('data-a-user') || node.getAttribute('data-user') || node.textContent || '').trim().toLocaleLowerCase() === user.toLocaleLowerCase());
       const nativeCard = button('Карточка Twitch', () => {
@@ -322,6 +330,15 @@
       search.addEventListener('input', renderHistory);
       const count = document.createElement('p');
       count.className = 'vortex-history-note';
+      const copyHistory = button('Копировать историю', async () => {
+        // Export only the bounded, already-observed messages for this user/channel.
+        const entries = history.forUser(channel, user, search.value);
+        if (!entries.length) { options.toast('Нет сообщений для копирования'); return; }
+        const text = entries.map(entry => '[' + String(entry.at || '') + '] ' + user + ': ' + String(entry.text || '')).join('\n');
+        try { await navigator.clipboard.writeText(text); options.toast('История скопирована'); }
+        catch { options.toast('Не удалось скопировать историю'); }
+      }, 'vortex-tool-button');
+      actions.appendChild(copyHistory);
       const messages = document.createElement('div');
       messages.className = 'vortex-history-list';
       dialog.append(header, info, actions, search, count, messages);

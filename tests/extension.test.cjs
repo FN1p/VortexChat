@@ -491,3 +491,12 @@ test('content script uses the extension relay and reports cached data', async ()
   assert.equal(app.getExtensionStatus().cachedSources, 6);
   assert.equal(app.catalog.visible(core.defaults)[0].code, 'Cached');
 });
+
+test('user card offers local copy actions without external lookup', () => {
+  const source = fs.readFileSync(path.join(__dirname, '../extension/chat-tools.js'), 'utf8');
+  assert.match(source, /const copyUsername = button\('Копировать ник'/);
+  assert.match(source, /const copyHistory = button\('Копировать историю'/);
+  assert.match(source, /history\.forUser\(channel, user, search\.value\)/);
+  assert.match(source, /navigator\.clipboard\.writeText\(text\)/);
+  assert.ok(!source.includes('chat.eblo.id'));
+});
