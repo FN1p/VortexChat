@@ -549,3 +549,14 @@ test('hover preview recognizes native Twitch chat rows before enhancement', () =
  assert.match(source,/hoveredName !== target/);
  assert.match(source,/closePreview\(\);\s*resume\(false\)/);
 });
+
+test('FM first-message highlighting applies to entire Twitch chat row', () => {
+ const script=fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(script,/line\.classList\.toggle\('vortex-first-message-line', first\)/);
+ assert.match(script,/data-first-time-chatter/);
+ assert.match(script,/data-first-msg/);
+ assert.match(css,/\.vortex-chat-line\.vortex-first-message-line/);
+ assert.match(css,/background-color: rgba\(166, 95, 242, \.25\)/);
+ assert.match(script,/if \(!first\) \{ badge\?\.remove\(\); return; \}/);
+});

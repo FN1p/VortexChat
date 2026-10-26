@@ -1520,18 +1520,24 @@
   }
 
   function markFirstMessage(line) {
-    const indicator = line.querySelector('[data-a-target*="first-message"], [data-test-selector*="first-message"], .first-time-chatter, .first-message-highlight');
-    const first = Boolean(indicator) || line.matches('[data-first-msg="true"], [data-first-message="true"]') ||
-      Boolean(line.parentElement?.matches('.first-time-chatter, [data-first-msg="true"], [data-first-message="true"]'));
-    let badge = line.querySelector(':scope > .vortex-first-message-badge');
+    // Detect only explicit first-time chatter markers provided by Twitch.
+    // Do not guess from the first message observed in this browser session.
+    const markers = '[data-a-target*="first-message"], [data-test-selector*="first-message"], [data-first-msg="true"], [data-first-message="true"], [data-first-time-chatter="true"], .first-time-chatter, .first-message-highlight, [data-a-target="chat-first-message-indicator"]';
+    const nativeMarker = line.matches(markers) || Boolean(line.querySelector(markers)) ||
+      Boolean(line.parentElement?.matches(markers));
+    const label = line.querySelector('[data-a-target="chat-message-first-message"], [data-test-selector="first-message-indicator"], [data-a-target="first-message-indicator"]');
+    const first = nativeMarker || Boolean(label);
+    line.classList.toggle('vortex-first-message-line', first);
+    let badge = line.querySelector('.vortex-first-message-badge');
     if (!first) { badge?.remove(); return; }
     if (!badge) {
+      const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username');
+      if (!username) return;
       badge = document.createElement('span');
       badge.className = 'vortex-first-message-badge';
       badge.textContent = 'FM';
-      badge.title = 'Первое сообщение в чате';
-      const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username');
-      username?.after(badge);
+      badge.title = 'Первое сообщение пользователя в чате';
+      username.after(badge);
     }
   }
 
