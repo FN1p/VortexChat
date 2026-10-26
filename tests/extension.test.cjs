@@ -520,3 +520,12 @@ test('interactive controls support hover, keyboard focus and reduced motion', ()
  assert.match(css, /:hover:not\(:disabled\)/);
  assert.match(media, /\.vortex-ambilight-button:hover/);
 });
+
+test('user card UI stays scoped and supports reduced motion', () => {
+  const css = fs.readFileSync(path.join(__dirname, '../extension/content.css'), 'utf8');
+  assert.match(css, /\.vortex-user-card\s*\{/);
+  assert.match(css, /\.vortex-user-card \.vortex-tool-button:hover/);
+  assert.match(css, /\.vortex-user-card input\[type=search\]/);
+  assert.match(css, /prefers-reduced-motion:reduce/);
+  assert.doesNotMatch(css.slice(css.lastIndexOf('Vortex Studio user card')), /(?:^|\n)\s*(?:html|body|:root)\s*\{/);
+});

@@ -661,3 +661,38 @@ input:checked + .vortex-slider:before {
   .vortex-tool-button, .vortex-user-history-button, .vortex-message-copy,
   .vortex-quick-all, .seventv-header-btn { transition: none !important; transform: none !important; }
 }
+
+
+/* Vortex Studio user card: isolated design tokens, no global Twitch styles. */
+.vortex-user-card {
+ --vc-panel:#111923;--vc-accent:#40dce2;--vc-border:#314e63;
+ background:linear-gradient(155deg,#172736 0%,var(--vc-panel) 55%,#171326 100%);
+ border:1px solid var(--vc-border);border-radius:16px;
+ box-shadow:0 26px 90px #000b,0 0 0 1px #65d9e51b inset;
+ overflow:hidden;animation:vortex-card-enter 170ms ease-out;
+}
+.vortex-user-card::before{content:"";display:block;height:3px;flex:none;
+ background:linear-gradient(90deg,#40dce2,#986aff,#40dce2);}
+.vortex-user-card header{padding-bottom:12px;border-bottom:1px solid #ffffff20;}
+.vortex-user-card h2{color:#f4fcff;font-weight:750;letter-spacing:.015em;}
+.vortex-user-actions{display:flex;gap:7px;flex-wrap:wrap;padding:12px 0;}
+.vortex-user-card .vortex-tool-button{
+ border-radius:9px;border:1px solid #395365;background:#1b2c3d;
+ color:#e6f8ff;min-height:30px;transition:background 140ms,border-color 140ms,transform 140ms,box-shadow 140ms;
+}
+.vortex-user-card .vortex-tool-button:hover:not(:disabled){
+ background:#28475a;border-color:#51dce2;box-shadow:0 3px 13px #2cc4e022;transform:translateY(-1px);
+}
+.vortex-user-card .vortex-tool-button:focus-visible,
+.vortex-user-card input:focus-visible{outline:2px solid #66e8e9;outline-offset:2px;}
+.vortex-user-card input[type=search]{
+ background:#0b1420;border-radius:10px;border:1px solid #345168;min-height:40px;
+}
+.vortex-user-card .vortex-history-message{border-radius:8px;transition:background 140ms,border-color 140ms;}
+.vortex-user-card .vortex-history-message:hover{background:#3ed7df10;}
+.vortex-user-card-overlay{backdrop-filter:blur(5px);}
+@keyframes vortex-card-enter{from{opacity:0;transform:translateY(8px) scale(.986)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){
+ .vortex-user-card{animation:none!important}
+ .vortex-user-card .vortex-tool-button,.vortex-user-card .vortex-history-message{transition:none!important;transform:none!important}
+}
