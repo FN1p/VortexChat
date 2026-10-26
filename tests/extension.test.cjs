@@ -500,3 +500,11 @@ test('user card offers local copy actions without external lookup', () => {
   assert.match(source, /navigator\.clipboard\.writeText\(text\)/);
   assert.ok(!source.includes('chat.eblo.id'));
 });
+
+test('user card supports scoped search shortcuts without changing chat input', () => {
+  const source = fs.readFileSync(path.join(__dirname, '../extension/chat-tools.js'), 'utf8');
+  assert.match(source, /card\.search\.focus\(\); card\.search\.select\(\)/);
+  assert.match(source, /event\.key\.toLowerCase\(\) === 'f'/);
+  assert.match(source, /search\.addEventListener\('keydown'/);
+  assert.match(source, /if \(event\.key === 'Escape'\)/);
+});
