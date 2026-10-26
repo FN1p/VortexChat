@@ -1,0 +1,22 @@
+/* VortexChat popup localization. Only changes presentation, never chat messages. */
+(() => {
+ const translations = new Map([["Твой чат. Твой ритм.","Your chat. Your rhythm."],["Подключение…","Connecting…"],["Проверка связи","Checking connection"],["Проверка активной вкладки…","Checking active tab…"],["Прозрачность чата · Twitch / YouTube","Chat transparency · Twitch / YouTube"],["Непрозрачность фона","Background opacity"],["100% — обычный фон; 0% — прозрачный. Текст остаётся видимым.","100% — opaque; 0% — transparent. Text stays visible."],["Плеер и производительность","Player and performance"],["Размытие фона чата","Blur chat background"],["Сила размытия","Blur strength"],["Дополнительная подсветка видео","Additional video glow"],["Интенсивность свечения","Glow intensity"],["Режим производительности","Performance mode"],["Отключает новую подсветку и размытие","Disables additional glow and blur"],["Кинотеатр","Theater mode"],["Горячие клавиши: Alt+Shift+T — кинотеатр, Alt+Shift+P — PiP, Alt+Shift+O — прозрачность.","Shortcuts: Alt+Shift+T — theater, Alt+Shift+P — PiP, Alt+Shift+O — opacity."],["Кастомизация Beta","Beta customization"],["Неоновая рамка","Neon border"],["Цвет акцента","Accent color"],["Скругление панелей","Panel corner radius"],["Удобство чтения","Readability"],["Размер текста","Font size"],["Отступ сообщений","Message spacing"],["Отступ смайлов","Emote spacing"],["Скорость чата в шапке","Chat speed in header"],["Кнопка копирования сообщений","Copy message button"],["Пейнты и бейджи 7TV","7TV paints and badges"],["Время сообщений","Message timestamps"],["Время появления в расширении","Time seen by extension"],["Чередование фона строк","Alternating row backgrounds"],["Пауза при наведении","Pause on hover"],["Ручная пауза — кнопкой Ⅱ в шапке чата","Manual pause via Ⅱ in chat header"],["Группировать повторы","Collapse repeated messages"],["Одинаковые сообщения одного автора подряд","Consecutive identical messages from one author"],["Подсветка слов и упоминаний","Highlight words and mentions"],["Через запятую · без учёта регистра","Comma-separated · case insensitive"],["Подсветка пользователей","Highlight users"],["Точное совпадение Twitch-имени","Exact Twitch username match"],["Подсветка бейджей","Highlight badges"],["Название бейджа через запятую","Comma-separated badge names"],["Смайлы и ввод","Emotes and input"],["Наложение Zero-Width","Zero-width emote overlay"],["Автодополнение по Tab","Tab autocomplete"],["Enter отправляет сообщение как обычно","Enter sends messages normally"],["Уведомления об изменении сета","Emote set change notifications"],["Оформление Twitch","Twitch appearance"],["Тема VortexChat на Twitch","VortexChat Twitch theme"],["Палитра","Palette"],["Аврора","Aurora"],["Графит","Graphite"],["Орхидея","Orchid"],["Плотность чата","Chat density"],["Обычная","Normal"],["Компактная","Compact"],["Видео и клипы","Video and clips"],["Яркость","Brightness"],["Размах свечения","Glow spread"],["Клипы поверх страницы","Overlay clips"],["Все настройки","All settings"],["Обновить смайлы","Refresh emotes"],["Экспорт настроек","Export settings"],["Импорт настроек","Import settings"]]);
+ const languageKey='vortexLanguage';
+ document.addEventListener('DOMContentLoaded', async () => {
+   const chooser=document.getElementById('vortex-language');
+   if(!chooser)return;
+   const nodes=[];
+   const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+   while(walker.nextNode()){const n=walker.currentNode;const raw=n.nodeValue;const label=raw.trim();if(translations.has(label))nodes.push({node:n,original:raw,translated:translations.get(label)});}
+   function apply(lang){
+     document.documentElement.lang=lang;
+     for(const item of nodes){
+       const leading=item.original.match(/^\s*/)[0],trailing=item.original.match(/\s*$/)[0];
+       item.node.nodeValue=lang==='en'?leading+item.translated+trailing:item.original;
+     }
+     chooser.value=lang;
+   }
+   try{const r=await chrome.storage.local.get(languageKey);apply(r[languageKey]==='en'?'en':'ru');}catch{apply('ru');}
+   chooser.addEventListener('change',()=>{apply(chooser.value);chrome.storage.local.set({[languageKey]:chooser.value}).catch(()=>{});});
+ });
+})();
