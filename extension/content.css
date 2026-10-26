@@ -641,3 +641,23 @@ input:checked + .vortex-slider:before {
 .vortex-native-clear-recent:hover { color: #fff; text-decoration: underline; }
 .vortex-user-card, .seventv-settings-modal, .seventv-emote-card { color-scheme: dark; }
 .vortex-history-copy { font-family: inherit; font-size: 11px; line-height: 1.4; }
+
+/* Accessible, consistent interactive states across chat actions and user cards. */
+.vortex-tool-button, .vortex-user-history-button, .vortex-message-copy,
+.vortex-quick-all, .seventv-header-btn {
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, opacity 160ms ease;
+}
+.vortex-tool-button:hover:not(:disabled), .vortex-quick-all:hover:not(:disabled),
+.seventv-header-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.vortex-tool-button:active:not(:disabled), .vortex-quick-all:active:not(:disabled),
+.seventv-header-btn:active:not(:disabled) { transform: translateY(0); }
+.vortex-tool-button:focus-visible, .vortex-quick-all:focus-visible,
+.seventv-header-btn:focus-visible, .vortex-user-history-button:focus-visible,
+.vortex-message-copy:focus-visible {
+  outline: 2px solid #57dadd; outline-offset: 2px;
+}
+.vortex-tool-button:disabled { cursor: not-allowed; opacity: .5; }
+@media (prefers-reduced-motion: reduce) {
+  .vortex-tool-button, .vortex-user-history-button, .vortex-message-copy,
+  .vortex-quick-all, .seventv-header-btn { transition: none !important; transform: none !important; }
+}

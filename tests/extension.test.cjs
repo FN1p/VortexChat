@@ -508,3 +508,15 @@ test('user card supports scoped search shortcuts without changing chat input', (
   assert.match(source, /search\.addEventListener\('keydown'/);
   assert.match(source, /if \(event\.key === 'Escape'\)/);
 });
+
+test('interactive controls support hover, keyboard focus and reduced motion', () => {
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ const media=fs.readFileSync(path.join(__dirname,'../extension/media.css'),'utf8');
+ const visual=fs.readFileSync(path.join(__dirname,'../extension/visual-controls.js'),'utf8');
+ for(const item of [css,media,visual]){
+  assert.match(item, /:focus-visible/);
+  assert.match(item, /prefers-reduced-motion:\s*reduce/);
+ }
+ assert.match(css, /:hover:not\(:disabled\)/);
+ assert.match(media, /\.vortex-ambilight-button:hover/);
+});
