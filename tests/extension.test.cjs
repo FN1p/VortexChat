@@ -529,3 +529,14 @@ test('user card UI stays scoped and supports reduced motion', () => {
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.doesNotMatch(css.slice(css.lastIndexOf('Vortex Studio user card')), /(?:^|\n)\s*(?:html|body|:root)\s*\{/);
 });
+
+test('hover preview is local, delayed and closes when full card opens', () => {
+ const source=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(source,/function previewUser\(name, target\)/);
+ assert.match(source,/setTimeout\(\(\) => previewUser\(name, node\), 420\)/);
+ assert.match(source,/function openCard\(user, channel, trigger\) \{\s*closePreview\(\)/);
+ assert.match(source,/previewTimer = setTimeout/);
+ assert.match(css,/\.vortex-user-preview/);
+ assert.doesNotMatch(source,/chat\.eblo\.id/);
+});
