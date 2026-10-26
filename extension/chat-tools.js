@@ -414,7 +414,9 @@
         if (!native) { options.toast('Пользователя больше нет в видимой ленте'); return; }
         resume(false);
         closeCard();
-        (native.closest('button') || native).click();
+        passThroughNativeUserClick = true;
+        try { (native.closest('button') || native).click(); }
+        finally { passThroughNativeUserClick = false; }
       }, 'vortex-tool-button');
       nativeCard.disabled = !findNativeUsername();
       nativeCard.title = 'Открыть встроенную карточку Twitch с доступными действиями';
@@ -500,6 +502,25 @@
         event.preventDefault();
         event.stopPropagation();
       }
+    }, true);
+
+    // Clicking a Twitch username opens Vortex's full profile card.
+    // Preserve modifier-click and provide access to Twitch's native user card.
+    let passThroughNativeUserClick = false;
+    document.addEventListener('click', event => {
+      if (passThroughNativeUserClick || event.defaultPrevented || event.button !== 0 ||
+          event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const username = event.target.closest?.(USER);
+      if (!username || !username.closest(LINE + ', .vortex-paused-view')) return;
+      if (card?.overlay.contains(username)) return;
+      const user = (username.getAttribute('data-a-user') ||
+        username.getAttribute('data-user') ||
+        username.querySelector('[data-a-user]')?.getAttribute('data-a-user') ||
+        username.textContent || '').trim();
+      if (!/^[a-z0-9_]{1,25}$/i.test(user)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openCard(user, options.channel(), username);
     }, true);
 
     document.addEventListener('click', event => {
