@@ -696,3 +696,24 @@ input:checked + .vortex-slider:before {
  .vortex-user-card{animation:none!important}
  .vortex-user-card .vortex-tool-button,.vortex-user-card .vortex-history-message{transition:none!important;transform:none!important}
 }
+
+
+/* Compact, independently implemented hover actions for Twitch usernames. */
+.vortex-user-preview {
+  position:fixed;z-index:10000001;width:236px;max-width:calc(100vw - 16px);
+  display:flex;flex-direction:column;gap:10px;padding:12px;
+  border:1px solid #3e7686;border-radius:12px;color:#edfaff;
+  background:linear-gradient(145deg,#1d3444,#111825 75%);
+  box-shadow:0 14px 42px #000a; font:13px/1.35 "Segoe UI",sans-serif;
+  animation:vortex-preview-in 135ms ease-out;
+}
+.vortex-user-preview strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;}
+.vortex-user-preview>div{display:flex;gap:7px;}
+.vortex-user-preview .vortex-tool-button{
+ flex:1;padding:7px 5px;border:1px solid #47667b;border-radius:8px;
+ background:#233b4e;color:#edfcff;cursor:pointer;
+}
+.vortex-user-preview .vortex-tool-button:hover{background:#315a70;border-color:#5cdce4;}
+.vortex-user-preview .vortex-tool-button:focus-visible{outline:2px solid #70edf0;outline-offset:2px;}
+@keyframes vortex-preview-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.vortex-user-preview{animation:none!important;}}

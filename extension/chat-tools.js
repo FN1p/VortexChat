@@ -231,6 +231,63 @@
       if (restore?.isConnected) restore.focus();
     }
 
+    // Compact preview uses only local DOM data; no profile requests or external services.
+    let preview = null;
+    let previewTimer = null;
+    function closePreview() {
+      clearTimeout(previewTimer);
+      previewTimer = null;
+      preview?.remove();
+      preview = null;
+    }
+    function previewUser(name, target) {
+      closePreview();
+      if (card || !target?.isConnected || !/^[a-z0-9_]{1,25}$/i.test(name)) return;
+      const box = document.createElement('section');
+      box.className = 'vortex-user-preview';
+      box.setAttribute('role', 'group');
+      box.setAttribute('aria-label', 'Быстрые действия: ' + name);
+      const heading = document.createElement('strong');
+      heading.textContent = name;
+      const actions = document.createElement('div');
+      const mention = button('@ Упомянуть', () => {
+        if (!options.insertText('@' + name + ' ')) options.toast('Поле ввода Twitch недоступно');
+        closePreview();
+      }, 'vortex-tool-button');
+      const historyAction = button('История', () => {
+        closePreview();
+        openCard(name, options.channel(), target);
+      }, 'vortex-tool-button');
+      actions.append(mention, historyAction);
+      box.append(heading, actions);
+      box.addEventListener('pointerenter', () => clearTimeout(previewTimer));
+      box.addEventListener('pointerleave', closePreview);
+      document.body.appendChild(box);
+      const rect = target.getBoundingClientRect();
+      const width = box.getBoundingClientRect().width;
+      const left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.left));
+      box.style.left = left + 'px';
+      box.style.top = Math.max(8, rect.top - box.offsetHeight - 8) + 'px';
+      preview = box;
+    }
+    document.addEventListener('pointerover', event => {
+      if (event.pointerType === 'touch' || card || preview?.contains(event.target)) return;
+      const node = event.target.closest?.('[data-a-target="chat-message-username"], .chat-line__username');
+      if (!node?.closest('.vortex-chat-line')) return;
+      const name = (node.getAttribute('data-a-user') || node.getAttribute('data-user') || node.textContent || '').trim();
+      if (!/^[a-z0-9_]{1,25}$/i.test(name)) return;
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(() => previewUser(name, node), 420);
+    }, true);
+    document.addEventListener('pointerout', event => {
+      const node = event.target.closest?.('[data-a-target="chat-message-username"], .chat-line__username');
+      if (!node?.closest('.vortex-chat-line')) return;
+      if (node.contains(event.relatedTarget)) return;
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(() => {
+        if (!preview?.matches(':hover')) closePreview();
+      }, 220);
+    }, true);
     function renderHistory() {
       if (!card) return;
       const entries = history.forUser(card.channel, card.user, card.search.value);
@@ -266,6 +323,7 @@
     }
 
     function openCard(user, channel, trigger) {
+      closePreview();
       closeCard();
       const overlay = document.createElement('div');
       overlay.className = 'vortex-user-card-overlay';
