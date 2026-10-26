@@ -1,50 +1,73 @@
-# VortexChat — PFT Studio
+<div align="center">
 
-Браузерное расширение для удобного чтения чата Twitch. Проект вдохновлён возможностями Chatterino+; текущая работа сосредоточена на расширении, версия 4.1.0.
+# ⚡ VortexChat
 
-В 4.1.0 добавлены пейнты и бейджи 7TV, а также подсветка по имени пользователя и бейджу. Также доступны метка FM для первых сообщений и затемнённое отображение удалённых сообщений, которые расширение успело увидеть до удаления.
+**A customizable streaming companion for Twitch and YouTube**
 
-## Расширение
+**Удобный чат, гибкие настройки и подсветка видео для стримов**
 
-- Смайлы 7TV, BetterTTV и FrankerFaceZ в сообщениях и меню Twitch.
-- Размер текста, время сообщений, чередование строк и подсветка слов.
-- Группировка повторов одного автора, автодополнение по Tab и Zero-Width.
-- Обновления сетов 7TV с восстановлением соединения.
-- Ручная пауза и пауза при наведении со счётчиком новых сообщений.
-- История пользователя, поиск и копирование сообщений, быстрые упоминания.
-- Избранные смайлы, экспорт и импорт настроек.
-- Фоновая загрузка API с запасным адресом 7TV и локальным кэшем; скорость чата и настраиваемые отступы.
-- Настройки и состояние подключения через значок VortexChat.
-- Ambilight с кнопкой в плеере и открытие клипов поверх страницы через встроенный плеер Twitch.
+[![Release](https://img.shields.io/github/v/release/FN1p/VortexChat?include_prereleases&style=for-the-badge&label=Beta%20release)](https://github.com/FN1p/VortexChat/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/FN1p/VortexChat/extension.yml?branch=main&style=for-the-badge&label=Extension%20checks)](https://github.com/FN1p/VortexChat/actions)
+[![License](https://img.shields.io/github/license/FN1p/VortexChat?style=for-the-badge)](LICENSE)
 
-Установка: откройте `chrome://extensions/`, включите режим разработчика, выберите «Загрузить распакованное расширение» и укажите папку `extension/`. Затем обновите Twitch. Для обновления уже установленного расширения нажмите кнопку перезагрузки на его карточке и обновите вкладку Twitch.
+**[⬇ Download / Скачать](https://github.com/FN1p/VortexChat/releases)** · **[English](#english)** · **[Русский](#русский)** · **[Issues](https://github.com/FN1p/VortexChat/issues)**
 
-Подробности, ограничения и проверки: [extension/README.md](extension/README.md). Сопоставление с Chatterino+: [extension/PARITY.md](extension/PARITY.md).
+</div>
 
-## Разработка расширения
+---
 
-Сборка и установка зависимостей не требуются. Для регрессионных тестов нужен Node.js 20+:
+## English
 
-```sh
+VortexChat is an independent, experimental streaming toolkit from **PFT Studio**. It combines a **Windows desktop Twitch chat client** with a **Chromium browser extension** for Twitch chat enhancements and YouTube player visuals.
+
+| 🪟 Desktop (Windows) | 🧩 Browser extension |
+| --- | --- |
+| Twitch chat, multiple channels, emotes | 7TV, BTTV and FFZ on Twitch |
+| OBS Browser Source overlay on localhost:5222 | Message highlights, favorites, reading tools |
+| Setup installer or portable EXE | YouTube player glow, theater mode, PiP |
+| Release notifications (opens GitHub; no automatic installation yet) | Opacity, blur and visual preferences |
+
+### Installation
+
+**Windows:** download `VortexChat-Setup-*.exe` (installer) or `VortexChat-Portable-*.exe` from [Releases](https://github.com/FN1p/VortexChat/releases). For Twitch login, you need your own Twitch application Client ID.
+
+**Browser:** download `VortexChat-7TV-Extension.zip`, extract it, open `chrome://extensions`, enable *Developer mode*, choose *Load unpacked* and select the extracted folder. Refresh any already-open Twitch or YouTube tabs.
+
+**Beta limitations:** YouTube Ambilight depends on video playback and browser media restrictions. Some protected videos may show a fallback glow. Desktop release checks use GitHub; automatic background download and installation are not yet implemented. This project is not affiliated with Twitch, YouTube, 7TV or BTTV.
+
+## Русский
+
+**VortexChat** — экспериментальный проект PFT Studio для стримеров. В нём есть отдельный Windows-клиент чата Twitch и браузерное расширение для Twitch и YouTube.
+
+- **Windows:** несколько каналов, смайлы 7TV/BTTV/FFZ, чат и оверлей для OBS на `127.0.0.1:5222`.
+- **Twitch в браузере:** смайлы, подсветка сообщений, инструменты чтения и настройки отображения.
+- **YouTube:** Ambilight, кнопка ✦ Vortex в плеере, кинотеатральный режим, PiP и визуальные настройки.
+- **Обновления:** Windows-приложение проверяет GitHub Releases и предлагает открыть страницу обновления. Автоматической установки пока нет.
+
+### Установка
+
+**На Windows:** скачайте `VortexChat-Setup-*.exe` или `VortexChat-Portable-*.exe` со страницы [Releases](https://github.com/FN1p/VortexChat/releases).
+
+**Расширение:** скачайте ZIP, распакуйте, откройте `chrome://extensions`, включите **Режим разработчика**, нажмите **Загрузить распакованное расширение** и выберите папку с файлами. Обновите страницы Twitch/YouTube.
+
+**Ограничения Beta:** подсветка видео может работать по-разному в зависимости от браузера и защиты контента. Некоторые эффекты ещё требуют проверки на реальных трансляциях.
+
+---
+
+### Development / Разработка
+
+```bash
 node --test tests/extension.test.cjs
-node tests/browser-server.cjs
+node --test tests/desktop-*.test.cjs
 ```
 
-Браузерные тесты: `http://127.0.0.1:5187/forsen`. Проверки окна настроек: `http://127.0.0.1:5187/popup-tests`. Интерактивное превью: `http://127.0.0.1:5187/forsen?preview=1`. API и отправка сообщений на стенде подставные.
+| Directory | Purpose |
+| --- | --- |
+| `desktop-app/` | Electron application and OBS bridge |
+| `extension/` | Manifest V3 Chromium extension |
+| `tests/` | Regression tests |
+| `.github/workflows/` | Windows builds and extension checks |
 
-## Структура
+More details: [Extension guide](extension/README.md) · [Desktop guide](desktop-app/README.md) · [License](LICENSE).
 
-```text
-extension/       Браузерное расширение Manifest V3
-tests/           Проверки логики и браузерные фикстуры
-desktop-app/     Настольный Electron-клиент и OBS-оверлей; сборки Setup и Portable
-.github/        Существующий процесс сборки и релизов
-```
-
-Настольная версия собирается в установщик и переносимый `.exe`; инструкции и ограничения указаны в [desktop-app/README.md](desktop-app/README.md). Косметика 7TV и полное соответствие Chatterino+ пока не реализованы.
-
-Настольный чат поддерживает вход по коду Twitch, отправку через официальный API, поиск, паузу, подсветку, локальную историю зрителя и смайлы 7TV, BTTV и FFZ. Для входа нужен Client ID собственного приложения Twitch.
-
-## Лицензия
-
-[MIT](LICENSE). PFT Studio · artempft@gmail.com.
+<div align="center"><sub>Made by PFT Studio · Experimental beta software</sub></div>
