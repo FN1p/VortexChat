@@ -1,7 +1,7 @@
 {
   "name": "vortexchat",
   "productName": "VortexChat",
-  "version": "1.3.10",
+  "version": "1.3.11",
   "description": "VortexChat standalone desktop chat client with integrated OBS Studio overlay server by PFT Studio",
   "main": "main.js",
   "author": {
