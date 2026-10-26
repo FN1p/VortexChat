@@ -13,6 +13,7 @@
     <p id="emote-status" aria-live="polite">Проверка активной вкладки…</p>
   </header>
   <main>
+    <div class="actions"><label for="vortex-language">Language / Язык</label><select id="vortex-language" aria-label="Language"><option value="ru">Русский</option><option value="en">English</option></select></div>
     <section aria-labelledby="opacity-heading"><h2 id="opacity-heading">Прозрачность чата · Twitch / YouTube</h2><div class="card"><div class="font-row"><label for="chat-opacity">Непрозрачность фона</label><output id="chat-opacity-value" for="chat-opacity">100%</output></div><input type="range" id="chat-opacity" data-key="chatOpacity" min="0" max="100" value="100"/><small>100% — обычный фон; 0% — прозрачный. Текст остаётся видимым.</small></div></section>
     <section aria-labelledby="visual-heading"><h2 id="visual-heading">Плеер и производительность</h2><div class="card">
 <label class="row"><span>Размытие фона чата</span><input type="checkbox" data-key="visualBlurEnabled"/><span class="switch" aria-hidden="true"></span></label>
@@ -84,5 +85,6 @@
   <footer><span>PFT Studio</span><span>Twitch · 7TV · BTTV · FFZ</span></footer>
   <script src="core.js"></script>
   <script src="popup.js"></script>
+  <script src="i18n.js"></script>
 </body>
 </html>
