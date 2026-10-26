@@ -372,6 +372,28 @@
       }, 'vortex-tool-button');
       copyUsername.disabled = !validLogin;
       actions.appendChild(copyUsername);
+      const highlightedUsers = String(options.settings().highlightUsers || '').split(',').map(part => part.trim()).filter(Boolean);
+      const alreadyHighlighted = highlightedUsers.some(part => part.toLowerCase() === user.toLowerCase());
+      const highlightAction = button(alreadyHighlighted ? 'Убрать подсветку' : 'Подсвечивать ник', () => {
+        if (!validLogin) return;
+        const current = String(options.settings().highlightUsers || '').split(',').map(part => part.trim()).filter(Boolean);
+        const exists = current.some(part => part.toLowerCase() === user.toLowerCase());
+        const next = exists ? current.filter(part => part.toLowerCase() !== user.toLowerCase()) : [...current, user];
+        if (next.join(', ').length > 500) { options.toast('Список подсветки заполнен'); return; }
+        options.saveSettings?.({ highlightUsers: next.join(', ') });
+        // Update current visible rows without waiting for another chat message.
+        list?.querySelectorAll(LINE).forEach(row => {
+          const username = row.querySelector(USER);
+          const login = (username?.getAttribute('data-a-user') || username?.getAttribute('data-user') || username?.textContent || '').trim();
+          if (login.toLowerCase() !== user.toLowerCase()) return;
+          if (!exists) row.classList.add('vortex-highlight-line');
+          else row.classList.remove('vortex-highlight-line');
+        });
+        closeCard();
+        options.toast(exists ? 'Подсветка ника выключена' : 'Подсветка ника включена');
+      }, 'vortex-tool-button');
+      highlightAction.disabled = !validLogin || typeof options.saveSettings !== 'function';
+      actions.appendChild(highlightAction);
       const findNativeUsername = () => [...(list?.querySelectorAll(USER) || [])].find(node =>
         (node.getAttribute('data-a-user') || node.getAttribute('data-user') || node.textContent || '').trim().toLocaleLowerCase() === user.toLocaleLowerCase());
       const nativeCard = button('Карточка Twitch', () => {

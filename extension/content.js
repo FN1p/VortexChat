@@ -2120,7 +2120,7 @@
   // =========================================================================
   function init() {
     chatTools = VortexChatTools.create({ settings: () => state.settings, channel: () => state.currentChannel,
-      getText: messageText, insertText: insertTextIntoTwitchChat, toast: showToast,
+      getText: messageText, insertText: insertTextIntoTwitchChat, toast: showToast, saveSettings,
       openEmote: code => { const emote = emoteMap.get(code); if (emote) open7TVEmoteCard(emote); else showToast('Этот смайл больше не доступен на канале'); } });
     loadSettings();
     applySettings();
