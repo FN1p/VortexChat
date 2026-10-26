@@ -85,6 +85,10 @@ function cssApply(){
  ${sel}{background-color:rgba(15,18,28,${opacity})!important;${blur?`backdrop-filter:blur(${blur}px)!important;`:''}}
  ${yt?'ytd-live-chat-frame,yt-live-chat-renderer':'.chat-room'}{border-radius:${radius}px!important;${settings.visualAccentEnabled?`outline:1px solid ${accent}88!important;`:''}}
  ${theater?(yt?'#secondary,#related{display:none!important}':'.channel-root__right-column{display:none!important}') : ''}
+ .vortex-yt-settings:hover{background:#223d51!important;border-color:#63e8e9!important;transform:translateY(-1px)}
+ .vortex-yt-settings:focus-visible,.vortex-yt-panel button:focus-visible{outline:2px solid #63e8e9!important;outline-offset:2px}
+ .vortex-yt-panel button:hover{background:#28506a!important}
+ @media(prefers-reduced-motion:reduce){.vortex-yt-settings,.vortex-yt-panel button{transition:none!important;transform:none!important}}
  .vortex-yt-settings{font-family:Arial,sans-serif!important;background:#171a26!important;color:#eaf5ff!important;border:1px solid #45d4d866!important;border-radius:9px!important;cursor:pointer!important}
  .vortex-yt-panel{position:absolute;bottom:56px;right:12px;width:255px;box-sizing:border-box;z-index:2147483646;background:#111724;color:#f0f6ff;border:1px solid #39d8d077;border-radius:14px;padding:15px;box-shadow:0 12px 35px #000b;font:13px Arial,sans-serif}
  .vortex-yt-panel label{display:flex;justify-content:space-between;gap:10px;margin:10px 0;align-items:center}
