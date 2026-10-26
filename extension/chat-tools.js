@@ -328,6 +328,9 @@
       search.setAttribute('aria-label', 'Поиск по истории пользователя');
       search.maxLength = 200;
       search.addEventListener('input', renderHistory);
+      search.addEventListener('keydown', event => {
+        if (event.key === 'Enter') { event.preventDefault(); card?.messages.querySelector('button')?.focus(); }
+      });
       const count = document.createElement('p');
       count.className = 'vortex-history-note';
       const copyHistory = button('Копировать историю', async () => {
@@ -443,6 +446,11 @@
     document.addEventListener('keydown', event => {
       if (!card) return;
       if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); closeCard(); return; }
+      // Ctrl+F inside the card searches its local message history, not the page.
+      if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'f') {
+        event.preventDefault(); event.stopPropagation();
+        card.search.focus(); card.search.select(); return;
+      }
       if (event.key !== 'Tab') return;
       const controls = [...card.overlay.querySelectorAll('button:not(:disabled), a[href], input')];
       const first = controls[0];
