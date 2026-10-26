@@ -59,16 +59,16 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
 
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release VortexChat Beta v1.3.11'))
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release VortexChat Beta v1.3.12'))
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.11-beta.9' }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.12-beta.10' }}
           target_commitish: ${{ github.sha }}
           files: |
             desktop-app/dist/VortexChat-Setup-*.exe
             desktop-app/dist/VortexChat-Portable-*.exe
             desktop-app/dist/VortexChat-7TV-Extension.zip
-          name: VortexChat ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.11-beta.9' }} (PFT Studio)
+          name: VortexChat ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.12-beta.10' }} (PFT Studio)
           body: |
             ## ⚡ VortexChat Beta 3 — OBS port conflict fix
             - Prevent a second VortexChat process from binding port 5222.
