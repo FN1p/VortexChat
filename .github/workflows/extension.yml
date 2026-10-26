@@ -22,7 +22,7 @@ jobs:
         run: |
           for file in extension/*.js; do node --check "$file"; done
       - name: Run regression tests
-        run: node --test tests/extension.test.cjs
+        run: node --test tests/extension.test.cjs tests/extension-locales.test.cjs
       - name: Package extension independently of desktop app
         working-directory: extension
         run: zip -r ../VortexChat-Extension.zip .

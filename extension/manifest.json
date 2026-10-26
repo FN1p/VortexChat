@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "VortexChat — Twitch & YouTube Live",
+  "name": "__MSG_extensionName__",
   "author": "PFT Studio",
   "version": "4.4.0",
-  "description": "VortexChat Beta for Twitch and YouTube Live: customizable opacity, blur, neon accents, theater mode, PiP and performance controls.",
+  "description": "__MSG_extensionDescription__",
   "permissions": [
     "storage",
     "tabs",
@@ -88,5 +88,6 @@
       ]
     }
   ],
-  "version_name": "4.4.0 Beta 1"
+  "version_name": "4.4.0 Beta — RU/EN",
+  "default_locale": "ru"
 }
