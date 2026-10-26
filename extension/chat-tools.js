@@ -281,7 +281,27 @@
         openCard(name, options.channel(), target);
       }, 'vortex-tool-button');
       actions.append(mention, historyAction);
-      box.append(heading, actions);
+      // Show a bounded preview from messages already observed on this tab.
+      const recent = history.forUser(options.channel(), name).slice(-3);
+      const latest = document.createElement('div');
+      latest.className = 'vortex-user-preview-messages';
+      const sectionLabel = document.createElement('span');
+      sectionLabel.className = 'vortex-user-preview-label';
+      sectionLabel.textContent = 'Последние сообщения · ' + recent.length;
+      latest.appendChild(sectionLabel);
+      if (!recent.length) {
+        const empty = document.createElement('p');
+        empty.textContent = 'Сообщений в текущей вкладке пока нет';
+        latest.appendChild(empty);
+      } else {
+        for (const entry of recent) {
+          const line = document.createElement('p');
+          line.textContent = String(entry.text || '').slice(0, 240);
+          line.title = String(entry.text || '');
+          latest.appendChild(line);
+        }
+      }
+      box.append(heading, latest, actions);
       box.addEventListener('pointerenter', clearPreviewTimer);
       box.addEventListener('pointerleave', closePreview);
       document.body.appendChild(box);
@@ -321,7 +341,7 @@
       const previousHeight = card.messages.scrollHeight;
       const focusedId = card.messages.contains(document.activeElement) ? document.activeElement.closest('[data-history-id]')?.dataset.historyId : null;
       card.messages.replaceChildren();
-      card.count.textContent = `Найдено: ${entries.length} · #${card.channel}`;
+      card.count.textContent = `Сообщения пользователя: ${entries.length} · #${card.channel}`;
       if (!entries.length) {
         const empty = document.createElement('p');
         empty.className = 'vortex-history-empty';
@@ -452,7 +472,10 @@
       actions.appendChild(copyHistory);
       const messages = document.createElement('div');
       messages.className = 'vortex-history-list';
-      dialog.append(header, info, actions, search, count, messages);
+      const historyHeading = document.createElement('h3');
+      historyHeading.className = 'vortex-user-history-heading';
+      historyHeading.textContent = 'Что писал ' + user;
+      dialog.append(header, info, actions, historyHeading, search, count, messages);
       overlay.appendChild(dialog);
       overlay.addEventListener('click', event => { if (event.target === overlay) closeCard(); });
       card = { overlay, user, channel, search, count, messages, restore: trigger || document.activeElement };
