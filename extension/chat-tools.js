@@ -221,6 +221,19 @@
       } else if (open.nextElementSibling !== copy) open.insertAdjacentElement('afterend', copy);
       if (copy.dataset.vortexCopy !== text) copy.dataset.vortexCopy = text;
       copy.setAttribute('aria-label', `Копировать сообщение ${user}`);
+      // Quote locally in the editor; never send chat messages without user action.
+      let quote = line.querySelector('.vortex-message-quote');
+      if (!quote) {
+        quote = button('↩', () => {}, 'vortex-message-quote');
+        quote.title = 'Цитировать в ответе';
+      }
+      quote.dataset.vortexUser = user;
+      quote.dataset.vortexText = String(text || '').slice(0, 220);
+      quote.setAttribute('aria-label', 'Цитировать сообщение ' + user);
+      if (controls) {
+        if (quote.parentElement !== controls) controls.appendChild(quote);
+      } else if (copy.nextElementSibling !== quote) copy.insertAdjacentElement('afterend', quote);
+
       copy.hidden = !options.settings().showCopyButton;
     }
 
@@ -510,6 +523,17 @@
           event.stopPropagation();
           openCard(user, options.channel(), pausedMention);
         }
+        return;
+      }
+      const quote = event.target.closest?.('.vortex-message-quote');
+      if (quote) {
+        event.preventDefault();
+        event.stopPropagation();
+        const name = quote.dataset.vortexUser || '';
+        if (!/^[a-z0-9_]{1,25}$/i.test(name)) return;
+        const snippet = (quote.dataset.vortexText || '').replace(/\\s+/g, ' ').slice(0, 180);
+        const message = '@' + name + (snippet ? ' «' + snippet + '» ' : ' ');
+        if (!options.insertText(message)) options.toast('Поле ввода Twitch недоступно');
         return;
       }
       const copy = event.target.closest?.('.vortex-message-copy');
