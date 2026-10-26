@@ -570,3 +570,12 @@ test('user card can manage local highlighted user settings', () => {
  assert.match(source,/Подсвечивать ник/);
  assert.match(source,/next\.join\(', '\)\.length > 500/);
 });
+
+test('quote action inserts a local draft without auto-sending', () => {
+ const source=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ assert.match(source,/vortex-message-quote/);
+ assert.match(source,/options\.insertText\(message\)/);
+ assert.match(source,/quote\.dataset\.vortexText/);
+ assert.match(source,/\.slice\(0, 180\)/);
+ assert.match(source,/if \(!\/\^\[a-z0-9_\]\{1,25\}\$\/i\.test\(name\)\) return;/);
+});
