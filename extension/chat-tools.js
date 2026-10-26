@@ -334,7 +334,7 @@
         // Export only the bounded, already-observed messages for this user/channel.
         const entries = history.forUser(channel, user, search.value);
         if (!entries.length) { options.toast('Нет сообщений для копирования'); return; }
-        const text = entries.map(entry => '[' + String(entry.at || '') + '] ' + user + ': ' + String(entry.text || '')).join('\\n');
+        const text = entries.map(entry => '[' + String(entry.at || '') + '] ' + user + ': ' + String(entry.text || '')).join('\n');
         try { await navigator.clipboard.writeText(text); options.toast('История скопирована'); }
         catch { options.toast('Не удалось скопировать историю'); }
       }, 'vortex-tool-button');
