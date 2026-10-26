@@ -515,7 +515,7 @@ test('interactive controls support hover, keyboard focus and reduced motion', ()
  const visual=fs.readFileSync(path.join(__dirname,'../extension/visual-controls.js'),'utf8');
  for(const item of [css,media,visual]){
   assert.match(item, /:focus-visible/);
-  assert.match(item, /prefers-reduced-motion:\\s*reduce/);
+  assert.match(item, /prefers-reduced-motion:\s*reduce/);
  }
  assert.match(css, /:hover:not\(:disabled\)/);
  assert.match(media, /\.vortex-ambilight-button:hover/);
