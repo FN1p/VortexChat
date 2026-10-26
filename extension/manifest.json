@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "author": "PFT Studio",
-  "version": "4.4.5",
+  "version": "4.4.6",
   "description": "__MSG_extensionDescription__",
   "permissions": [
     "storage",
@@ -88,6 +88,6 @@
       ]
     }
   ],
-  "version_name": "4.4.5 Beta 10",
+  "version_name": "4.4.6 Beta 11",
   "default_locale": "ru"
 }
