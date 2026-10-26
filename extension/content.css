@@ -717,3 +717,27 @@ input:checked + .vortex-slider:before {
 .vortex-user-preview .vortex-tool-button:focus-visible{outline:2px solid #70edf0;outline-offset:2px;}
 @keyframes vortex-preview-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.vortex-user-preview{animation:none!important;}}
+
+
+/* Twitch first-time chatter: highlight the entire message, not only its FM badge. */
+.vortex-chat-line.vortex-first-message-line,
+.chat-line__message.vortex-first-message-line,
+[data-a-target="chat-line-message"].vortex-first-message-line {
+  background-color: rgba(166, 95, 242, .25) !important;
+  box-shadow: inset 4px 0 0 #b985fb !important;
+  border-radius: 4px;
+}
+.vortex-chat-line.vortex-first-message-line:hover,
+.chat-line__message.vortex-first-message-line:hover,
+[data-a-target="chat-line-message"].vortex-first-message-line:hover {
+  background-color: rgba(166, 95, 242, .35) !important;
+}
+.vortex-first-message-line .vortex-first-message-badge {
+  background: #6c3a99;
+  border: 1px solid #b985fb;
+  color: #fff;
+  font-weight: 800;
+}
+@media (forced-colors: active) {
+  .vortex-first-message-line { outline: 2px solid Highlight; outline-offset: -2px; }
+}
