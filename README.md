@@ -9,8 +9,9 @@
 [![Release](https://img.shields.io/github/v/release/FN1p/VortexChat?include_prereleases&style=for-the-badge&label=Beta%20release)](https://github.com/FN1p/VortexChat/releases)
 [![CI](https://img.shields.io/github/actions/workflow/status/FN1p/VortexChat/extension.yml?branch=main&style=for-the-badge&label=Extension%20checks)](https://github.com/FN1p/VortexChat/actions)
 [![License](https://img.shields.io/github/license/FN1p/VortexChat?style=for-the-badge)](LICENSE)
+[![Telegram](https://img.shields.io/badge/Telegram-PFT_Studio-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/PFT_Studio)
 
-**[⬇ Download / Скачать](https://github.com/FN1p/VortexChat/releases)** · **[English](#english)** · **[Русский](#русский)** · **[Issues](https://github.com/FN1p/VortexChat/issues)**
+**[⬇ Download / Скачать](https://github.com/FN1p/VortexChat/releases)** · **[Telegram / Новости](https://t.me/PFT_Studio)** · **[English](#english)** · **[Русский](#русский)** · **[Issues](https://github.com/FN1p/VortexChat/issues)**
 
 </div>
 
@@ -35,6 +36,8 @@ VortexChat is an independent, experimental streaming toolkit from **PFT Studio**
 
 **Beta limitations:** YouTube Ambilight depends on video playback and browser media restrictions. Some protected videos may show a fallback glow. Desktop release checks use GitHub; automatic background download and installation are not yet implemented. This project is not affiliated with Twitch, YouTube, 7TV or BTTV.
 
+**Studio news:** [PFT Studio on Telegram](https://t.me/PFT_Studio).
+
 ## Русский
 
 **VortexChat** — экспериментальный проект PFT Studio для стримеров. В нём есть отдельный Windows-клиент чата Twitch и браузерное расширение для Twitch и YouTube.
@@ -43,6 +46,8 @@ VortexChat is an independent, experimental streaming toolkit from **PFT Studio**
 - **Twitch в браузере:** смайлы, подсветка сообщений, инструменты чтения и настройки отображения.
 - **YouTube:** Ambilight, кнопка ✦ Vortex в плеере, кинотеатральный режим, PiP и визуальные настройки.
 - **Обновления:** Windows-приложение проверяет GitHub Releases и предлагает открыть страницу обновления. Автоматической установки пока нет.
+
+**Новости студии:** [Telegram-канал PFT Studio](https://t.me/PFT_Studio).
 
 ### Установка
 
