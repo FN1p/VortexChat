@@ -579,3 +579,13 @@ test('quote action inserts a local draft without auto-sending', () => {
  assert.match(source,/\.slice\(0, 180\)/);
  assert.match(source,/if \(!\/\^\[a-z0-9_\]\{1,25\}\$\/i\.test\(name\)\) return;/);
 });
+
+test('clicking Twitch username opens Vortex profile while native card remains accessible', () => {
+  const source = fs.readFileSync(path.join(__dirname, '../extension/chat-tools.js'), 'utf8');
+  assert.match(source, /const username = event\.target\.closest\?\.\(USER\)/);
+  assert.match(source, /username\.closest\(LINE \+ ', \.vortex-paused-view'\)/);
+  assert.match(source, /event\.stopImmediatePropagation\(\)/);
+  assert.match(source, /openCard\(user, options\.channel\(\), username\)/);
+  assert.match(source, /passThroughNativeUserClick = true/);
+  assert.match(source, /finally \{ passThroughNativeUserClick = false; \}/);
+});
