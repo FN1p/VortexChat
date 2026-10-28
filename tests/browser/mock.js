@@ -22,6 +22,7 @@ window.chrome = {
   },
   runtime: {
     getManifest: () => ({ version: '4.1.0' }),
+    getURL: path => `chrome-extension://fixture/${path}`,
     sendMessage: (message, callback) => {
       if (message.action !== 'VORTEX_GET_COSMETICS') {
         callback?.({ ok: false, error: 'Fixture uses direct provider fetch' });
@@ -37,6 +38,7 @@ window.chrome = {
     onMessage: { addListener: listener => messageListeners.push(listener) }
   },
   tabs: {
+    create: async options => { window.fixtureCreatedTab = options.url; },
     query: async () => [{ id: 1, url: 'https://www.twitch.tv/forsen' }],
     sendMessage: async (_tab, message) => {
       if (messageListeners.length) return new Promise(resolve => messageListeners[0](message, {}, resolve));

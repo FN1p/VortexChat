@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Обновление VortexChat</title>
+  <link rel="stylesheet" href="update.css" />
+</head>
+<body>
+  <main>
+    <header><img src="icons/icon48.png" alt="" width="42" height="42" /><div><h1>Обновление VortexChat</h1><p>Установка последнего проверенного релиза расширения</p></div></header>
+    <section class="versions"><span>Установлено <strong id="current-version">…</strong></span><span>Доступно <strong id="latest-version">Проверяю…</strong></span></section>
+    <p id="status" role="status" aria-live="polite">Проверяю GitHub Release…</p>
+    <p class="help">Для обновления выбери <strong>папку, из которой Chrome загрузил VortexChat</strong>. В ней должен лежать файл <code>manifest.json</code>. Браузер запросит доступ к этой папке, затем расширение заменит файлы и перезапустится.</p>
+    <button id="install" type="button" disabled>Выбрать папку и обновить</button>
+    <a id="fallback" href="https://github.com/FN1p/VortexChat/releases" target="_blank" rel="noopener noreferrer" hidden>Скачать архив вручную</a>
+    <small>Настройки и избранные смайлы хранятся в Chrome и сохранятся после обновления.</small>
+  </main>
+  <script src="updater.js"></script>
+  <script src="update-page.js"></script>
+</body>
+</html>

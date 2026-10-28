@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "author": "PFT Studio",
-  "version": "4.4.11",
+  "version": "4.4.12",
   "description": "__MSG_extensionDescription__",
   "permissions": [
     "storage",
@@ -21,7 +21,8 @@
     "https://cdn.frankerfacez.com/*",
     "https://www.youtube.com/*",
     "https://youtube.com/*",
-    "https://raw.githubusercontent.com/FN1p/vortexchat-extension/*"
+    "https://raw.githubusercontent.com/FN1p/VortexChat/*",
+    "https://api.github.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -91,6 +92,6 @@
       ]
     }
   ],
-  "version_name": "4.4.11 Beta 16",
+  "version_name": "4.4.12 Beta 17",
   "default_locale": "ru"
 }

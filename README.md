@@ -32,7 +32,7 @@ VortexChat is an independent, experimental streaming toolkit from **PFT Studio**
 
 **Windows:** download `VortexChat-Setup-*.exe` (installer) or `VortexChat-Portable-*.exe` from [Releases](https://github.com/FN1p/VortexChat/releases). For Twitch login, you need your own Twitch application Client ID.
 
-**Browser:** download `VortexChat-7TV-Extension.zip`, extract it, open `chrome://extensions`, enable *Developer mode*, choose *Load unpacked* and select the extracted folder. Refresh any already-open Twitch or YouTube tabs.
+**Browser:** download `VortexChat-7TV-Extension.zip`, extract it, open `chrome://extensions`, enable *Developer mode*, choose *Load unpacked* and select the extracted folder. Refresh any already-open Twitch or YouTube tabs. From extension 4.4.12 onward, **Update extension** installs a newer GitHub Release into the selected unpacked folder and reloads it; Chrome asks for folder write access.
 
 **Beta limitations:** YouTube Ambilight depends on video playback and browser media restrictions. Some protected videos may show a fallback glow. Desktop release checks use GitHub; automatic background download and installation are not yet implemented. This project is not affiliated with Twitch, YouTube, 7TV or BTTV.
 

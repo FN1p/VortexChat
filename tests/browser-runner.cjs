@@ -10,7 +10,7 @@ const contentTypes = { '.js': 'text/javascript', '.css': 'text/css', '.png': 'im
   const browser = await chromium.launch({ headless: true, executablePath: chrome });
   let failed = false;
   try {
-    for (const entry of ['/forsen', '/popup-tests']) {
+    for (const entry of ['/forsen', '/popup-tests', '/update-tests']) {
       const page = await browser.newPage();
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
@@ -22,8 +22,15 @@ const contentTypes = { '.js': 'text/javascript', '.css': 'text/css', '.png': 'im
             .replace('<script src="core.js">', '<script src="/tests/browser/mock.js"></script><script src="core.js">');
           return route.fulfill({ body: html, contentType: 'text/html' });
         }
+        if (requestPath === '/update-preview') {
+          const html = fs.readFileSync(path.join(root, 'extension/update.html'), 'utf8')
+            .replace('<head>', '<head><base href="/extension/">')
+            .replace('<script src="updater.js">', '<script src="/tests/browser/update-mock.js"></script><script src="updater.js">');
+          return route.fulfill({ body: html, contentType: 'text/html' });
+        }
         const localPath = requestPath === '/forsen' ? '/tests/browser/chat.html' :
-          requestPath === '/popup-tests' ? '/tests/browser/popup-tests.html' : requestPath;
+          requestPath === '/popup-tests' ? '/tests/browser/popup-tests.html' :
+          requestPath === '/update-tests' ? '/tests/browser/update-tests.html' : requestPath;
         const file = path.resolve(root, `.${localPath}`);
         if (!file.startsWith(root + path.sep) || !fs.existsSync(file)) return route.abort();
         return route.fulfill({ body: fs.readFileSync(file), contentType: contentTypes[path.extname(file)] || 'application/octet-stream' });

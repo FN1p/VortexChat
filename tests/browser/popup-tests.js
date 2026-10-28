@@ -40,6 +40,9 @@ frame.addEventListener('load', async () => {
   await wait();
   saved = await win.chrome.storage.local.get('vortexSettings');
   check('Popup saves mention and live playback options', saved.vortexSettings.mentionName === 'fnip' && saved.vortexSettings.autoCatchup);
+  doc.getElementById('btn-check-update').click();
+  await wait();
+  check('Update button opens the installer page instead of GitHub Actions', win.fixtureCreatedTab === 'chrome-extension://fixture/update.html');
   async function importText(text) {
     const data = new win.DataTransfer();
     data.items.add(new win.File([text], 'settings.json', { type: 'application/json' }));
@@ -56,5 +59,5 @@ frame.addEventListener('load', async () => {
   await importText('{"wrong":"format"}');
   saved = await win.chrome.storage.local.get('vortexSettings');
   check('Invalid imports leave current settings untouched', saved.vortexSettings.fontSize === 21 && doc.getElementById('toast').textContent.includes('Не удалось импортировать'));
-  document.getElementById('summary').textContent = `${6 - failures}/6 passed`;
+  document.getElementById('summary').textContent = `${7 - failures}/7 passed`;
 });
