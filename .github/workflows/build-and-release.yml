@@ -59,41 +59,26 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
 
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release VortexChat Beta v1.3.14'))
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.14-beta.12' }}
+          tag_name: ${{ github.ref_name }}
           target_commitish: ${{ github.sha }}
           files: |
             desktop-app/dist/VortexChat-Setup-*.exe
             desktop-app/dist/VortexChat-Portable-*.exe
             desktop-app/dist/VortexChat-7TV-Extension.zip
-          name: VortexChat ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.3.14-beta.12' }} (PFT Studio)
+          name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## ⚡ VortexChat Beta 3 — OBS port conflict fix
-            - Prevent a second VortexChat process from binding port 5222.
-            - Focus the running window when launched again.
-            - Keep OBS bridge errors from terminating the app.
+            ## Расширение VortexChat 4.4.10 Beta 15
+            - FM и текст удалённых сообщений читаются из данных Twitch, когда они доступны.
+            - Добавлены подсветка и звук упоминаний с исключениями для пользователей и каналов.
+            - История ввода по стрелкам, группировка похожих повторов, быстрые ссылки и превью каналов.
+            - Кнопка возврата к прямому эфиру и необязательное плавное ускорение при отставании.
+            - Проверка обновлений в меню расширения.
 
-            ## VortexChat Beta — Extension 4.4.0
-            - YouTube Live appearance support and adjustable chat opacity/blur.
-            - Theater mode, Picture-in-Picture, keyboard shortcuts, optional ambient glow and performance mode.
-            - Twitch chat message processing and Windows desktop app functionality unchanged.
-
-            ## VortexChat Release by PFT Studio
-
-            Официальный релиз настольного чат-клиента **VortexChat** для Twitch со встроенным локальным сервером **OBS Studio (:5222)** и браузерного расширения **VortexChat (7TV v3 Extension)**.
-
-            ### 📦 Загрузки для Windows 10 / 11 (x64):
-            - **`VortexChat-Setup-*.exe`** — Мастер установки NSIS (создаёт ярлыки на Рабочем столе и в меню «Пуск»).
-            - **`VortexChat-Portable-*.exe`** — Автономная переносная версия без необходимости установки.
-
-            ### 🧩 Браузерное расширение `VortexChat-7TV-Extension.zip` (Manifest V3):
-            - Нативное встраивание смайлов **7TV v3 / BetterTTV / FrankerFaceZ** прямо в стандартное меню смайликов Twitch (5 колонок + категории справа).
-            - Мост **React Fiber / Slate.js** (`page-bridge.js`) для мгновенной вставки смайликов в чат.
-            - Наложение слоёв **Zero-Width**, живая синхронизация **7TV EventAPI v3 WebSocket**, тултип 4x, карточка смайла `1x/2x/3x/4x` и автодополнение по `Tab`.
-            - Устанавливается через распаковку архива и выбор папки в `chrome://extensions` (включив «Режим разработчика»).
-
-            Разработано студией **PFT Studio**.
+            ## Загрузки
+            - `VortexChat-7TV-Extension.zip` — расширение для Chrome. Распакуйте архив и выберите папку в `chrome://extensions` через «Загрузить распакованное расширение».
+            - `VortexChat-Setup-*.exe` и `VortexChat-Portable-*.exe` — настольное приложение 1.3.14 для Windows. В этом релизе приложение не менялось.
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-beta') || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+          prerelease: ${{ contains(github.ref_name, '-beta') }}
