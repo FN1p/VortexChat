@@ -50,8 +50,10 @@
       const key = `${channel()}:${line.dataset.vortexMessageId || line.getAttribute('data-id') || ''}:${name}`;
       const firstSeen = !seenMentions.has(line);
       const ownName = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username')?.textContent?.trim().toLowerCase();
+      const ignored = VortexCore.matchesExactList(ownName || '', settings.mentionIgnoreUsers) ||
+        VortexCore.matchesExactList(channel(), settings.mentionMuteChannels);
       const body = line.querySelector('[data-a-target="chat-line-message-body"], .chat-line__message--content') || line;
-      const mentioned = Boolean(expression && ownName !== name && expression.test(body.textContent || ''));
+      const mentioned = Boolean(expression && !ignored && ownName !== name && expression.test(body.textContent || ''));
       if (line.classList.contains('vortex-named-mention') !== mentioned) line.classList.toggle('vortex-named-mention', mentioned);
       if (mentioned && line.style.getPropertyValue('--vortex-mention-color') !== settings.mentionColor)
         line.style.setProperty('--vortex-mention-color', settings.mentionColor);

@@ -313,6 +313,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   await wait(180);
   check('Named mentions are highlighted with the selected color',
     namedMention.classList.contains('vortex-named-mention') && namedMention.style.getPropertyValue('--vortex-mention-color') === '#ff8800');
+  await fixtureSettings({ mentionIgnoreUsers: 'somebody' });
+  await wait();
+  check('Mention exclusions suppress named users', !namedMention.classList.contains('vortex-named-mention'));
+  await fixtureSettings({ mentionIgnoreUsers: '', mentionMuteChannels: 'forsen' });
+  await wait();
+  check('Mention exclusions suppress named channels', !namedMention.classList.contains('vortex-named-mention'));
+  await fixtureSettings({ mentionMuteChannels: '' });
+  await wait();
+  check('Removing exclusions restores mention highlighting', namedMention.classList.contains('vortex-named-mention'));
   check('Channel quick links point to the current channel',
     document.querySelector('#vortex-channel-links a[href="/forsen/clips"]') !== null);
   await fixtureSettings({ mentionName: '', channelQuickLinks: false });
