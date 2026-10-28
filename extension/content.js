@@ -1513,9 +1513,11 @@
         if (originalMessages.size > 500) originalMessages.delete(originalMessages.keys().next().value);
       }
       line.classList.remove('vortex-moderated-line');
+      line.classList.remove('vortex-banned-line');
       return;
     }
     line.classList.add('vortex-moderated-line');
+    line.classList.toggle('vortex-banned-line', line.dataset.vortexBanned === 'true');
     const placeholder = line.querySelector('[data-a-target="chat-deleted-message-placeholder"], [data-a-target="chat-deleted-message"]');
     if (line.querySelector('.vortex-restored-message')) return;
     const saved = key && originalMessages.get(key);
@@ -1603,17 +1605,18 @@
 
   function updateLineGroups(lines = document.querySelectorAll(CHAT_LINE_SELECTOR)) {
     let previous = null;
-    let previousKey = '';
+    let previousUser = '';
+    let previousText = '';
     const counts = new Map();
     lines.forEach((line, index) => {
       line.classList.toggle('vortex-alt-row-even', state.settings.alternatingRows && index % 2 === 1);
       const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username')?.textContent || '';
       const text = messageText(line);
-      const key = JSON.stringify([username, text]);
-      const duplicate = Boolean(state.settings.collapseSpam && username && text && previous && previousKey === key);
+      const duplicate = Boolean(state.settings.collapseSpam && username && text && previous &&
+        previousUser === username && VortexCore.sameSpamMessage(previousText, text, state.settings.fuzzySpam));
       line.classList.toggle('vortex-duplicate-line', duplicate);
       if (duplicate) counts.set(previous, (counts.get(previous) || 1) + 1);
-      else { previous = line; previousKey = key; }
+      else { previous = line; previousUser = username; previousText = text; }
     });
     lines.forEach(line => {
       const count = counts.get(line);
@@ -1813,21 +1816,22 @@
           return;
         }
 
-        const mention = tok.match(/^@([a-z0-9_]{1,25})([.,!?;:]*)$/i);
+        const mention = tok.match(/^([^a-z0-9_@]*)@([a-z0-9_]{1,25})([^a-z0-9_].*)?$/i);
         if (mention) {
           hasReplacement = true;
+          if (mention[1]) fragmentContainer.appendChild(document.createTextNode(mention[1]));
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'vortex-chat-mention';
-          button.textContent = `@${mention[1]}`;
-          button.setAttribute('aria-label', `Открыть карточку ${mention[1]}`);
+          button.textContent = `@${mention[2]}`;
+          button.setAttribute('aria-label', `Открыть карточку ${mention[2]}`);
           button.addEventListener('click', event => {
             event.preventDefault();
             event.stopPropagation();
-            chatTools?.openUser(mention[1], button);
+            chatTools?.openUser(mention[2], button);
           });
           fragmentContainer.appendChild(button);
-          if (mention[2]) fragmentContainer.appendChild(document.createTextNode(mention[2]));
+          if (mention[3]) fragmentContainer.appendChild(document.createTextNode(mention[3]));
           lastRenderedEmoteStack = null;
           return;
         }
@@ -2030,6 +2034,11 @@
               <span class="vortex-slider"></span>
             </label>
           </div>
+          <div class="seventv-setting-row"><div><div class="seventv-setting-title">Считать похожие сообщения повторами</div><div class="seventv-setting-desc">Допускает до двух изменений в длинных сообщениях одного автора</div></div><label class="vortex-switch"><input type="checkbox" data-key="fuzzySpam" ${state.settings.fuzzySpam ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><label for="vortex-mention-name">Мой ник для упоминаний</label><input id="vortex-mention-name" class="vortex-setting-input" data-key="mentionName" maxlength="25" value="${escapeHTML(state.settings.mentionName)}" placeholder="ник Twitch" /></div>
+          <div class="seventv-setting-row"><div class="seventv-setting-title">Звук при упоминании</div><label class="vortex-switch"><input type="checkbox" data-key="mentionSound" ${state.settings.mentionSound ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><label for="vortex-mention-color">Цвет упоминания</label><input id="vortex-mention-color" type="color" data-key="mentionColor" value="${state.settings.mentionColor}" /></div>
+          <div class="seventv-setting-row"><div><div class="seventv-setting-title">История введённых сообщений</div><div class="seventv-setting-desc">Стрелки ↑ и ↓ в поле ввода</div></div><label class="vortex-switch"><input type="checkbox" data-key="inputHistory" ${state.settings.inputHistory ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
           <div class="seventv-setting-row">
             <label for="vortex-font-size" class="seventv-setting-title">Размер текста</label>
             <select id="vortex-font-size" class="vortex-setting-input" data-key="fontSize">
@@ -2075,6 +2084,10 @@
           <div class="seventv-setting-row"><label for="vortex-ambilight-response">Отклик Ambilight</label><input id="vortex-ambilight-response" type="range" min="0" max="100" data-key="ambilightResponse" value="${state.settings.ambilightResponse}" /></div>
           <div class="seventv-setting-row"><label for="vortex-ambilight-dim">Затемнение интерфейса</label><input id="vortex-ambilight-dim" type="range" min="0" max="100" data-key="ambilightDimUI" value="${state.settings.ambilightDimUI}" /></div>
           <div class="seventv-setting-row"><div><div class="seventv-setting-title">Открывать клипы поверх страницы</div><div class="seventv-setting-desc">Обычный клик по ссылке. Ctrl, Shift и средняя кнопка сохраняют поведение браузера.</div></div><label class="vortex-switch"><input type="checkbox" data-key="openClipsOverlay" ${state.settings.openClipsOverlay ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><div><div class="seventv-setting-title">Кнопка «В эфир»</div><div class="seventv-setting-desc">Возврат к прямому эфиру при отставании</div></div><label class="vortex-switch"><input type="checkbox" data-key="liveControls" ${state.settings.liveControls ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><div><div class="seventv-setting-title">Догонять эфир</div><div class="seventv-setting-desc">Ускоряет видео до 1.05× при отставании; выключено по умолчанию</div></div><label class="vortex-switch"><input type="checkbox" data-key="autoCatchup" ${state.settings.autoCatchup ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><div class="seventv-setting-title">Быстрые ссылки канала</div><label class="vortex-switch"><input type="checkbox" data-key="channelQuickLinks" ${state.settings.channelQuickLinks ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><div class="seventv-setting-title">Превью каналов в боковом меню</div><label class="vortex-switch"><input type="checkbox" data-key="sidebarPreview" ${state.settings.sidebarPreview ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
         </div>`;
     } else if (tab === 'status') {
       const chCount = EMOTE_LIBRARY.filter(e => e.isChannel && e.provider === '7TV').length;

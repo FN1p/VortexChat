@@ -43,6 +43,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   mention?.click();
   check('Mention opens the named user card', document.querySelector('.vortex-user-card h2')?.textContent === 'fnip');
   document.querySelector('.vortex-user-card header button')?.click();
+  const wrappedMention = line('viewer', 'Смотри (@fnip), привет!');
+  chat.appendChild(wrappedMention);
+  await wait();
+  check('Mention remains clickable inside surrounding punctuation',
+    wrappedMention.querySelector('.vortex-chat-mention')?.textContent === '@fnip' &&
+    wrappedMention.textContent.includes('(@fnip),'));
   const twitchStyle = document.createElement('div');
   twitchStyle.className = 'chat-line__message';
   twitchStyle.innerHTML = '<span class="chat-line__username"><span data-a-target="chat-message-username" data-a-user="viewer">viewer</span></span><span data-a-target="chat-line-message-body"><span class="mention-fragment" data-a-target="chat-message-mention">@fnip</span><span class="text-fragment"> hello</span></span><div class="chat-line__icons"></div>';
@@ -301,5 +307,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fixtureSettings({ highlightWords: '', highlightUsers: 'viewer' });
   await wait();
   check('Highlighting a user marks their messages without matching message text', cosmeticLine.classList.contains('vortex-highlight-line'));
+  await fixtureSettings({ mentionName: 'fnip', mentionColor: '#ff8800' });
+  const namedMention = line('somebody', 'Hello @fnip!');
+  chat.appendChild(namedMention);
+  await wait(180);
+  check('Named mentions are highlighted with the selected color',
+    namedMention.classList.contains('vortex-named-mention') && namedMention.style.getPropertyValue('--vortex-mention-color') === '#ff8800');
+  check('Channel quick links point to the current channel',
+    document.querySelector('#vortex-channel-links a[href="/forsen/clips"]') !== null);
+  await fixtureSettings({ mentionName: '', channelQuickLinks: false });
+  await wait();
+  check('Turning off mention and channel controls removes decorations',
+    !namedMention.classList.contains('vortex-named-mention') && !document.querySelector('#vortex-channel-links'));
+  await fixtureSettings({ liveControls: true, autoCatchup: true, sidebarPreview: true });
+  const video = document.createElement('video');
+  video.getBoundingClientRect = () => ({ width: 640, height: 360, right: 640, bottom: 360 });
+  Object.defineProperty(video, 'seekable', { value: { length: 1, end: () => 20 } });
+  video.currentTime = 10;
+  document.body.append(video);
+  const sideLink = document.createElement('a');
+  sideLink.className = 'side-nav-card__link';
+  sideLink.href = '/streamer';
+  document.body.append(sideLink);
+  sideLink.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+  await wait(1450);
+  check('Back-to-live button appears only when the video is behind',
+    document.querySelector('#vortex-back-to-live')?.textContent.includes('10 с'));
+  check('Opt-in catchup gently speeds up delayed live video', video.playbackRate === 1.05);
+  document.querySelector('#vortex-back-to-live')?.click();
+  check('Back-to-live button seeks near the live edge', video.currentTime >= 19);
+  check('Sidebar hover shows a channel-specific preview',
+    document.querySelector('#vortex-sidebar-preview img')?.src.includes('live_user_streamer-320x180.jpg'));
+  sideLink.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }));
+  await fixtureSettings({ autoCatchup: false });
+  await wait(1300);
+  check('Turning off catchup restores normal playback speed', video.playbackRate === 1);
+  video.remove();
+  sideLink.remove();
   document.getElementById('summary').textContent = `${results.children.length - failures}/${results.children.length} passed${failures ? `; ${failures} failed` : ''}`;
 });

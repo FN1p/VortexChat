@@ -61,6 +61,15 @@ test('stored settings validate types, bound font size and migrate old settings',
   assert.equal(core.normalizeSettings({ ambilightDimUI: 75, openClipsOverlay: false }).openClipsOverlay, false);
   assert.equal(core.normalizeSettings({ themePreset: 'invalid', chatDensity: 'invalid' }).themePreset, 'aurora');
   assert.equal(core.normalizeSettings({ themePreset: 'orchid', chatDensity: 'compact' }).chatDensity, 'compact');
+  assert.equal(core.normalizeSettings({ mentionName: 'FNIP', mentionColor: '#12aBcD' }).mentionName, 'fnip');
+  assert.equal(core.normalizeSettings({ mentionName: 'bad/name', mentionColor: 'red' }).mentionName, '');
+});
+
+test('similar spam collapses only long messages with small changes', () => {
+  assert.equal(core.sameSpamMessage('Привет всем в чате!', 'Привет всем в чате?', true), true);
+  assert.equal(core.sameSpamMessage('Привет всем в чате!', 'Другое сообщение совсем', true), false);
+  assert.equal(core.sameSpamMessage('Kappa', 'Kappo', true), false);
+  assert.equal(core.sameSpamMessage('Привет всем в чате!', 'Привет всем в чате?', false), false);
 });
 
 test('recent emotes validate provider, deduplicate and stay bounded', () => {

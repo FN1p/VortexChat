@@ -31,6 +31,15 @@ frame.addEventListener('load', async () => {
   saved = await win.chrome.storage.local.get('vortexSettings');
   check('Popup saves palette and chat density together', saved.vortexSettings.themePreset === 'graphite' &&
     saved.vortexSettings.chatDensity === 'compact' && doc.documentElement.dataset.vortexPreset === 'graphite');
+  const mentionName = doc.querySelector('[data-key="mentionName"]');
+  mentionName.value = 'FNIP';
+  mentionName.dispatchEvent(new win.Event('change', { bubbles: true }));
+  const catchup = doc.querySelector('[data-key="autoCatchup"]');
+  catchup.checked = true;
+  catchup.dispatchEvent(new win.Event('change', { bubbles: true }));
+  await wait();
+  saved = await win.chrome.storage.local.get('vortexSettings');
+  check('Popup saves mention and live playback options', saved.vortexSettings.mentionName === 'fnip' && saved.vortexSettings.autoCatchup);
   async function importText(text) {
     const data = new win.DataTransfer();
     data.items.add(new win.File([text], 'settings.json', { type: 'application/json' }));
@@ -47,5 +56,5 @@ frame.addEventListener('load', async () => {
   await importText('{"wrong":"format"}');
   saved = await win.chrome.storage.local.get('vortexSettings');
   check('Invalid imports leave current settings untouched', saved.vortexSettings.fontSize === 21 && doc.getElementById('toast').textContent.includes('Не удалось импортировать'));
-  document.getElementById('summary').textContent = `${5 - failures}/5 passed`;
+  document.getElementById('summary').textContent = `${6 - failures}/6 passed`;
 });

@@ -1,0 +1,14 @@
+.vortex-named-mention { background: color-mix(in srgb, var(--vortex-mention-color, #29b6f6) 18%, transparent) !important; box-shadow: inset 3px 0 var(--vortex-mention-color, #29b6f6); }
+#vortex-channel-links { position: relative; margin-left: auto; color: #efeff1; font: 12px/1.4 sans-serif; }
+#vortex-channel-links summary { list-style: none; cursor: pointer; padding: 4px 9px; border-radius: 5px; }
+#vortex-channel-links summary::-webkit-details-marker { display: none; }
+#vortex-channel-links summary:hover, #vortex-channel-links[open] summary { background: #343447; }
+#vortex-channel-links nav { position: absolute; z-index: 100; right: 0; top: 100%; display: grid; min-width: 125px; padding: 5px; border: 1px solid #53536b; border-radius: 8px; background: #20202b; box-shadow: 0 10px 24px #0008; }
+#vortex-channel-links a { display: block; padding: 6px 8px; color: #f1f1fa; text-decoration: none; border-radius: 5px; }
+#vortex-channel-links a:hover { background: #343447; }
+#vortex-back-to-live { position: fixed; z-index: 1000; border: 1px solid #81e8ec; border-radius: 5px; background: #17272e; color: #eaffff; padding: 6px 9px; font: 600 11px/1.2 sans-serif; cursor: pointer; box-shadow: 0 2px 8px #0007; }
+#vortex-back-to-live:hover { background: #244951; }
+#vortex-sidebar-preview { position: fixed; z-index: 9999; width: 320px; padding: 6px; border: 1px solid #4c6c7a; border-radius: 9px; background: #15212b; color: #fff; box-shadow: 0 10px 25px #000a; pointer-events: none; font: 12px/1.4 sans-serif; }
+#vortex-sidebar-preview img { display: block; width: 320px; height: 180px; object-fit: cover; border-radius: 5px; }
+#vortex-sidebar-preview strong { display: block; padding: 6px 2px 1px; }
+@media (prefers-reduced-motion: reduce) { #vortex-back-to-live { transition: none; } }

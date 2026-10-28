@@ -21,6 +21,7 @@
       line.dataset.vortexMessageId = message.id;
       line.dataset.vortexFirstMsg = message.isFirstMsg === true ? 'true' : 'false';
       line.dataset.vortexDeleted = message.deleted === true || message.banned === true || props.isDeleted === true ? 'true' : 'false';
+      line.dataset.vortexBanned = message.banned === true ? 'true' : 'false';
       if (line.dataset.vortexDeleted === 'true' && typeof message.messageBody === 'string') {
         line.dataset.vortexOriginalBody = message.messageBody.slice(0, 2000);
       } else {
@@ -124,11 +125,11 @@
     return (editorEl.innerText || editorEl.textContent || '').replace(/[\uFEFF\u200B\n\r]/g, '');
   }
 
-  function insertTextNative(rawText, replaceAll) {
+  function insertTextNative(rawText, replaceAll, exact = false) {
     const editorEl = findChatEditorNode();
     if (!editorEl) return false;
 
-    const text = rawText.endsWith(' ') ? rawText : `${rawText} `;
+    const text = exact || rawText.endsWith(' ') ? rawText : `${rawText} `;
     editorEl.focus();
 
     // 1. Handle standard <textarea> chat input
@@ -212,7 +213,7 @@
     if (!detail || typeof detail.text !== 'string') return;
     let handled = false;
     if (detail.type === 'INSERT_TEXT') {
-      handled = insertTextNative(detail.text, Boolean(detail.replaceAll));
+      handled = insertTextNative(detail.text, Boolean(detail.replaceAll), Boolean(detail.exact));
     } else if (detail.type === 'SEND_TEXT') {
       handled = sendTextNative(detail.text);
     }

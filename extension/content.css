@@ -60,6 +60,8 @@
 .vortex-chat-line.vortex-duplicate-line { display: none !important; }
 .vortex-chat-line.vortex-moderated-line { opacity: .48; }
 .vortex-chat-line.vortex-moderated-line:hover { opacity: .8; }
+.vortex-chat-line.vortex-banned-line { opacity: .38; }
+.vortex-chat-line.vortex-banned-line:hover { opacity: .75; }
 .vortex-first-message-badge { display: inline-block; margin: 0 5px; padding: 1px 4px; border-radius: 3px; background: #8246af; color: white; font: 700 10px/1.4 sans-serif; vertical-align: middle; }
 .vortex-7tv-badge { display: inline-block; width: 18px; height: 18px; object-fit: contain; margin-right: 3px; vertical-align: middle; }
 .vortex-7tv-paint { background-repeat: repeat; background-size: auto 100%; }

@@ -3,10 +3,12 @@
   'use strict';
   const defaults = Object.freeze({
     enable7TV: true, enable7TVCosmetics: true, enableZeroWidth: true, enableBTTV: true, enableFFZ: true,
-    enableAutocomplete: true, alternatingRows: true, collapseSpam: false,
+    enableAutocomplete: true, alternatingRows: true, collapseSpam: false, fuzzySpam: false,
     showEventNotices: true, sendOnEmoteClick: false,
     fontSize: 13, messageGap: 0, emoteGap: 2, showTimestamps: false,
     highlightWords: '', highlightUsers: '', highlightBadges: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
+    mentionName: '', mentionSound: false, mentionColor: '#29b6f6', inputHistory: true,
+    liveControls: true, autoCatchup: false, channelQuickLinks: true, sidebarPreview: false,
     ambilightEnabled: false, ambilightBrightness: 70, ambilightSpread: 65, ambilightResponse: 50,
     ambilightDimUI: 0, openClipsOverlay: true, themeEnabled: true,
     themePreset: 'aurora', chatDensity: 'comfortable', chatOpacity: 100, visualBlurEnabled: false, visualBlur: 8, visualAmbilightEnabled: false, youtubeAmbientEnabled: true, visualAmbilightIntensity: 50, performanceMode: false, visualAccentEnabled: false, visualAccent: '#32d4da', visualCornerRadius: 8
@@ -20,6 +22,24 @@
     const parts = path.toLowerCase().split('/').filter(Boolean);
     const name = ['popout', 'moderator'].includes(parts[0]) ? parts[1] : parts[0];
     return name && /^[a-z0-9_]{1,25}$/.test(name) && !reserved.has(name) ? name : '';
+  }
+
+  function sameSpamMessage(first, second, fuzzy = false) {
+    if (first === second) return true;
+    if (!fuzzy) return false;
+    const normalize = value => String(value || '').toLocaleLowerCase().trim()
+      .replace(/[\s\p{P}\p{S}]+/gu, ' ').replace(/(.)\1{3,}/gu, '$1$1$1');
+    const a = normalize(first), b = normalize(second);
+    if (a.length < 12 || b.length < 12 || Math.abs(a.length - b.length) > 2) return false;
+    let edits = 0, i = 0, j = 0;
+    while (i < a.length && j < b.length) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++edits > 2) return false;
+      if (a[i + 1] === b[j]) i++;
+      else if (a[i] === b[j + 1]) j++;
+      else { i++; j++; }
+    }
+    return edits + (a.length - i) + (b.length - j) <= 2;
   }
 
   function normalizeSettings(value = {}) {
@@ -40,6 +60,8 @@
     { const blur = Number(value?.visualBlur ?? defaults.visualBlur); result.visualBlur = Number.isFinite(blur) ? Math.min(24,Math.max(0,Math.round(blur))) : defaults.visualBlur; }
     { const radius=Number(value?.visualCornerRadius??defaults.visualCornerRadius);result.visualCornerRadius=Number.isFinite(radius)?Math.min(28,Math.max(0,Math.round(radius))):defaults.visualCornerRadius; }
     if (typeof value?.visualAccent === 'string' && /^#[a-f0-9]{6}$/i.test(value.visualAccent)) result.visualAccent=value.visualAccent;
+    if (typeof value?.mentionColor === 'string' && /^#[a-f0-9]{6}$/i.test(value.mentionColor)) result.mentionColor = value.mentionColor;
+    if (typeof value?.mentionName === 'string' && /^[a-z0-9_]{0,25}$/i.test(value.mentionName)) result.mentionName = value.mentionName.toLowerCase();
     if (['aurora', 'graphite', 'orchid'].includes(value?.themePreset)) result.themePreset = value.themePreset;
     if (['comfortable', 'compact'].includes(value?.chatDensity)) result.chatDensity = value.chatDensity;
     result.highlightWords = typeof value?.highlightWords === 'string' ? value.highlightWords.slice(0, 500) : '';
@@ -205,7 +227,7 @@
     }
   }
 
-  const api = { defaults, channelFromPath, normalizeSettings, providerEnabled, suggestEmotes, matchesHighlight, matchesExactList, escapeHTML, parse7TV, clipSlug, videoLetterbox,
+  const api = { defaults, channelFromPath, normalizeSettings, sameSpamMessage, providerEnabled, suggestEmotes, matchesHighlight, matchesExactList, escapeHTML, parse7TV, clipSlug, videoLetterbox,
     EmoteCatalog, favoriteKey, normalizeFavorites, normalizeRecentEmotes, MessageHistory, parseBackup };
   root.VortexCore = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

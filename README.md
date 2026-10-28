@@ -36,6 +36,8 @@ VortexChat is an independent, experimental streaming toolkit from **PFT Studio**
 
 **Beta limitations:** YouTube Ambilight depends on video playback and browser media restrictions. Some protected videos may show a fallback glow. Desktop release checks use GitHub; automatic background download and installation are not yet implemented. This project is not affiliated with Twitch, YouTube, 7TV or BTTV.
 
+The browser extension adds configurable mention highlighting and sound, session-only input history, optional grouping of similar repeated messages, a live-edge button and opt-in gentle catchup, channel shortcuts, and optional sidebar stream previews. Twitch moderation text is shown when Twitch retains the original message in its chat data. These options are available in the extension popup and Twitch settings panel.
+
 **Studio news:** [PFT Studio on Telegram](https://t.me/PFT_Studio).
 
 ## Русский

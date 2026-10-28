@@ -42,6 +42,11 @@
         <label class="row"><span>Чередование фона строк</span><input type="checkbox" data-key="alternatingRows" /><span class="switch" aria-hidden="true"></span></label>
         <label class="row"><span>Пауза при наведении<small>Ручная пауза — кнопкой Ⅱ в шапке чата</small></span><input type="checkbox" data-key="pauseOnHover" /><span class="switch" aria-hidden="true"></span></label>
         <label class="row"><span>Группировать повторы<small>Одинаковые сообщения одного автора подряд</small></span><input type="checkbox" data-key="collapseSpam" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Похожие повторы<small>Учитывать небольшие изменения текста</small></span><input type="checkbox" data-key="fuzzySpam" /><span class="switch" aria-hidden="true"></span></label>
+        <div class="highlight-field"><label for="mention-name">Мой ник для упоминаний</label><input id="mention-name" data-key="mentionName" maxlength="25" placeholder="ник Twitch" /><small>Строки с @ником подсвечиваются</small></div>
+        <label class="row"><span>Звук при упоминании</span><input type="checkbox" data-key="mentionSound" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Цвет упоминания</span><input type="color" data-key="mentionColor" value="#29b6f6" aria-label="Цвет упоминаний" /></label>
+        <label class="row"><span>История ввода<small>Стрелки ↑ и ↓ в пустом поле чата</small></span><input type="checkbox" data-key="inputHistory" /><span class="switch" aria-hidden="true"></span></label>
         <div class="highlight-field"><label for="highlight-words">Подсветка слов и упоминаний</label><input id="highlight-words" data-key="highlightWords" maxlength="500" placeholder="твой ник, слово, фраза" /><small>Через запятую · без учёта регистра</small></div>
         <div class="highlight-field"><label for="highlight-users">Подсветка пользователей</label><input id="highlight-users" data-key="highlightUsers" maxlength="500" placeholder="ник1, ник2" /><small>Точное совпадение Twitch-имени</small></div>
         <div class="highlight-field"><label for="highlight-badges">Подсветка бейджей</label><input id="highlight-badges" data-key="highlightBadges" maxlength="500" placeholder="VIP, Модератор" /><small>Название бейджа через запятую</small></div>
@@ -75,6 +80,10 @@
         <div class="font-row"><label for="ambilight-spread">Размах свечения</label><output id="ambilight-spread-value" for="ambilight-spread">65%</output></div>
         <input type="range" id="ambilight-spread" data-key="ambilightSpread" min="0" max="100" value="65" />
         <label class="row"><span>Клипы поверх страницы</span><input type="checkbox" data-key="openClipsOverlay" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Кнопка «В эфир»<small>Появляется при отставании от прямого эфира</small></span><input type="checkbox" data-key="liveControls" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Догонять эфир<small>Ускоряет видео до 1.05× при отставании</small></span><input type="checkbox" data-key="autoCatchup" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Быстрые ссылки канала</span><input type="checkbox" data-key="channelQuickLinks" /><span class="switch" aria-hidden="true"></span></label>
+        <label class="row"><span>Превью каналов в боковом меню</span><input type="checkbox" data-key="sidebarPreview" /><span class="switch" aria-hidden="true"></span></label>
       </div>
     </section>
     <div class="actions"><button id="btn-open-settings" disabled>Все настройки</button><button id="btn-reload-emotes" disabled>Обновить смайлы</button></div>

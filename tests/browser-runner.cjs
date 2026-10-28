@@ -32,6 +32,17 @@ const contentTypes = { '.js': 'text/javascript', '.css': 'text/css', '.png': 'im
       await page.waitForFunction(() => !document.querySelector('#summary').textContent.includes('Running'), { timeout: 15000 }).catch(() => {});
       const summary = await page.locator('#summary').innerText();
       const failures = await page.locator('li.fail').allInnerTexts();
+      if (entry === '/forsen' && !failures.length && !errors.length) {
+        const input = page.locator('textarea[data-a-target="chat-input"]');
+        await input.fill('History test');
+        await input.press('Enter');
+        await input.fill('');
+        await input.press('ArrowUp');
+        if (!(await input.inputValue()).includes('History test')) {
+          console.log('FAIL · Chat input history did not restore the previous draft');
+          failed = true;
+        }
+      }
       console.log(`${entry}: ${summary}`);
       for (const line of failures) console.log(line);
       for (const error of errors) console.log(`Page error: ${error}`);
