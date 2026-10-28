@@ -38,6 +38,8 @@ VortexChat is an independent, experimental streaming toolkit from **PFT Studio**
 
 The browser extension adds configurable mention highlighting and sound, session-only input history, optional grouping of similar repeated messages, a live-edge button and opt-in gentle catchup, channel shortcuts, and optional sidebar stream previews. Twitch moderation text is shown when Twitch retains the original message in its chat data. These options are available in the extension popup and Twitch settings panel.
 
+The default Twitch theme uses a denser, flatter dark chat layout. The live-edge control ignores Twitch's placeholder seekable value, which otherwise looks like an enormous delay.
+
 **Studio news:** [PFT Studio on Telegram](https://t.me/PFT_Studio).
 
 ## Русский

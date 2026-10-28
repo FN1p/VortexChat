@@ -74,6 +74,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   check('Only consecutive messages by the same author are grouped', second.classList.contains('vortex-duplicate-line') && third.classList.contains('vortex-duplicate-line') && !otherUser.classList.contains('vortex-duplicate-line') && first.querySelector('.vortex-repeat-badge')?.textContent === '×3');
   check('Message timestamps and Cyrillic highlights render', first.querySelectorAll('time').length === 1 && first.classList.contains('vortex-highlight-line'));
   check('Font size is applied to actual messages', getComputedStyle(first).fontSize === '16px');
+  check('Chat theme uses compact flat rows without hiding the text',
+    getComputedStyle(first).borderRadius === '0px' && getComputedStyle(first).color === 'rgb(239, 239, 241)');
   first.remove();
   await wait();
   check('Removing a group head reveals the next surviving message', !second.classList.contains('vortex-duplicate-line') && second.querySelector('.vortex-repeat-badge')?.textContent === '×2');
@@ -331,7 +333,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fixtureSettings({ liveControls: true, autoCatchup: true, sidebarPreview: true });
   const video = document.createElement('video');
   video.getBoundingClientRect = () => ({ width: 640, height: 360, right: 640, bottom: 360 });
-  Object.defineProperty(video, 'seekable', { value: { length: 1, end: () => 20 } });
+  let liveEdge = 20;
+  Object.defineProperty(video, 'seekable', { value: { length: 1, end: () => liveEdge } });
   video.currentTime = 10;
   document.body.append(video);
   const sideLink = document.createElement('a');
@@ -341,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   sideLink.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
   await wait(1450);
   check('Back-to-live button appears only when the video is behind',
-    document.querySelector('#vortex-back-to-live')?.textContent.includes('10 с'));
+    document.querySelector('#vortex-back-to-live')?.textContent === '● В эфир');
   check('Opt-in catchup gently speeds up delayed live video', video.playbackRate === 1.05);
   document.querySelector('#vortex-back-to-live')?.click();
   check('Back-to-live button seeks near the live edge', video.currentTime >= 19);
@@ -351,6 +354,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fixtureSettings({ autoCatchup: false });
   await wait(1300);
   check('Turning off catchup restores normal playback speed', video.playbackRate === 1);
+  liveEdge = 1073741824;
+  await wait(1300);
+  check('Twitch sentinel time never appears as a billion-second live delay', !document.querySelector('#vortex-back-to-live'));
   video.remove();
   sideLink.remove();
   document.getElementById('summary').textContent = `${results.children.length - failures}/${results.children.length} passed${failures ? `; ${failures} failed` : ''}`;

@@ -126,7 +126,8 @@
     }
     let end;
     try { end = video.seekable.end(video.seekable.length - 1); } catch { restoreRate(); button?.remove(); return; }
-    const delay = end - video.currentTime;
+    const delay = VortexCore.liveDelay(video.currentTime, end);
+    if (delay === null) { restoreRate(); button?.remove(); return; }
     if (catchupVideo && (catchupVideo !== video || !settings.autoCatchup || !Number.isFinite(delay) || delay <= 3 || video.playbackRate !== 1.05)) restoreRate();
     if (settings.autoCatchup && delay > 6 && !catchupVideo && video.playbackRate === 1) {
       try { video.playbackRate = 1.05; catchupVideo = video; } catch { /* Some players lock playback speed. */ }
@@ -142,7 +143,8 @@
       });
       document.body.append(button);
     }
-    button.textContent = `В эфир · ${Math.round(delay)} с`;
+    button.textContent = '● В эфир';
+    button.title = `Вернуться к прямому эфиру (отставание около ${Math.round(delay)} с)`;
     const rect = video.getBoundingClientRect();
     button.style.left = `${Math.max(8, rect.right - 128)}px`;
     button.style.top = `${Math.max(8, rect.bottom - 48)}px`;

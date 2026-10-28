@@ -72,6 +72,13 @@ test('similar spam collapses only long messages with small changes', () => {
   assert.equal(core.sameSpamMessage('Привет всем в чате!', 'Привет всем в чате?', false), false);
 });
 
+test('live delay rejects Twitch placeholder seekable end', () => {
+  assert.equal(core.liveDelay(6.25, 1073741824), null);
+  assert.equal(core.liveDelay(10, 20), 10);
+  assert.equal(core.liveDelay(10, Infinity), null);
+  assert.equal(core.liveDelay(10, 900), null);
+});
+
 test('recent emotes validate provider, deduplicate and stay bounded', () => {
   const key = '7TV:123:TestEmote';
   assert.deepEqual(core.normalizeRecentEmotes([key, key, 'bad', 'Twitch:1:Kappa']), [key]);

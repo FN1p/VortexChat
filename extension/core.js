@@ -42,6 +42,15 @@
     return edits + (a.length - i) + (b.length - j) <= 2;
   }
 
+  function liveDelay(currentTime, seekableEnd) {
+    const delay = seekableEnd - currentTime;
+    // Twitch's live MSE stream can advertise 2^30 as a placeholder end time.
+    // It is not a real position to seek to or a useful latency measurement.
+    if (!Number.isFinite(currentTime) || !Number.isFinite(seekableEnd) ||
+      seekableEnd >= 100000000 || delay < 0 || delay > 600) return null;
+    return delay;
+  }
+
   function normalizeSettings(value = {}) {
     const result = { ...defaults };
     for (const key of Object.keys(defaults)) {
@@ -227,7 +236,7 @@
     }
   }
 
-  const api = { defaults, channelFromPath, normalizeSettings, sameSpamMessage, providerEnabled, suggestEmotes, matchesHighlight, matchesExactList, escapeHTML, parse7TV, clipSlug, videoLetterbox,
+  const api = { defaults, channelFromPath, normalizeSettings, sameSpamMessage, liveDelay, providerEnabled, suggestEmotes, matchesHighlight, matchesExactList, escapeHTML, parse7TV, clipSlug, videoLetterbox,
     EmoteCatalog, favoriteKey, normalizeFavorites, normalizeRecentEmotes, MessageHistory, parseBackup };
   root.VortexCore = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
