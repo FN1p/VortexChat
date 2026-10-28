@@ -1484,14 +1484,18 @@
       const original = parsedFragments.get(fragment);
       if (original && original.html === fragment.innerHTML && copiedFragments[index]) copiedFragments[index].textContent = original.text;
     });
-    clone.querySelectorAll('.vortex-message-time, .vortex-repeat-badge, .vortex-user-history-button, .vortex-message-copy, .chat-line__timestamp, [data-a-target="chat-message-username"], .chat-line__username').forEach(el => el.remove());
+    clone.querySelectorAll('.vortex-message-time, .vortex-repeat-badge, .vortex-user-history-button, .vortex-message-copy, .vortex-message-quote, .chat-line__timestamp, [data-a-target="chat-message-username"], .chat-line__username').forEach(el => el.remove());
     clone.querySelectorAll('img[alt]').forEach(img => img.replaceWith(document.createTextNode(img.alt)));
     return (clone.textContent || '').trim();
   }
 
   function messageKey(line) {
     const carrier = line.closest('[data-id], [data-message-id]') || line;
-    return carrier.getAttribute('data-id') || carrier.getAttribute('data-message-id') || '';
+    return line.dataset.vortexMessageId || carrier.getAttribute('data-id') || carrier.getAttribute('data-message-id') || '';
+  }
+
+  function readTwitchMessageMetadata(line) {
+    line.dispatchEvent(new Event('vortex-chat-metadata-request', { bubbles: true }));
   }
 
   function preserveModeratedMessage(line) {
@@ -1499,9 +1503,9 @@
     const body = line.querySelector('[data-a-target="chat-line-message-body"], .chat-line__message--content, .text-fragment');
     if (body?.querySelector('.vortex-restored-message')) return;
     const text = body?.textContent || line.textContent || '';
-    const deleted = /message deleted by a moderator|message deleted|сообщение удалено модератором|сообщение удалено/i.test(text) ||
+    const deleted = line.dataset.vortexDeleted === 'true' || /message deleted by a moderator|message deleted|сообщение удалено модератором|сообщение удалено/i.test(text) ||
       line.matches('[data-deleted="true"], .chat-line__message--deleted') ||
-      Boolean(line.querySelector('[data-a-target="chat-deleted-message"]'));
+      Boolean(line.querySelector('[data-a-target="chat-deleted-message"], [data-a-target="chat-deleted-message-placeholder"]'));
     if (!deleted) {
       if (key && body && text.trim()) {
         originalMessages.delete(key);
@@ -1512,11 +1516,17 @@
       return;
     }
     line.classList.add('vortex-moderated-line');
-    if (!key || !body || !originalMessages.has(key) || body.querySelector('.vortex-restored-message')) return;
+    const placeholder = line.querySelector('[data-a-target="chat-deleted-message-placeholder"], [data-a-target="chat-deleted-message"]');
+    if (line.querySelector('.vortex-restored-message')) return;
+    const saved = key && originalMessages.get(key);
+    const originalText = line.dataset.vortexOriginalBody;
+    if (!saved && !originalText) return;
     const restored = document.createElement('span');
     restored.className = 'vortex-restored-message';
-    restored.append(...originalMessages.get(key).cloneNode(true).childNodes);
-    body.replaceChildren(restored);
+    if (saved) restored.append(...saved.cloneNode(true).childNodes);
+    else restored.textContent = originalText;
+    if (placeholder) placeholder.replaceWith(restored);
+    else if (body) body.replaceChildren(restored);
   }
 
   function markFirstMessage(line) {
@@ -1526,7 +1536,7 @@
     const nativeMarker = line.matches(markers) || Boolean(line.querySelector(markers)) ||
       Boolean(line.parentElement?.matches(markers));
     const label = line.querySelector('[data-a-target="chat-message-first-message"], [data-test-selector="first-message-indicator"], [data-a-target="first-message-indicator"]');
-    const first = nativeMarker || Boolean(label);
+    const first = line.dataset.vortexFirstMsg === 'true' || nativeMarker || Boolean(label);
     line.classList.toggle('vortex-first-message-line', first);
     let badge = line.querySelector('.vortex-first-message-badge');
     if (!first) { badge?.remove(); return; }
@@ -1657,6 +1667,7 @@
 
   function enrichChatLine(node) {
     if (!node?.matches?.(CHAT_LINE_SELECTOR)) return;
+    readTwitchMessageMetadata(node);
     preserveModeratedMessage(node);
     markFirstMessage(node);
     render7TVCosmetics(node);

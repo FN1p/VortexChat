@@ -252,6 +252,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   await wait();
   check('First message has FM badge', firstMessage.querySelector('.vortex-first-message-badge')?.textContent === 'FM');
 
+  const twitchFirst = document.createElement('div');
+  twitchFirst.className = 'chat-line__message';
+  twitchFirst.innerHTML = '<span class="chat-line__username">newcomer2</span><span class="text-fragment">Hello</span>';
+  twitchFirst.__reactFiber$fixture = { memoizedProps: {}, return: { memoizedProps: {
+    message: { id: 'first-react', messageBody: 'Hello', isFirstMsg: true, deleted: false }
+  } } };
+  chat.appendChild(twitchFirst);
+  await wait();
+  check('FM reads Twitch message metadata even without a visible marker',
+    twitchFirst.dataset.vortexFirstMsg === 'true' && twitchFirst.querySelector('.vortex-first-message-badge')?.textContent === 'FM');
+
+  const twitchDeleted = document.createElement('div');
+  twitchDeleted.className = 'chat-line__message';
+  twitchDeleted.innerHTML = '<span class="chat-line__username">viewer</span><span data-a-target="chat-deleted-message-placeholder">сообщение удалено модератором.</span>';
+  twitchDeleted.__reactFiber$fixture = { memoizedProps: {}, return: { memoizedProps: {
+    message: { id: 'deleted-react', messageBody: 'Original 7TV text', isFirstMsg: false, deleted: true }
+  } } };
+  chat.appendChild(twitchDeleted);
+  await wait();
+  check('Deleted Twitch placeholder shows the original message dimmed',
+    twitchDeleted.classList.contains('vortex-moderated-line') &&
+    twitchDeleted.querySelector('.vortex-restored-message')?.textContent === 'Original 7TV text' &&
+    !twitchDeleted.querySelector('[data-a-target="chat-deleted-message-placeholder"]'));
+
   const moderated = document.createElement('div');
   moderated.className = 'chat-line__message';
   moderated.dataset.id = 'moderated-1';

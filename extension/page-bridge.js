@@ -6,6 +6,30 @@
   if (window.__vortexChatMainBridgeInstalled) return;
   window.__vortexChatMainBridgeInstalled = true;
 
+  // Twitch keeps chat flags and the original body in React props even when its
+  // rendered line only contains a deleted-message placeholder. Read only the
+  // props of the requested line; never change Twitch's React state.
+  if (typeof document.addEventListener === 'function') document.addEventListener('vortex-chat-metadata-request', event => {
+    const line = event.target;
+    if (!(line instanceof Element) || !line.matches('[data-a-target="chat-line-message"], .chat-line__message')) return;
+    const fiberKey = Object.keys(line).find(key => key.startsWith('__reactFiber$') || key.startsWith('__reactInternalInstance$'));
+    let fiber = fiberKey && line[fiberKey];
+    for (let depth = 0; fiber && depth < 35; fiber = fiber.return, depth++) {
+      const props = fiber.memoizedProps || fiber.pendingProps;
+      const message = props?.message;
+      if (!message || typeof message !== 'object' || typeof message.id !== 'string') continue;
+      line.dataset.vortexMessageId = message.id;
+      line.dataset.vortexFirstMsg = message.isFirstMsg === true ? 'true' : 'false';
+      line.dataset.vortexDeleted = message.deleted === true || message.banned === true || props.isDeleted === true ? 'true' : 'false';
+      if (line.dataset.vortexDeleted === 'true' && typeof message.messageBody === 'string') {
+        line.dataset.vortexOriginalBody = message.messageBody.slice(0, 2000);
+      } else {
+        delete line.dataset.vortexOriginalBody;
+      }
+      break;
+    }
+  }, true);
+
   function findChatEditorNode() {
     const target = document.querySelector('[data-a-target="chat-input"]');
     if (target) {

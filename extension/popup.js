@@ -132,6 +132,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch { toast('Не удалось прочитать настройки'); }
   $('version').textContent = `v${chrome.runtime.getManifest().version}`;
+  $('btn-check-update').addEventListener('click', async () => {
+    const button = $('btn-check-update');
+    const status = $('update-status');
+    if (button.dataset.updateReady === 'true') {
+      chrome.tabs.create({ url: 'https://github.com/FN1p/vortexchat-extension/actions/workflows/extension.yml' });
+      return;
+    }
+    button.disabled = true;
+    status.textContent = 'Проверяю…';
+    try {
+      const response = await fetch('https://raw.githubusercontent.com/FN1p/vortexchat-extension/main/extension/manifest.json', {
+        cache: 'no-store', signal: AbortSignal.timeout(10000)
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const remote = await response.json();
+      if (!/^\d+\.\d+\.\d+$/.test(remote.version || '')) throw new Error('Invalid version');
+      const current = chrome.runtime.getManifest().version.split('.').map(Number);
+      const latest = remote.version.split('.').map(Number);
+      const newer = latest.some((part, index) => part !== current[index] &&
+        latest.slice(0, index).every((previous, i) => previous === current[i]) && part > current[index]);
+      status.textContent = newer ? `Доступна v${remote.version}` : 'Установлена актуальная версия';
+      if (newer) {
+        button.textContent = 'Скачать сборку';
+        button.dataset.updateReady = 'true';
+      }
+    } catch { status.textContent = 'Не удалось проверить. Попробуй позже.'; }
+    button.disabled = false;
+  });
   await updateStatus();
   setInterval(updateStatus, 1500);
 });

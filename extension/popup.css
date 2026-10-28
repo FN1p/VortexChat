@@ -36,6 +36,9 @@ input:not([type="checkbox"]):not([type="range"]):not([type="number"]) { display:
 input:focus-visible, button:focus-visible { outline: 2px solid #77d6ff; outline-offset: 2px; }
 .actions { display: flex; gap: 8px; margin-top: 15px; }
 .backup-actions { margin-top: 8px; }
+.update-row { display: flex; align-items: center; gap: 9px; margin-top: 10px; }
+.update-row button { flex: 0 0 auto; }
+#update-status { color: #a5b9d8; font-size: 10px; }
 .backup-actions button { background: transparent; font-weight: 400; color: #b5b5c7; }
 input[hidden] { display: none !important; }
 button { flex: 1; border: 1px solid #373745; border-radius: 6px; background: #24242e; color: #ededf2; padding: 9px 8px; font: 600 11px "Segoe UI", sans-serif; cursor: pointer; }
