@@ -665,3 +665,14 @@ test('message context menu can toggle locally persisted mute', () => {
  assert.match(source,/options\.saveSettings\(\{ mutedUsers: next\.join\(', '\) \}\)/);
  assert.match(source,/next\.join\(', '\)\.length > 500/);
 });
+
+test('context menu exposes local profile, highlight and copy actions with keyboard endpoints', () => {
+ const script=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(script,/vortex-message-context-header/);
+ assert.match(script,/add\('Копировать ник'/);
+ assert.match(script,/Убрать подсветку ника/);
+ assert.match(script,/options\.saveSettings\(\{ highlightUsers: next\.join\(', '\) \}\)/);
+ assert.match(script,/key\.key === 'Home' \|\| key\.key === 'End'/);
+ assert.match(css,/\.vortex-message-context-header/);
+});
