@@ -495,7 +495,27 @@
       const historyHeading = document.createElement('h3');
       historyHeading.className = 'vortex-user-history-heading';
       historyHeading.textContent = 'Что писал ' + user;
-      dialog.append(header, info, actions, historyHeading, search, count, messages);
+      const details = document.createElement('details');
+      details.className = 'vortex-user-more';
+      const detailsLabel = document.createElement('summary');
+      detailsLabel.textContent = 'Дополнительные действия';
+      details.append(detailsLabel, actions);
+      const primary = document.createElement('div');
+      primary.className = 'vortex-user-primary-actions';
+      const quickMention = button('@ Упомянуть', () => {
+        if (options.insertText('@' + user + ' ')) closeCard();
+        else options.toast('Поле ввода Twitch недоступно');
+      }, 'vortex-tool-button');
+      quickMention.disabled = !validLogin;
+      const quickCopy = button('Копировать ник', async () => {
+        try { await navigator.clipboard.writeText(user); options.toast('Ник скопирован'); }
+        catch { options.toast('Не удалось скопировать ник'); }
+      }, 'vortex-tool-button');
+      quickCopy.disabled = !validLogin;
+      primary.append(quickMention, quickCopy);
+      info.textContent = 'Локальная история сообщений в этой вкладке';
+      historyHeading.textContent = 'Сообщения';
+      dialog.append(header, primary, details, historyHeading, search, count, messages);
       overlay.appendChild(dialog);
       card = { overlay, user, channel, search, count, messages, restore: trigger || document.activeElement };
       document.body.appendChild(overlay);
