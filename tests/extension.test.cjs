@@ -722,3 +722,12 @@ test('user profile opens as bounded anchored popover and cleans up listeners', (
  assert.match(css,/\.vortex-user-card-overlay \.vortex-user-card\{position:fixed/);
  assert.match(css,/pointer-events:none;backdrop-filter:none/);
 });
+
+test('compact profile separates common actions from expandable tools', () => {
+ const js=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(js,/vortex-user-primary-actions/);
+ assert.match(js,/vortex-user-more/);
+ assert.match(js,/Дополнительные действия/);
+ assert.match(css,/\.vortex-user-card-overlay \.vortex-user-primary-actions/);
+});
