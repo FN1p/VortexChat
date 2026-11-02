@@ -1506,7 +1506,7 @@
   function preserveModeratedMessage(line) {
     const key = messageKey(line);
     const body = line.querySelector('[data-a-target="chat-line-message-body"], .chat-line__message--content, .text-fragment');
-    if (body?.querySelector('.vortex-restored-message')) return;
+    if (line.querySelector('.vortex-restored-message')) return;
     const text = body?.textContent || line.textContent || '';
     const deleted = line.dataset.vortexDeleted === 'true' || /message deleted by a moderator|message deleted|сообщение удалено модератором|сообщение удалено/i.test(text) ||
       line.matches('[data-deleted="true"], .chat-line__message--deleted') ||
@@ -1534,6 +1534,7 @@
     else restored.textContent = originalText;
     if (placeholder) placeholder.replaceWith(restored);
     else if (body) body.replaceChildren(restored);
+    else line.appendChild(restored);
   }
 
   function markFirstMessage(line) {
