@@ -887,3 +887,38 @@ input:checked + .vortex-slider:before {
 .vortex-user-card-overlay .vortex-user-more>summary:focus-visible{background:#244253;outline:2px solid #68dce5;outline-offset:-2px}
 .vortex-user-card-overlay .vortex-user-more .vortex-user-actions{margin:0;padding:8px;border-top:1px solid #365263}
 .vortex-user-card-overlay .vortex-user-history-heading{border-top:1px solid #314653;padding-top:9px}
+
+/* Vortex unified interaction surfaces. Original PFT Studio treatment. */
+:is(.vortex-user-card,.vortex-user-preview,.vortex-message-context,.seventv-settings-modal){--vortex-surface:#17222e;--vortex-surface-raised:#203140;
+ --vortex-line:#3a5161;--vortex-ink:#e8f4f7;--vortex-muted:#9bb8c3;
+ --vortex-focus:#74e4e7;--vortex-radius:11px}
+.vortex-user-card,.vortex-user-preview,.vortex-message-context,
+.seventv-settings-modal{color:var(--vortex-ink);background:var(--vortex-surface);
+ border:1px solid var(--vortex-line);border-radius:var(--vortex-radius);
+ box-shadow:0 20px 55px #0009}
+.vortex-user-card button,.vortex-user-preview button,.vortex-message-context button,
+.seventv-settings-modal button{font-family:inherit;cursor:pointer}
+.vortex-user-card button:focus-visible,.vortex-user-preview button:focus-visible,
+.vortex-message-context button:focus-visible,.seventv-settings-modal button:focus-visible,
+.seventv-settings-modal input:focus-visible,.seventv-settings-modal select:focus-visible{
+ outline:2px solid var(--vortex-focus);outline-offset:2px}
+.vortex-user-card button:disabled,.seventv-settings-modal button:disabled{
+ cursor:not-allowed;opacity:.5}
+.vortex-user-card input,.seventv-settings-modal input,.seventv-settings-modal select{
+ max-width:100%;accent-color:var(--vortex-focus)}
+.vortex-message-context-item,.vortex-user-card .vortex-tool-button,
+.vortex-user-preview .vortex-tool-button{border-radius:8px}
+.vortex-message-context-item:hover,.vortex-user-card .vortex-tool-button:hover:not(:disabled),
+.vortex-user-preview .vortex-tool-button:hover:not(:disabled){
+ background:var(--vortex-surface-raised)}
+.seventv-settings-overlay{padding:clamp(8px,3vw,24px);overflow:auto}
+.seventv-settings-modal{max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);
+ overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+.seventv-settings-modal *{min-width:0;overflow-wrap:break-word}
+@media(max-width:600px){
+ .seventv-settings-modal{width:100%;padding:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .vortex-user-card *, .vortex-user-preview *, .vortex-message-context *,
+ .seventv-settings-modal *{transition:none!important;animation:none!important}
+}

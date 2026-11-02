@@ -731,3 +731,11 @@ test('compact profile separates common actions from expandable tools', () => {
  assert.match(js,/Дополнительные действия/);
  assert.match(css,/\.vortex-user-card-overlay \.vortex-user-primary-actions/);
 });
+
+test('all Vortex UI surfaces use shared original design tokens', () => {
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(css,/--vortex-surface:#17222e/);
+ assert.match(css,/--vortex-focus:#74e4e7/);
+ assert.match(css,/\.vortex-user-card,\.vortex-user-preview,\.vortex-message-context,/);
+ assert.match(css,/\.seventv-settings-modal\{max-width:calc\(100vw - 16px\)/);
+});
