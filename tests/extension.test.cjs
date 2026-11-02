@@ -703,3 +703,11 @@ test('Vortex action controls have keyboard dismissal and accessible target sizin
  assert.match(css,/overscroll-behavior:contain/);
  assert.match(css,/prefers-reduced-motion:reduce/);
 });
+
+test('chat overlays constrain long names and controls to viewport', () => {
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(css,/\.vortex-user-card\{min-width:0;min-height:0;overflow:hidden\}/);
+ assert.match(css,/\.vortex-user-preview\{max-width:calc\(100vw - 16px\)/);
+ assert.match(css,/\.vortex-message-context\{min-width:0;width:max-content;max-width:calc\(100vw - 16px\)/);
+ assert.match(css,/\.vortex-user-actions \.vortex-tool-button\{flex:1 1 100%\}/);
+});
