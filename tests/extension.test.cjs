@@ -614,3 +614,15 @@ test('profile hover shows bounded session messages and full card labels history'
  assert.match(source,/historyHeading\.textContent = 'Что писал ' \+ user/);
  assert.match(css,/\.vortex-user-preview-messages/);
 });
+
+test('local user mute is persisted and only affects rendered messages', () => {
+  const coreSource = fs.readFileSync(path.join(__dirname,'../extension/core.js'),'utf8');
+  const chat = fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+  const content = fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+  const css = fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+  assert.match(coreSource, /mutedUsers: ''/);
+  assert.equal(core.normalizeSettings({ mutedUsers: 'alice' }).mutedUsers, 'alice');
+  assert.match(chat, /options.saveSettings\(\{ mutedUsers: next.join\(', '\) \}\)/);
+  assert.match(content, /vortex-muted-user-line/);
+  assert.match(css, /\.vortex-chat-line\.vortex-muted-user-line/);
+});

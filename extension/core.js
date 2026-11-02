@@ -6,7 +6,7 @@
     enableAutocomplete: true, alternatingRows: true, collapseSpam: false, fuzzySpam: false,
     showEventNotices: true, sendOnEmoteClick: false,
     fontSize: 13, messageGap: 0, emoteGap: 2, showTimestamps: false,
-    highlightWords: '', highlightUsers: '', highlightBadges: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
+    highlightWords: '', highlightUsers: '', mutedUsers: '', highlightBadges: '', pauseOnHover: false, showChatSpeed: true, showCopyButton: true,
     mentionName: '', mentionSound: false, mentionColor: '#29b6f6', mentionIgnoreUsers: '', mentionMuteChannels: '', inputHistory: true,
     liveControls: true, autoCatchup: false, channelQuickLinks: true, sidebarPreview: false,
     ambilightEnabled: false, ambilightBrightness: 70, ambilightSpread: 65, ambilightResponse: 50,
@@ -74,7 +74,7 @@
     if (['aurora', 'graphite', 'orchid'].includes(value?.themePreset)) result.themePreset = value.themePreset;
     if (['comfortable', 'compact'].includes(value?.chatDensity)) result.chatDensity = value.chatDensity;
     result.highlightWords = typeof value?.highlightWords === 'string' ? value.highlightWords.slice(0, 500) : '';
-    for (const key of ['highlightUsers', 'highlightBadges', 'mentionIgnoreUsers', 'mentionMuteChannels'])
+    for (const key of ['highlightUsers', 'mutedUsers', 'highlightBadges', 'mentionIgnoreUsers', 'mentionMuteChannels'])
       result[key] = typeof value?.[key] === 'string' ? value[key].slice(0, 500) : '';
     return result;
   }
