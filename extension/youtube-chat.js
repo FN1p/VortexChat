@@ -6,6 +6,8 @@
   const isChatFrame = /^\/live_chat(?:_replay)?\/?$/.test(location.pathname);
   let emotes = new Map();
   let observer = null;
+  let observedRoot = null;
+  let disposed = false;
   const rendered = new WeakSet();
   const queue = new Set();
   let scheduled = false;
@@ -52,14 +54,16 @@
     if (queue.size) schedule();
   }
   function schedule() {
-    if (scheduled) return;
+    if (scheduled || disposed) return;
     scheduled = true;
     requestAnimationFrame(flush);
   }
   function startChat() {
-    if (!isChatFrame || observer) return;
+    if (!isChatFrame || disposed) return;
     const root = document.querySelector('yt-live-chat-item-list-renderer #items');
-    if (!root) return;
+    if (!root || (root === observedRoot && observer)) return;
+    observer?.disconnect();
+    observedRoot = root;
     root.querySelectorAll('yt-live-chat-text-message-renderer, yt-live-chat-paid-message-renderer').forEach(item => queue.add(item));
     schedule();
     observer = new MutationObserver(records => {
@@ -76,7 +80,7 @@
   async function loadGlobal() {
     try {
       const result = await chrome.runtime.sendMessage({action:'VORTEX_FETCH_PROVIDER',url:'https://7tv.io/v3/emote-sets/global'});
-      if (!result?.ok) return;
+      if (!result?.ok || disposed) return;
       emotes = new Map(VortexCore.parse7TV(result.data?.emotes, false).map(emote => [emote.code, emote]));
       startChat();
     } catch { /* YouTube chat stays usable when 7TV is offline. */ }
@@ -93,7 +97,7 @@
     style.textContent = '.vortex-yt-emote{display:inline-block;height:28px;max-width:112px;width:auto;vertical-align:middle;object-fit:contain;margin:0 2px}';
     (document.head || document.documentElement).appendChild(style);
     loadGlobal();
-    const timer = setInterval(() => { if (observer) { clearInterval(timer); return; } startChat(); }, 1200);
-    window.addEventListener('pagehide', () => { clearInterval(timer); observer?.disconnect(); queue.clear(); }, {once:true});
+    const timer = setInterval(() => { if (!document.hidden) startChat(); }, 2000);
+    window.addEventListener('pagehide', () => { disposed = true; clearInterval(timer); observer?.disconnect(); observedRoot = null; queue.clear(); }, {once:true});
   }
 })();
