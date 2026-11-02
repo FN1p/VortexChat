@@ -62,3 +62,12 @@ html[data-vortex-ambilight] .top-nav { filter: brightness(calc(1 - var(--vortex-
 .vortex-ambilight-button:hover { background-color: rgba(31, 74, 100, .95); border-color: #59e2e8; }
 .vortex-ambilight-button:focus-visible { outline: 2px solid #59e2e8; outline-offset: 3px; opacity: 1 !important; pointer-events: auto !important; }
 @media (prefers-reduced-motion: reduce) { .vortex-ambilight-button { transition: none !important; } }
+
+/* Keep Twitch chat usable while the player has ambient glow. */
+.vortex-ambilight-light,.vortex-ambilight-bar{pointer-events:none!important}
+html[data-vortex-ambilight] .channel-root__right-column,
+html[data-vortex-ambilight] .chat-room,
+html[data-vortex-ambilight] .stream-chat{filter:none!important}
+@media(max-width:700px){
+ .vortex-ambilight-light{box-shadow:none!important}
+}
