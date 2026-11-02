@@ -693,3 +693,13 @@ test('autocomplete updates from editor events instead of 200ms polling', () => {
  assert.match(script,/document\.addEventListener\('selectionchange'/);
  assert.match(script,/document\.addEventListener\('visibilitychange'/);
 });
+
+test('Vortex action controls have keyboard dismissal and accessible target sizing', () => {
+ const js=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(js,/if \(key\.key === 'Tab'\) closeMessageMenu\(\)/);
+ assert.match(css,/min-height:40px/);
+ assert.match(css,/max-height:min\(75vh,560px\)/);
+ assert.match(css,/overscroll-behavior:contain/);
+ assert.match(css,/prefers-reduced-motion:reduce/);
+});

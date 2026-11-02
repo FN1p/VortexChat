@@ -617,6 +617,9 @@
         }
       });
       messageMenu = menu;
+      menu.addEventListener('keydown', key => {
+        if (key.key === 'Tab') closeMessageMenu();
+      });
       menu.querySelector('button')?.focus();
       return true;
     }
