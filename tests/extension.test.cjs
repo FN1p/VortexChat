@@ -739,3 +739,12 @@ test('all Vortex UI surfaces use shared original design tokens', () => {
  assert.match(css,/\.vortex-user-card,\.vortex-user-preview,\.vortex-message-context,/);
  assert.match(css,/\.seventv-settings-modal\{max-width:calc\(100vw - 16px\)/);
 });
+
+test('local stretch command adjusts Twitch chat without sending the command', () => {
+ const script=fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(script,/function initChatStretchCommand/);
+ assert.match(script,/setChatStretch\(width\)/);
+ assert.match(script,/event\.stopImmediatePropagation\(\)/);
+ assert.match(css,/html\[data-vortex-stretch-chat\] \.channel-root__right-column/);
+});

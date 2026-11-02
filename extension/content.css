@@ -922,3 +922,13 @@ input:checked + .vortex-slider:before {
  .vortex-user-card *, .vortex-user-preview *, .vortex-message-context *,
  .seventv-settings-modal *{transition:none!important;animation:none!important}
 }
+
+/* Custom chat width requested from /stretch or /ширина; scoped to Twitch chat. */
+html[data-vortex-stretch-chat] .channel-root__right-column,
+html[data-vortex-stretch-chat] .right-column,
+html[data-vortex-stretch-chat] [data-a-target="right-column"]{
+ width:min(var(--vortex-stretch-chat-width),calc(100vw - 120px))!important;
+ min-width:min(var(--vortex-stretch-chat-width),calc(100vw - 120px))!important;
+ max-width:min(var(--vortex-stretch-chat-width),calc(100vw - 120px))!important;
+ flex-basis:min(var(--vortex-stretch-chat-width),calc(100vw - 120px))!important;
+}

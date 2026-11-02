@@ -539,6 +539,43 @@
     return (editor.innerText || editor.textContent || '').replace(/[\uFEFF\u200B]/g, '').replace(/\n$/, '');
   }
 
+  // Local-only chat width commands. Never send these commands to Twitch chat.
+  function setChatStretch(width) {
+    const value = width === null ? '' : String(width) + 'px';
+    document.documentElement.style.setProperty('--vortex-stretch-chat-width', value);
+    document.documentElement.toggleAttribute('data-vortex-stretch-chat', width !== null);
+  }
+
+  function initChatStretchCommand() {
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+      const editor = findTwitchChatInput();
+      if (!editor || !(editor === event.target || editor.contains(event.target))) return;
+      const text = getChatInputText(editor).trim();
+      const match = /^\/(?:stretch|ширина)(?:\s+(reset|off|normal|\d{2,4}))?$/i.exec(text);
+      if (!match) return;
+      const argument = match[1]?.toLowerCase();
+      let width = null;
+      if (argument && !['reset', 'off', 'normal'].includes(argument)) {
+        const n = Number(argument);
+        if (n < 280 || n > 900) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          toast('Ширина чата: от 280 до 900 px');
+          return;
+        }
+        width = n;
+      } else if (!argument) {
+        width = document.documentElement.hasAttribute('data-vortex-stretch-chat') ? null : 520;
+      }
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setChatStretch(width);
+      insertTextIntoTwitchChat('', true);
+      toast(width === null ? 'Обычная ширина чата' : 'Ширина чата: ' + width + ' px');
+    }, true);
+  }
+
   function ensureMainWorldPageBridge() {
     if (document.getElementById('vortex-main-world-bridge')) return;
     try {
@@ -2187,6 +2224,7 @@
     applySettings();
     ensureMainWorldPageBridge();
     initTabCompletion();
+    initChatStretchCommand();
     loadLiveChannelEmotes(state.currentChannel);
 
     const maintain = () => {
