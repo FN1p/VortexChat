@@ -539,6 +539,14 @@
       menu.className = 'vortex-message-context';
       menu.setAttribute('role', 'menu');
       menu.setAttribute('aria-label', 'Действия с сообщением ' + user);
+      const header = document.createElement('div');
+      header.className = 'vortex-message-context-header';
+      const brand = document.createElement('span');
+      brand.textContent = 'VORTEX / CHAT';
+      const subtitle = document.createElement('strong');
+      subtitle.textContent = user;
+      header.append(brand, subtitle);
+      menu.appendChild(header);
       const add = (label, action) => {
         const item = button(label, () => { closeMessageMenu(); action(); }, 'vortex-message-context-item');
         item.setAttribute('role', 'menuitem');
@@ -557,6 +565,22 @@
         navigator.clipboard.writeText(text).then(() => options.toast('Сообщение скопировано'))
           .catch(() => options.toast('Не удалось скопировать сообщение'));
       });
+      add('Копировать ник', () => {
+        navigator.clipboard.writeText(user).then(() => options.toast('Ник скопирован'))
+          .catch(() => options.toast('Не удалось скопировать ник'));
+      });
+      if (typeof options.saveSettings === 'function') {
+        const highlighted = String(options.settings().highlightUsers || '').split(',').map(v => v.trim()).filter(Boolean);
+        const isHighlighted = highlighted.some(v => v.toLowerCase() === user.toLowerCase());
+        add(isHighlighted ? 'Убрать подсветку ника' : 'Подсвечивать ник', () => {
+          const current = String(options.settings().highlightUsers || '').split(',').map(v => v.trim()).filter(Boolean);
+          const exists = current.some(v => v.toLowerCase() === user.toLowerCase());
+          const next = exists ? current.filter(v => v.toLowerCase() !== user.toLowerCase()) : [...current, user];
+          if (next.join(', ').length > 500) { options.toast('Список подсветки заполнен'); return; }
+          options.saveSettings({ highlightUsers: next.join(', ') });
+          options.toast(exists ? 'Подсветка отключена' : 'Подсветка включена');
+        });
+      }
       // Reuse the same persisted mute list as the full user card.
       const muted = String(options.settings().mutedUsers || '').split(',').map(v => v.trim()).filter(Boolean);
       const isMuted = muted.some(v => v.toLowerCase() === user.toLowerCase());
@@ -578,6 +602,10 @@
         const items = [...menu.querySelectorAll('[role="menuitem"]')];
         const index = items.indexOf(document.activeElement);
         if (key.key === 'Escape') { key.preventDefault(); closeMessageMenu(); }
+        if (key.key === 'Home' || key.key === 'End') {
+          key.preventDefault();
+          items[key.key === 'Home' ? 0 : items.length - 1]?.focus();
+        }
         if (key.key === 'ArrowDown' || key.key === 'ArrowUp') {
           key.preventDefault();
           items[(index + (key.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus();
