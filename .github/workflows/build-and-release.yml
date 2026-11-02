@@ -59,12 +59,12 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
 
       - name: Publish Beta after tested main build
-        if: github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release VortexChat Beta v1.3.15')
+        if: github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release VortexChat Beta v1.3.16')
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v1.3.15-beta.16 ./desktop-app/dist/VortexChat-7TV-Extension.zip ./desktop-app/dist/VortexChat-Setup-1.3.15.exe ./desktop-app/dist/VortexChat-Portable-1.3.15.exe --repo "${{ github.repository }}" --target "${{ github.sha }}" --prerelease --title "VortexChat v1.3.15-beta.16 (PFT Studio)" --notes "Beta 16: updated Twitch moderation, user cards, context actions, layout fixes and autocomplete performance."
+          gh release create v1.3.16-beta.17 ./desktop-app/dist/VortexChat-7TV-Extension.zip ./desktop-app/dist/VortexChat-Setup-1.3.16.exe ./desktop-app/dist/VortexChat-Portable-1.3.16.exe --repo "${{ github.repository }}" --target "${{ github.sha }}" --prerelease --title "VortexChat v1.3.16-beta.17 (PFT Studio)" --notes "Beta 17: YouTube Live global 7TV emotes, BTTV wide/flip/stack modifiers and updated PFT chat controls."
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
