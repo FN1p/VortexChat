@@ -427,6 +427,20 @@
       }, 'vortex-tool-button');
       highlightAction.disabled = !validLogin || typeof options.saveSettings !== 'function';
       actions.appendChild(highlightAction);
+      const isMuted = String(options.settings().mutedUsers || '').split(',').some(v => v.trim().toLowerCase() === user.toLowerCase());
+      const muteAction = button(isMuted ? 'Показывать сообщения' : 'Скрыть сообщения', () => {
+        if (!validLogin || typeof options.saveSettings !== 'function') return;
+        const list = String(options.settings().mutedUsers || '').split(',').map(v => v.trim()).filter(Boolean);
+        const exists = list.some(v => v.toLowerCase() === user.toLowerCase());
+        const next = exists ? list.filter(v => v.toLowerCase() !== user.toLowerCase()) : [...list, user];
+        if (next.join(', ').length > 500) { options.toast('Список скрытых пользователей заполнен'); return; }
+        options.saveSettings({ mutedUsers: next.join(', ') });
+        closeCard();
+        options.toast(exists ? 'Сообщения снова отображаются' : 'Сообщения пользователя скрыты');
+      }, 'vortex-tool-button');
+      muteAction.disabled = !validLogin || typeof options.saveSettings !== 'function';
+      actions.appendChild(muteAction);
+
       const findNativeUsername = () => [...(list?.querySelectorAll(USER) || [])].find(node =>
         (node.getAttribute('data-a-user') || node.getAttribute('data-user') || node.textContent || '').trim().toLocaleLowerCase() === user.toLocaleLowerCase());
       const nativeCard = button('Карточка Twitch', () => {
