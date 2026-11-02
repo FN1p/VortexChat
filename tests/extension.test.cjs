@@ -685,3 +685,11 @@ test('profile shares original Vortex identity language with context menu', () =>
  assert.match(css,/\.vortex-user-card \.vortex-history-list/);
  assert.match(css,/\.vortex-user-identity>span/);
 });
+
+test('autocomplete updates from editor events instead of 200ms polling', () => {
+ const script=fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+ assert.doesNotMatch(script,/setInterval\(updateSuggestions, 200\)/);
+ assert.match(script,/document\.addEventListener\('focusin'/);
+ assert.match(script,/document\.addEventListener\('selectionchange'/);
+ assert.match(script,/document\.addEventListener\('visibilitychange'/);
+});
