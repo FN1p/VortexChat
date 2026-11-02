@@ -877,3 +877,13 @@ input:checked + .vortex-slider:before {
  .vortex-user-card-overlay .vortex-user-card{width:calc(100vw - 20px)}
  .vortex-user-card-overlay .vortex-user-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* Compact profile workflow: primary actions first, secondary controls disclosed on demand. */
+.vortex-user-card-overlay .vortex-user-primary-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.vortex-user-card-overlay .vortex-user-primary-actions .vortex-tool-button{min-height:38px;min-width:0;white-space:normal}
+.vortex-user-card-overlay .vortex-user-more{border:1px solid #354d5d;border-radius:9px;background:#14212c}
+.vortex-user-card-overlay .vortex-user-more>summary{cursor:pointer;padding:9px 12px;color:#95dce3;font-weight:650;user-select:none}
+.vortex-user-card-overlay .vortex-user-more>summary:hover,
+.vortex-user-card-overlay .vortex-user-more>summary:focus-visible{background:#244253;outline:2px solid #68dce5;outline-offset:-2px}
+.vortex-user-card-overlay .vortex-user-more .vortex-user-actions{margin:0;padding:8px;border-top:1px solid #365263}
+.vortex-user-card-overlay .vortex-user-history-heading{border-top:1px solid #314653;padding-top:9px}
