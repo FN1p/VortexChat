@@ -248,6 +248,11 @@
       else input.value = value;
     });
     syncQuickPanel();
+    // Apply changed mute settings to currently rendered messages immediately.
+    document.querySelectorAll('.vortex-chat-line').forEach(row => {
+      row.classList.toggle('vortex-muted-user-line',
+        VortexCore.matchesExactList(lineLogin(row), state.settings.mutedUsers));
+    });
     chatTools?.maintain();
     if (!state.settings.enable7TV) stop7TVEvents();
     else if (active7TVEmoteSetId && !active7TVEventSocket) connect7TVEventWebSocket(active7TVEmoteSetId);
@@ -1711,6 +1716,9 @@
     const usernameLogin = lineLogin(node);
     const matchingBadge = [...node.querySelectorAll('.chat-badge img, [data-a-target*="chat-badge"] img, .vortex-7tv-badge')]
       .some(badge => VortexCore.matchesExactList(badge.title || badge.alt, state.settings.highlightBadges));
+    // User-controlled local mute. Twitch still receives the message; nothing is sent remotely.
+    const muted = VortexCore.matchesExactList(usernameLogin, state.settings.mutedUsers);
+    node.classList.toggle('vortex-muted-user-line', muted);
     node.classList.toggle('vortex-highlight-line',
       VortexCore.matchesHighlight(fullText, state.settings.highlightWords) ||
       VortexCore.matchesExactList(usernameLogin, state.settings.highlightUsers) || matchingBadge);
