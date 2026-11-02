@@ -758,3 +758,14 @@ test('BTTV emote modifiers use a supported emote and scoped transformation class
  assert.match(js,/modifier === 'z!'/);
  assert.match(css,/\.vortex-zw-stack\.vortex-emote-wide/);
 });
+
+test('YouTube Live chat renders global 7TV emotes without replacing platform chat logic', () => {
+ const source=fs.readFileSync(path.join(__dirname,'../extension/youtube-chat.js'),'utf8');
+ assert.match(source,/VORTEX_FETCH_PROVIDER/);
+ assert.match(source,/VortexCore\.parse7TV/);
+ assert.match(source,/yt-live-chat-text-message-renderer/);
+ assert.match(source,/yt-live-chat-paid-message-renderer/);
+ assert.match(source,/new MutationObserver/);
+ assert.match(source,/NodeFilter\.SHOW_TEXT/);
+ assert.match(source,/emoteCount:emotes\.size/);
+});
