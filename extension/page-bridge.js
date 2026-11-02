@@ -9,6 +9,14 @@
   // Twitch keeps chat flags and the original body in React props even when its
   // rendered line only contains a deleted-message placeholder. Read only the
   // props of the requested line; never change Twitch's React state.
+  // A small in-memory buffer preserves message bodies seen before Twitch moderation.
+  const recentChatBodies = new Map();
+  function rememberChatBody(id, body) {
+    if (typeof id !== 'string' || !id || typeof body !== 'string' || !body.trim()) return;
+    recentChatBodies.delete(id);
+    recentChatBodies.set(id, body.slice(0, 2000));
+    if (recentChatBodies.size > 800) recentChatBodies.delete(recentChatBodies.keys().next().value);
+  }
   if (typeof document.addEventListener === 'function') document.addEventListener('vortex-chat-metadata-request', event => {
     const line = event.target;
     if (!(line instanceof Element) || !line.matches('[data-a-target="chat-line-message"], .chat-line__message')) return;
@@ -18,12 +26,17 @@
       const props = fiber.memoizedProps || fiber.pendingProps;
       const message = props?.message;
       if (!message || typeof message !== 'object' || typeof message.id !== 'string') continue;
+      const originalBody = typeof message.messageBody === 'string' ? message.messageBody :
+        typeof message.text === 'string' ? message.text : '';
+      const isDeleted = message.deleted === true || message.banned === true || props.isDeleted === true;
+      if (!isDeleted) rememberChatBody(message.id, originalBody);
       line.dataset.vortexMessageId = message.id;
       line.dataset.vortexFirstMsg = message.isFirstMsg === true ? 'true' : 'false';
       line.dataset.vortexDeleted = message.deleted === true || message.banned === true || props.isDeleted === true ? 'true' : 'false';
       line.dataset.vortexBanned = message.banned === true ? 'true' : 'false';
-      if (line.dataset.vortexDeleted === 'true' && typeof message.messageBody === 'string') {
-        line.dataset.vortexOriginalBody = message.messageBody.slice(0, 2000);
+      if (isDeleted) {
+        const prior = recentChatBodies.get(message.id) || originalBody;
+        if (prior) line.dataset.vortexOriginalBody = prior.slice(0, 2000);
       } else {
         delete line.dataset.vortexOriginalBody;
       }
