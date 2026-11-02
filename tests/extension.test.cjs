@@ -676,3 +676,12 @@ test('context menu exposes local profile, highlight and copy actions with keyboa
  assert.match(script,/key\.key === 'Home' \|\| key\.key === 'End'/);
  assert.match(css,/\.vortex-message-context-header/);
 });
+
+test('profile shares original Vortex identity language with context menu', () => {
+ const script=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(script,/vortex-user-identity/);
+ assert.match(script,/VORTEX \/ USER/);
+ assert.match(css,/\.vortex-user-card \.vortex-history-list/);
+ assert.match(css,/\.vortex-user-identity>span/);
+});
