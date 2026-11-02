@@ -638,3 +638,13 @@ test('message context menu uses local actions and preserves text selection', () 
  assert.match(chat,/key\.key === 'ArrowDown'/);
  assert.match(css,/\.vortex-message-context\{/);
 });
+
+test('moderated messages keep a bounded local pre-deletion body snapshot', () => {
+ const bridge=fs.readFileSync(path.join(__dirname,'../extension/page-bridge.js'),'utf8');
+ const content=fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+ assert.match(bridge,/const recentChatBodies = new Map\(\)/);
+ assert.match(bridge,/if \(!isDeleted\) rememberChatBody\(message\.id, originalBody\)/);
+ assert.match(bridge,/recentChatBodies\.size > 800/);
+ assert.match(bridge,/recentChatBodies\.get\(message\.id\) \|\| originalBody/);
+ assert.match(content,/else line\.appendChild\(restored\)/);
+});
