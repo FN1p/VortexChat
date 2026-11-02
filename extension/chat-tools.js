@@ -240,6 +240,7 @@
     function closeCard() {
       if (!card) return;
       const restore = card.restore;
+      card.cleanup?.();
       card.overlay.remove();
       card = null;
       if (restore?.isConnected) restore.focus();
@@ -376,7 +377,7 @@
       const dialog = document.createElement('section');
       dialog.className = 'vortex-user-card';
       dialog.setAttribute('role', 'dialog');
-      dialog.setAttribute('aria-modal', 'true');
+      dialog.setAttribute('aria-modal', 'false');
       dialog.setAttribute('aria-labelledby', 'vortex-user-card-title');
       const header = document.createElement('header');
       const title = document.createElement('h2');
@@ -496,11 +497,40 @@
       historyHeading.textContent = 'Что писал ' + user;
       dialog.append(header, info, actions, historyHeading, search, count, messages);
       overlay.appendChild(dialog);
-      overlay.addEventListener('click', event => { if (event.target === overlay) closeCard(); });
       card = { overlay, user, channel, search, count, messages, restore: trigger || document.activeElement };
       document.body.appendChild(overlay);
+      const positionCard = () => {
+        if (!card || card.overlay !== overlay) return;
+        const rect = trigger?.isConnected ? trigger.getBoundingClientRect() : null;
+        const gap = 10;
+        const margin = 10;
+        const w = dialog.offsetWidth;
+        const h = dialog.offsetHeight;
+        const x = rect ? (rect.right + gap + w <= window.innerWidth - margin
+          ? rect.right + gap : rect.left - w - gap) : (window.innerWidth - w) / 2;
+        const y = rect ? rect.top : (window.innerHeight - h) / 2;
+        dialog.style.left = Math.round(Math.max(margin, Math.min(x, window.innerWidth - w - margin))) + 'px';
+        dialog.style.top = Math.round(Math.max(margin, Math.min(y, window.innerHeight - h - margin))) + 'px';
+      };
+      const dismissOutside = event => {
+        if (!dialog.contains(event.target) && !trigger?.contains?.(event.target)) closeCard();
+      };
+      const dismissEscape = event => {
+        if (event.key === 'Escape') { event.preventDefault(); closeCard(); }
+      };
+      window.addEventListener('resize', positionCard);
+      window.addEventListener('scroll', positionCard, true);
+      document.addEventListener('pointerdown', dismissOutside, true);
+      document.addEventListener('keydown', dismissEscape, true);
+      card.cleanup = () => {
+        window.removeEventListener('resize', positionCard);
+        window.removeEventListener('scroll', positionCard, true);
+        document.removeEventListener('pointerdown', dismissOutside, true);
+        document.removeEventListener('keydown', dismissEscape, true);
+      };
+      positionCard();
       renderHistory();
-      search.focus();
+      search.focus({ preventScroll: true });
     }
 
     function mountHeader(group) {
