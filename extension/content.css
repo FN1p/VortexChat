@@ -804,3 +804,33 @@ input:checked + .vortex-slider:before {
 .vortex-user-card-overlay{backdrop-filter:blur(4px)}
 @media(max-width:520px){.vortex-user-card{padding:14px;max-height:92vh}.vortex-user-actions{gap:5px}}
 @media(prefers-reduced-motion:reduce){.vortex-user-card{animation:none!important}}
+
+/* Accessible touch targets and readable layout for the VortexChat action surfaces. */
+.vortex-user-card,.vortex-message-context,.vortex-user-preview{box-sizing:border-box}
+.vortex-user-card .vortex-tool-button,
+.vortex-user-preview .vortex-tool-button,
+.vortex-message-context-item{
+ min-height:40px;padding:9px 12px;line-height:1.35;white-space:normal;
+ transition:background-color 140ms ease,border-color 140ms ease;
+}
+.vortex-user-card .vortex-tool-button:disabled{opacity:.45;cursor:not-allowed}
+.vortex-user-actions{align-items:stretch;gap:8px}
+.vortex-user-card .vortex-tool-button{display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.vortex-user-preview>div:last-child{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.vortex-message-context{max-height:min(75vh,560px);overflow-y:auto;overscroll-behavior:contain}
+.vortex-message-context-item{width:100%;touch-action:manipulation}
+.vortex-user-card .vortex-history-list{flex:1;min-height:80px;overflow-y:auto;overscroll-behavior:contain}
+.vortex-user-card input[type=search]{min-height:44px}
+.vortex-user-card .vortex-tool-button:focus-visible,
+.vortex-user-preview .vortex-tool-button:focus-visible,
+.vortex-message-context-item:focus-visible{outline:2px solid #75eaf0;outline-offset:2px}
+@media(max-width:560px){
+ .vortex-user-card-overlay{align-items:flex-end;padding:8px}
+ .vortex-user-card{width:100%;max-height:94dvh;border-radius:14px;padding:14px}
+ .vortex-user-actions .vortex-tool-button{flex:1 1 calc(50% - 8px)}
+ .vortex-message-context{max-width:calc(100vw - 16px)}
+}
+@media(prefers-reduced-motion:reduce){
+ .vortex-user-card .vortex-tool-button,.vortex-user-preview .vortex-tool-button,
+ .vortex-message-context-item{transition:none!important}
+}
