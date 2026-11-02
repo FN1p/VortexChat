@@ -791,3 +791,16 @@ input:checked + .vortex-slider:before {
 .vortex-message-context-item{min-height:34px;padding:8px 10px;border-radius:7px;transition:background 120ms ease}
 .vortex-message-context-item:hover,.vortex-message-context-item:focus-visible{background:#294c60;outline:2px solid #69d6df;outline-offset:-2px}
 @media(prefers-reduced-motion:reduce){.vortex-message-context-item{transition:none!important}}
+
+/* Vortex unified card language: independent PFT Studio identity system. */
+.vortex-user-card{width:min(560px,100%);border:1px solid #37576a;border-radius:15px;
+ background:linear-gradient(155deg,#1b2b39,#121a24 70%);box-shadow:0 25px 70px #000b}
+.vortex-user-identity{display:flex;flex-direction:column;gap:3px;min-width:0}
+.vortex-user-identity>span{font-size:10px;font-weight:800;letter-spacing:.13em;color:#6dd6e2}
+.vortex-user-card .vortex-user-identity h2{font-size:21px;line-height:1.2;white-space:normal}
+.vortex-user-card .vortex-history-list{border:1px solid #334655;border-radius:10px;padding:4px 10px;background:#0c1721}
+.vortex-user-card .vortex-history-message{padding:10px 6px}
+.vortex-user-card .vortex-history-message time{color:#92c7d0}
+.vortex-user-card-overlay{backdrop-filter:blur(4px)}
+@media(max-width:520px){.vortex-user-card{padding:14px;max-height:92vh}.vortex-user-actions{gap:5px}}
+@media(prefers-reduced-motion:reduce){.vortex-user-card{animation:none!important}}
