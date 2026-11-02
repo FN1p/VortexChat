@@ -75,6 +75,14 @@ function startLight(){
     ].join(',')});
  },250);
 }
+function toggleTheater(){
+ if(tw){
+  const nativeButton=document.querySelector('[data-a-target="player-theatre-mode-button"],[data-a-target="player-theater-mode-button"],button[data-test-selector="theatre-mode-button"]');
+  if(nativeButton){nativeButton.click();return true;}
+  return false;
+ }
+ theater=!theater;cssApply();return true;
+}
 function cssApply(){
  const opacity=settings.chatOpacity/100,blur=settings.visualBlurEnabled&&!settings.performanceMode?settings.visualBlur:0;
  const radius=settings.visualCornerRadius||0;
@@ -84,7 +92,7 @@ function cssApply(){
  style.textContent=`
  ${sel}{background-color:rgba(15,18,28,${opacity})!important;${blur?`backdrop-filter:blur(${blur}px)!important;`:''}}
  ${yt?'ytd-live-chat-frame,yt-live-chat-renderer':'.chat-room'}{border-radius:${radius}px!important;${settings.visualAccentEnabled?`outline:1px solid ${accent}88!important;`:''}}
- ${theater?(yt?'#secondary,#related{display:none!important}':'.channel-root__right-column{display:none!important}') : ''}
+ ${theater&&yt?'#secondary,#related{display:none!important}':''}
  .vortex-yt-settings:hover{background:#223d51!important;border-color:#63e8e9!important;transform:translateY(-1px)}
  .vortex-yt-settings:focus-visible,.vortex-yt-panel button:focus-visible{outline:2px solid #63e8e9!important;outline-offset:2px}
  .vortex-yt-panel button:hover{background:#28506a!important}
@@ -95,7 +103,8 @@ function cssApply(){
  .vortex-yt-panel input[type=range]{width:112px;accent-color:#39d8d0}
  .vortex-yt-panel button{border:1px solid #39d8d077;background:#1e2c3b;color:#fff;padding:7px;border-radius:7px;cursor:pointer}
  `;
- if((yt?settings.youtubeAmbientEnabled:settings.visualAmbilightEnabled)&&!settings.performanceMode&&!matchMedia('(prefers-reduced-motion:reduce)').matches)startLight();else stopLight();
+ // Twitch uses media.js as the sole Ambilight renderer; avoid two competing overlays.
+ if(yt&&settings.youtubeAmbientEnabled&&!settings.performanceMode&&!matchMedia('(prefers-reduced-motion:reduce)').matches)startLight();else stopLight();
  updatePanelValues();
 }
 function save(key,value){
@@ -154,7 +163,7 @@ function openPanel(player){
  panel.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.action==='close'){panel.remove();panel=null;}
-  if(b.dataset.action==='theater'){theater=!theater;cssApply();}
+  if(b.dataset.action==='theater'){toggleTheater();}
   if(b.dataset.action==='pip')void pip();
  });
  player.append(panel);updatePanelValues();
@@ -162,7 +171,7 @@ function openPanel(player){
 async function pip(){const v=getVideo();if(!v||!document.pictureInPictureEnabled)return false;try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else await v.requestPictureInPicture();return true;}catch{return false;}}
 document.addEventListener('keydown',e=>{
  if(e.repeat||!e.altKey||!e.shiftKey||e.ctrlKey||e.metaKey||e.target?.closest?.('input,textarea,select,[contenteditable],[role=textbox]'))return;
- if(e.code==='KeyT'&&topPage){theater=!theater;cssApply();}
+ if(e.code==='KeyT'&&topPage){toggleTheater();}
  else if(e.code==='KeyP'&&topPage){void pip();}
  else if(e.code==='KeyO')save('chatOpacity',settings.chatOpacity===100?30:100);
  else return;
@@ -171,6 +180,6 @@ document.addEventListener('keydown',e=>{
 chrome.storage.local.get('vortexSettings').then(r=>{settings=VortexCore.normalizeSettings(r.vortexSettings);cssApply();initButton();});
 chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes.vortexSettings){settings=VortexCore.normalizeSettings(changes.vortexSettings.newValue);cssApply();}});
 if(yt&&topPage){new MutationObserver(()=>{if(!settingsButton?.isConnected){panel=null;initButton();}}).observe(document.documentElement,{childList:true,subtree:true});}
-if(topPage)chrome.runtime.onMessage.addListener((m,_s,reply)=>{if(m?.action==='VORTEX_VISUAL_TOGGLE_THEATER'){theater=!theater;cssApply();reply({ok:true});}else if(m?.action==='VORTEX_VISUAL_PIP'){pip().then(ok=>reply({ok}));return true;}});
+if(topPage)chrome.runtime.onMessage.addListener((m,_s,reply)=>{if(m?.action==='VORTEX_VISUAL_TOGGLE_THEATER'){toggleTheater();reply({ok:true});}else if(m?.action==='VORTEX_VISUAL_PIP'){pip().then(ok=>reply({ok}));return true;}});
 addEventListener('pagehide',stopLight,{once:true});
 })();
