@@ -779,3 +779,15 @@ input:checked + .vortex-slider:before {
 .vortex-chat-line.vortex-moderated-line{opacity:.78}
 .vortex-chat-line.vortex-banned-line{opacity:.72}
 .vortex-chat-line.vortex-moderated-line:hover,.vortex-chat-line.vortex-banned-line:hover{opacity:1}
+
+/* PFT Studio menu treatment: original compact tool palette, not reference artwork. */
+.vortex-message-context{min-width:244px;max-width:min(320px,calc(100vw - 16px));padding:8px;gap:2px;
+ border:1px solid #395465;border-radius:13px;background:linear-gradient(155deg,#192936,#101820);
+ box-shadow:0 18px 50px #000a, inset 0 1px #ffffff12}
+.vortex-message-context-header{display:flex;flex-direction:column;gap:2px;padding:8px 10px 10px;margin-bottom:4px;
+ border-bottom:1px solid #ffffff1a;min-width:0}
+.vortex-message-context-header span{font-size:10px;font-weight:800;letter-spacing:.13em;color:#6dd6e2}
+.vortex-message-context-header strong{font-size:13px;color:#f0f8ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vortex-message-context-item{min-height:34px;padding:8px 10px;border-radius:7px;transition:background 120ms ease}
+.vortex-message-context-item:hover,.vortex-message-context-item:focus-visible{background:#294c60;outline:2px solid #69d6df;outline-offset:-2px}
+@media(prefers-reduced-motion:reduce){.vortex-message-context-item{transition:none!important}}
