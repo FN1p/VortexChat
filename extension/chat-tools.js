@@ -384,7 +384,12 @@
       title.textContent = user;
       const close = button('×', closeCard, 'vortex-tool-button');
       close.setAttribute('aria-label', 'Закрыть историю пользователя');
-      header.append(title, close);
+      const identity = document.createElement('div');
+      identity.className = 'vortex-user-identity';
+      const eyebrow = document.createElement('span');
+      eyebrow.textContent = 'VORTEX / USER';
+      identity.append(eyebrow, title);
+      header.append(identity, close);
       const info = document.createElement('p');
       info.className = 'vortex-history-note';
       info.textContent = 'Сообщения, замеченные этой вкладкой. История хранится в памяти, до 1200 сообщений на канал; показаны последние 100 совпадений.';
