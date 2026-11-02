@@ -658,3 +658,10 @@ test('moderation state has a visible label and is removed if message is restored
  assert.match(script,/status\.textContent = line\.dataset\.vortexBanned/);
  assert.match(css,/\.vortex-chat-line \.vortex-moderation-status/);
 });
+
+test('message context menu can toggle locally persisted mute', () => {
+ const source=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ assert.match(source,/add\(isMuted \? 'Показывать сообщения' : 'Скрыть сообщения'/);
+ assert.match(source,/options\.saveSettings\(\{ mutedUsers: next\.join\(', '\) \}\)/);
+ assert.match(source,/next\.join\(', '\)\.length > 500/);
+});
