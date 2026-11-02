@@ -557,6 +557,19 @@
         navigator.clipboard.writeText(text).then(() => options.toast('Сообщение скопировано'))
           .catch(() => options.toast('Не удалось скопировать сообщение'));
       });
+      // Reuse the same persisted mute list as the full user card.
+      const muted = String(options.settings().mutedUsers || '').split(',').map(v => v.trim()).filter(Boolean);
+      const isMuted = muted.some(v => v.toLowerCase() === user.toLowerCase());
+      if (typeof options.saveSettings === 'function') {
+        add(isMuted ? 'Показывать сообщения' : 'Скрыть сообщения', () => {
+          const current = String(options.settings().mutedUsers || '').split(',').map(v => v.trim()).filter(Boolean);
+          const exists = current.some(v => v.toLowerCase() === user.toLowerCase());
+          const next = exists ? current.filter(v => v.toLowerCase() !== user.toLowerCase()) : [...current, user];
+          if (next.join(', ').length > 500) { options.toast('Список скрытых пользователей заполнен'); return; }
+          options.saveSettings({ mutedUsers: next.join(', ') });
+          options.toast(exists ? 'Сообщения снова отображаются' : 'Сообщения пользователя скрыты');
+        });
+      }
       document.body.appendChild(menu);
       const bounds = menu.getBoundingClientRect();
       menu.style.left = Math.max(8, Math.min(event.clientX, window.innerWidth - bounds.width - 8)) + 'px';
