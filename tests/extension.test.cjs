@@ -778,3 +778,14 @@ test('Ambilight does not duplicate Twitch effects or hide the chat sidebar', () 
  assert.doesNotMatch(visual,/channel-root__right-column\{display:none/);
  assert.match(css,/\.vortex-ambilight-light,\.vortex-ambilight-bar\{pointer-events:none!important\}/);
 });
+
+test('video and YouTube chat integrations release timers and observers on pagehide', () => {
+ const media=fs.readFileSync(path.join(__dirname,'../extension/media.js'),'utf8');
+ const youtube=fs.readFileSync(path.join(__dirname,'../extension/youtube-chat.js'),'utf8');
+ assert.match(media,/clearInterval\(playerScanTimer\)/);
+ assert.match(media,/disposed = true/);
+ assert.match(youtube,/observedRoot = root/);
+ assert.match(youtube,/observer\?\.disconnect\(\)/);
+ assert.match(youtube,/disposed = true/);
+ assert.match(youtube,/if \(!document\.hidden\) startChat\(\)/);
+});
