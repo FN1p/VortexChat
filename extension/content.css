@@ -857,3 +857,23 @@ input:checked + .vortex-slider:before {
  .vortex-user-actions .vortex-tool-button{flex:1 1 100%}
  .vortex-user-preview>div:last-child{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Nonmodal Twitch user popover anchored to the clicked nickname. */
+.vortex-user-card-overlay{position:fixed;inset:0;z-index:10000000;display:block;padding:0;
+ background:transparent;pointer-events:none;backdrop-filter:none;overflow:visible}
+.vortex-user-card-overlay .vortex-user-card{position:fixed;pointer-events:auto;
+ width:min(390px,calc(100vw - 20px));max-height:min(640px,calc(100dvh - 20px));
+ padding:14px;gap:8px;overflow-x:hidden;overflow-y:auto;
+ border-radius:12px;box-shadow:0 18px 60px #000b,0 0 0 1px #ffffff08}
+.vortex-user-card-overlay .vortex-user-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:6px;padding:6px 0}
+.vortex-user-card-overlay .vortex-user-actions .vortex-tool-button{min-width:0;max-width:none;
+ width:100%;flex:none;min-height:36px;padding:7px 9px;font-size:12px}
+.vortex-user-card-overlay .vortex-history-note{margin:3px 0;font-size:11px}
+.vortex-user-card-overlay .vortex-user-history-heading{margin:6px 0 2px}
+.vortex-user-card-overlay .vortex-history-list{max-height:240px;min-height:50px;flex:none}
+.vortex-user-card-overlay .vortex-user-identity h2{font-size:18px}
+@media(max-width:420px){
+ .vortex-user-card-overlay .vortex-user-card{width:calc(100vw - 20px)}
+ .vortex-user-card-overlay .vortex-user-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
