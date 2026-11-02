@@ -552,7 +552,7 @@
       const editor = findTwitchChatInput();
       if (!editor || !(editor === event.target || editor.contains(event.target))) return;
       const text = getChatInputText(editor).trim();
-      const match = /^\\/(?:stretch|ширина)(?:\\s+(reset|off|normal|\\d{2,4}))?$/i.exec(text);
+      const match = /^\/(?:stretch|ширина)(?:\s+(reset|off|normal|\d{2,4}))?$/i.exec(text);
       if (!match) return;
       const argument = match[1]?.toLowerCase();
       let width = null;
