@@ -1267,7 +1267,24 @@
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
       queueMicrotask(updateSuggestions);
     }, true);
-    setInterval(updateSuggestions, 200);
+    // Event-driven completion avoids scanning the entire emote catalog five times a second.
+    document.addEventListener('focusin', event => {
+      const editor = findTwitchChatInput();
+      if (editor && (editor === event.target || editor.contains(event.target)))
+        queueMicrotask(updateSuggestions);
+    }, true);
+    document.addEventListener('focusout', event => {
+      const editor = findTwitchChatInput();
+      if (editor && (editor === event.target || editor.contains(event.target)))
+        queueMicrotask(updateSuggestions);
+    }, true);
+    document.addEventListener('selectionchange', () => {
+      if (document.getElementById('vortex-autocomplete-popup'))
+        queueMicrotask(updateSuggestions);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) hideAutocompletePopup();
+    });
   }
 
   function highlightAutocompleteItem() {
