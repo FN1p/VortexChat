@@ -8,6 +8,8 @@
   let bars = [];
   let sampleTimer = 0;
   let positionTimer = 0;
+  let playerScanTimer = 0;
+  let disposed = false;
   let clipDialog = null;
   let mutedMedia = [];
   let clipMuteTimer = 0;
@@ -144,6 +146,7 @@
   }
 
   function attachLight() {
+    if (disposed || document.hidden) return;
     const found = findPlayer();
     if (!found) { if (video) removeLight(); return; }
     if (video === found) return;
@@ -261,7 +264,13 @@
       sync();
     }
   });
-  setInterval(attachLight, 1500);
+  playerScanTimer = setInterval(attachLight, 1500);
   attachLight();
-  window.addEventListener('pagehide', () => { closeClip(); removeLight(); });
+  window.addEventListener('pagehide', () => {
+    disposed = true;
+    clearInterval(playerScanTimer);
+    playerScanTimer = 0;
+    closeClip();
+    removeLight();
+  });
 })();
