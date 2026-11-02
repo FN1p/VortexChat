@@ -540,7 +540,6 @@
         username?.getAttribute('data-user') || username?.textContent || '').trim();
       const text = String(options.getText(line) || '').slice(0, 1000);
       if (!/^[a-z0-9_]{1,25}$/i.test(user)) return false;
-      const returnFocus = document.activeElement;
       const menu = document.createElement('div');
       menu.className = 'vortex-message-context';
       menu.setAttribute('role', 'menu');
@@ -618,7 +617,6 @@
         }
       });
       messageMenu = menu;
-      menu.dataset.vortexReturnFocus = 'true';
       menu.addEventListener('keydown', key => {
         if (key.key === 'Tab') closeMessageMenu();
       });
