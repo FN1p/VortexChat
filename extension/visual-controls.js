@@ -84,7 +84,7 @@ function cssApply(){
  style.textContent=`
  ${sel}{background-color:rgba(15,18,28,${opacity})!important;${blur?`backdrop-filter:blur(${blur}px)!important;`:''}}
  ${yt?'ytd-live-chat-frame,yt-live-chat-renderer':'.chat-room'}{border-radius:${radius}px!important;${settings.visualAccentEnabled?`outline:1px solid ${accent}88!important;`:''}}
- ${theater?(yt?'#secondary,#related{display:none!important}':'.channel-root__right-column{display:none!important}') : ''}
+ ${theater&&yt?'#secondary,#related{display:none!important}':''}
  .vortex-yt-settings:hover{background:#223d51!important;border-color:#63e8e9!important;transform:translateY(-1px)}
  .vortex-yt-settings:focus-visible,.vortex-yt-panel button:focus-visible{outline:2px solid #63e8e9!important;outline-offset:2px}
  .vortex-yt-panel button:hover{background:#28506a!important}
@@ -95,7 +95,8 @@ function cssApply(){
  .vortex-yt-panel input[type=range]{width:112px;accent-color:#39d8d0}
  .vortex-yt-panel button{border:1px solid #39d8d077;background:#1e2c3b;color:#fff;padding:7px;border-radius:7px;cursor:pointer}
  `;
- if((yt?settings.youtubeAmbientEnabled:settings.visualAmbilightEnabled)&&!settings.performanceMode&&!matchMedia('(prefers-reduced-motion:reduce)').matches)startLight();else stopLight();
+ // Twitch uses media.js as the sole Ambilight renderer; avoid two competing overlays.
+ if(yt&&settings.youtubeAmbientEnabled&&!settings.performanceMode&&!matchMedia('(prefers-reduced-motion:reduce)').matches)startLight();else stopLight();
  updatePanelValues();
 }
 function save(key,value){
