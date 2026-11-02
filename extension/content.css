@@ -758,3 +758,6 @@ input:checked + .vortex-slider:before {
 .vortex-user-preview-label{font-size:11px;font-weight:700;letter-spacing:.02em;color:#8fdfe6}
 .vortex-user-preview-messages p{margin:0;padding:5px 7px;border-radius:6px;background:#ffffff0a;color:#dfedf5;overflow-wrap:anywhere;white-space:pre-wrap;max-height:55px;overflow:hidden}
 .vortex-user-history-heading{font-size:14px;line-height:1.4;margin:12px 0 6px;color:#83e3e8}
+
+/* Locally muted users: hide only rendered message rows; no Twitch moderation request. */
+.vortex-chat-line.vortex-muted-user-line { display: none !important; }
