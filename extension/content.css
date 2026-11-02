@@ -771,3 +771,11 @@ input:checked + .vortex-slider:before {
 .vortex-message-context-item:hover,.vortex-message-context-item:focus-visible{
  background:#315267;outline:2px solid #65e4e8;outline-offset:-2px;}
 @media(prefers-reduced-motion:reduce){.vortex-message-context-item{transition:none!important}}
+
+/* A native Twitch moderation marker remains readable even when the body is removed. */
+.vortex-chat-line .vortex-moderation-status {display:inline-block;margin:2px 6px 2px 0;padding:2px 7px;
+ border:1px solid #8a689f;border-radius:5px;background:#392c43;color:#f7e2ff;
+ font:600 11px/1.4 "Segoe UI",sans-serif;opacity:1;}
+.vortex-chat-line.vortex-moderated-line{opacity:.78}
+.vortex-chat-line.vortex-banned-line{opacity:.72}
+.vortex-chat-line.vortex-moderated-line:hover,.vortex-chat-line.vortex-banned-line:hover{opacity:1}
