@@ -769,3 +769,12 @@ test('YouTube Live chat renders global 7TV emotes without replacing platform cha
  assert.match(source,/NodeFilter\.SHOW_TEXT/);
  assert.match(source,/emoteCount:emotes\.size/);
 });
+
+test('Ambilight does not duplicate Twitch effects or hide the chat sidebar', () => {
+ const visual=fs.readFileSync(path.join(__dirname,'../extension/visual-controls.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/media.css'),'utf8');
+ assert.match(visual,/if\(yt&&settings\.youtubeAmbientEnabled/);
+ assert.match(visual,/nativeButton\.click\(\)/);
+ assert.doesNotMatch(visual,/channel-root__right-column\{display:none/);
+ assert.match(css,/\.vortex-ambilight-light,\.vortex-ambilight-bar\{pointer-events:none!important\}/);
+});
