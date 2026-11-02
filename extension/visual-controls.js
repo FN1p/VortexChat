@@ -75,6 +75,14 @@ function startLight(){
     ].join(',')});
  },250);
 }
+function toggleTheater(){
+ if(tw){
+  const nativeButton=document.querySelector('[data-a-target="player-theatre-mode-button"],[data-a-target="player-theater-mode-button"],button[data-test-selector="theatre-mode-button"]');
+  if(nativeButton){nativeButton.click();return true;}
+  return false;
+ }
+ theater=!theater;cssApply();return true;
+}
 function cssApply(){
  const opacity=settings.chatOpacity/100,blur=settings.visualBlurEnabled&&!settings.performanceMode?settings.visualBlur:0;
  const radius=settings.visualCornerRadius||0;
@@ -155,7 +163,7 @@ function openPanel(player){
  panel.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.action==='close'){panel.remove();panel=null;}
-  if(b.dataset.action==='theater'){theater=!theater;cssApply();}
+  if(b.dataset.action==='theater'){toggleTheater();}
   if(b.dataset.action==='pip')void pip();
  });
  player.append(panel);updatePanelValues();
@@ -163,7 +171,7 @@ function openPanel(player){
 async function pip(){const v=getVideo();if(!v||!document.pictureInPictureEnabled)return false;try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else await v.requestPictureInPicture();return true;}catch{return false;}}
 document.addEventListener('keydown',e=>{
  if(e.repeat||!e.altKey||!e.shiftKey||e.ctrlKey||e.metaKey||e.target?.closest?.('input,textarea,select,[contenteditable],[role=textbox]'))return;
- if(e.code==='KeyT'&&topPage){theater=!theater;cssApply();}
+ if(e.code==='KeyT'&&topPage){toggleTheater();}
  else if(e.code==='KeyP'&&topPage){void pip();}
  else if(e.code==='KeyO')save('chatOpacity',settings.chatOpacity===100?30:100);
  else return;
@@ -172,6 +180,6 @@ document.addEventListener('keydown',e=>{
 chrome.storage.local.get('vortexSettings').then(r=>{settings=VortexCore.normalizeSettings(r.vortexSettings);cssApply();initButton();});
 chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes.vortexSettings){settings=VortexCore.normalizeSettings(changes.vortexSettings.newValue);cssApply();}});
 if(yt&&topPage){new MutationObserver(()=>{if(!settingsButton?.isConnected){panel=null;initButton();}}).observe(document.documentElement,{childList:true,subtree:true});}
-if(topPage)chrome.runtime.onMessage.addListener((m,_s,reply)=>{if(m?.action==='VORTEX_VISUAL_TOGGLE_THEATER'){theater=!theater;cssApply();reply({ok:true});}else if(m?.action==='VORTEX_VISUAL_PIP'){pip().then(ok=>reply({ok}));return true;}});
+if(topPage)chrome.runtime.onMessage.addListener((m,_s,reply)=>{if(m?.action==='VORTEX_VISUAL_TOGGLE_THEATER'){toggleTheater();reply({ok:true});}else if(m?.action==='VORTEX_VISUAL_PIP'){pip().then(ok=>reply({ok}));return true;}});
 addEventListener('pagehide',stopLight,{once:true});
 })();
