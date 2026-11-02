@@ -748,3 +748,13 @@ test('local stretch command adjusts Twitch chat without sending the command', ()
  assert.match(script,/event\.stopImmediatePropagation\(\)/);
  assert.match(css,/html\[data-vortex-stretch-chat\] \.channel-root__right-column/);
 });
+
+test('BTTV emote modifiers use a supported emote and scoped transformation classes', () => {
+ const js=fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(js,/modifierToken = \/\^\(w!\|h!\|v!\|z!\)/);
+ assert.match(js,/vortex-emote-wide/);
+ assert.match(js,/vortex-emote-flip-x/);
+ assert.match(js,/modifier === 'z!'/);
+ assert.match(css,/\.vortex-zw-stack\.vortex-emote-wide/);
+});

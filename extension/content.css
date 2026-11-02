@@ -932,3 +932,8 @@ html[data-vortex-stretch-chat] [data-a-target="right-column"]{
  max-width:min(var(--vortex-stretch-chat-width),calc(100vw - 120px))!important;
  flex-basis:min(var(--vortex-stretch-chat-width),calc(100vw - 120px))!important;
 }
+
+/* BTTV-style emote modifiers are rendered only inside Vortex emote stacks. */
+.vortex-zw-stack.vortex-emote-wide{transform:scaleX(1.8);transform-origin:center}
+.vortex-zw-stack.vortex-emote-flip-x{transform:scaleX(-1)}
+.vortex-zw-stack.vortex-emote-flip-y{transform:scaleY(-1)}

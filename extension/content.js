@@ -1814,11 +1814,24 @@
 
       const fragmentContainer = document.createDocumentFragment();
       let lastRenderedEmoteStack = null;
+      let pendingModifier = '';
 
-      tokens.forEach(tok => {
+      tokens.forEach((tok, index) => {
+        const modifierToken = /^(w!|h!|v!|z!)$/i.exec(tok.trim())?.[1]?.toLowerCase();
+        if (modifierToken) {
+          const next = tokens.slice(index + 1).find(part => part.trim());
+          const emote = next && emoteMap.get(next.trim());
+          if (emote && ((emote.provider === '7TV' && state.settings.enable7TV) ||
+            (emote.provider === 'BTTV' && state.settings.enableBTTV) ||
+            (emote.provider === 'FFZ' && state.settings.enableFFZ))) {
+            pendingModifier = modifierToken;
+            hasReplacement = true;
+            return;
+          }
+        }
         const cleanTok = tok.trim();
         if (!cleanTok) {
-          fragmentContainer.appendChild(document.createTextNode(tok));
+          if (!pendingModifier) fragmentContainer.appendChild(document.createTextNode(tok));
           return;
         }
 
@@ -1831,9 +1844,11 @@
 
         if (matchedEmote && providerEnabled) {
           hasReplacement = true;
+          const modifier = pendingModifier;
+          pendingModifier = '';
 
           // 7TV Zero-Width Stacking
-          if (matchedEmote.zeroWidth && state.settings.enableZeroWidth && lastRenderedEmoteStack) {
+          if ((matchedEmote.zeroWidth || modifier === 'z!') && state.settings.enableZeroWidth && lastRenderedEmoteStack) {
             const zwImg = document.createElement('img');
             zwImg.src = matchedEmote.url;
             zwImg.alt = matchedEmote.code;
@@ -1845,6 +1860,9 @@
 
           const stackWrap = document.createElement('span');
           stackWrap.className = 'vortex-zw-stack';
+          if (modifier === 'w!') stackWrap.classList.add('vortex-emote-wide');
+          if (modifier === 'h!') stackWrap.classList.add('vortex-emote-flip-x');
+          if (modifier === 'v!') stackWrap.classList.add('vortex-emote-flip-y');
           stackWrap.tabIndex = 0;
           stackWrap.setAttribute('role', 'button');
           stackWrap.setAttribute('aria-label', `Смайл ${matchedEmote.code}, открыть карточку`);
