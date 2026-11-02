@@ -711,3 +711,14 @@ test('chat overlays constrain long names and controls to viewport', () => {
  assert.match(css,/\.vortex-message-context\{min-width:0;width:max-content;max-width:calc\(100vw - 16px\)/);
  assert.match(css,/\.vortex-user-actions \.vortex-tool-button\{flex:1 1 100%\}/);
 });
+
+test('user profile opens as bounded anchored popover and cleans up listeners', () => {
+ const js=fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(js,/dialog\.setAttribute\('aria-modal', 'false'\)/);
+ assert.match(js,/const positionCard = \(\) =>/);
+ assert.match(js,/document\.addEventListener\('pointerdown', dismissOutside, true\)/);
+ assert.match(js,/card\.cleanup\?\.\(\)/);
+ assert.match(css,/\.vortex-user-card-overlay \.vortex-user-card\{position:fixed/);
+ assert.match(css,/pointer-events:none;backdrop-filter:none/);
+});
