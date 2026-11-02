@@ -761,3 +761,13 @@ input:checked + .vortex-slider:before {
 
 /* Locally muted users: hide only rendered message rows; no Twitch moderation request. */
 .vortex-chat-line.vortex-muted-user-line { display: none !important; }
+
+/* Local message context menu; never replaces Twitch's controls outside chat rows. */
+.vortex-message-context{position:fixed;z-index:10000003;display:grid;gap:3px;min-width:205px;
+ padding:7px;border:1px solid #3d6573;border-radius:11px;background:#142330;
+ box-shadow:0 16px 45px #0009;color:#eefaff;font:13px/1.4 "Segoe UI",sans-serif;}
+.vortex-message-context-item{background:transparent;border:0;border-radius:6px;text-align:left;
+ padding:9px 11px;color:inherit;font:inherit;cursor:pointer;}
+.vortex-message-context-item:hover,.vortex-message-context-item:focus-visible{
+ background:#315267;outline:2px solid #65e4e8;outline-offset:-2px;}
+@media(prefers-reduced-motion:reduce){.vortex-message-context-item{transition:none!important}}

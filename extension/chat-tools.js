@@ -522,6 +522,64 @@
       }
     }
 
+    // Context tools are scoped to chat rows and do not invoke moderation APIs.
+    let messageMenu = null;
+    function closeMessageMenu() {
+      messageMenu?.remove();
+      messageMenu = null;
+    }
+    function showMessageMenu(line, event) {
+      closeMessageMenu();
+      const username = line.querySelector(USER);
+      const user = (username?.getAttribute('data-a-user') ||
+        username?.getAttribute('data-user') || username?.textContent || '').trim();
+      const text = String(options.getText(line) || '').slice(0, 1000);
+      if (!/^[a-z0-9_]{1,25}$/i.test(user)) return false;
+      const menu = document.createElement('div');
+      menu.className = 'vortex-message-context';
+      menu.setAttribute('role', 'menu');
+      menu.setAttribute('aria-label', 'Действия с сообщением ' + user);
+      const add = (label, action) => {
+        const item = button(label, () => { closeMessageMenu(); action(); }, 'vortex-message-context-item');
+        item.setAttribute('role', 'menuitem');
+        menu.appendChild(item);
+      };
+      add('Профиль ' + user, () => openCard(user, options.channel(), username));
+      add('Упомянуть', () => {
+        if (!options.insertText('@' + user + ' ')) options.toast('Поле ввода Twitch недоступно');
+      });
+      add('Цитировать', () => {
+        const snippet = text.replace(/\s+/g, ' ').slice(0, 180);
+        if (!options.insertText('@' + user + (snippet ? ' «' + snippet + '» ' : ' ')))
+          options.toast('Поле ввода Twitch недоступно');
+      });
+      add('Копировать сообщение', () => {
+        navigator.clipboard.writeText(text).then(() => options.toast('Сообщение скопировано'))
+          .catch(() => options.toast('Не удалось скопировать сообщение'));
+      });
+      document.body.appendChild(menu);
+      const bounds = menu.getBoundingClientRect();
+      menu.style.left = Math.max(8, Math.min(event.clientX, window.innerWidth - bounds.width - 8)) + 'px';
+      menu.style.top = Math.max(8, Math.min(event.clientY, window.innerHeight - bounds.height - 8)) + 'px';
+      menu.addEventListener('keydown', key => {
+        const items = [...menu.querySelectorAll('[role="menuitem"]')];
+        const index = items.indexOf(document.activeElement);
+        if (key.key === 'Escape') { key.preventDefault(); closeMessageMenu(); }
+        if (key.key === 'ArrowDown' || key.key === 'ArrowUp') {
+          key.preventDefault();
+          items[(index + (key.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus();
+        }
+      });
+      messageMenu = menu;
+      menu.querySelector('button')?.focus();
+      return true;
+    }
+    document.addEventListener('pointerdown', event => {
+      if (messageMenu && !messageMenu.contains(event.target)) closeMessageMenu();
+    }, true);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && messageMenu) { event.preventDefault(); closeMessageMenu(); }
+    }, true);
     document.addEventListener('contextmenu', event => {
       const emote = event.target.closest?.('.vortex-zw-stack');
       if (emote && emote.closest('.vortex-chat-line')) {
@@ -532,8 +590,10 @@
         }
         return;
       }
-      const username = event.target.closest?.(USER);
-      if (!username || !username.closest('.vortex-chat-line')) return;
+      const line = event.target.closest?.(LINE);
+      if (!line || !line.closest('body') || window.getSelection()?.toString()) return;
+      if (event.target.closest?.('a, input, textarea, [contenteditable="true"]')) return;
+      if (showMessageMenu(line, event)) { event.preventDefault(); event.stopPropagation(); }
       const user = (username.getAttribute('data-a-user') || username.getAttribute('data-user') || username.textContent || '').trim();
       if (/^[a-z0-9_]{1,25}$/i.test(user) && options.insertText(`@${user} `)) {
         event.preventDefault();
@@ -635,7 +695,7 @@
     }, true);
     window.addEventListener('resize', positionPause);
     window.addEventListener('scroll', positionPause, true);
-    window.addEventListener('pagehide', () => { resume(false); closeCard(); });
+    window.addEventListener('pagehide', () => { closeMessageMenu(); resume(false); closeCard(); });
     return { attach, capture, mountHeader, maintain, pause, resume,
       openUser: (user, trigger) => {
         if (/^[a-z0-9_]{1,25}$/i.test(user)) openCard(user, options.channel(), trigger);

@@ -626,3 +626,15 @@ test('local user mute is persisted and only affects rendered messages', () => {
   assert.match(content, /vortex-muted-user-line/);
   assert.match(css, /\.vortex-chat-line\.vortex-muted-user-line/);
 });
+
+test('message context menu uses local actions and preserves text selection', () => {
+ const chat = fs.readFileSync(path.join(__dirname,'../extension/chat-tools.js'),'utf8');
+ const css = fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(chat,/function showMessageMenu\(line, event\)/);
+ assert.match(chat,/window\.getSelection\(\)\?\.toString\(\)/);
+ assert.match(chat,/add\('Профиль '/);
+ assert.match(chat,/add\('Цитировать'/);
+ assert.match(chat,/add\('Копировать сообщение'/);
+ assert.match(chat,/key\.key === 'ArrowDown'/);
+ assert.match(css,/\.vortex-message-context\{/);
+});
