@@ -889,7 +889,7 @@ input:checked + .vortex-slider:before {
 .vortex-user-card-overlay .vortex-user-history-heading{border-top:1px solid #314653;padding-top:9px}
 
 /* Vortex unified interaction surfaces. Original PFT Studio treatment. */
-:root{--vortex-surface:#17222e;--vortex-surface-raised:#203140;
+:is(.vortex-user-card,.vortex-user-preview,.vortex-message-context,.seventv-settings-modal){--vortex-surface:#17222e;--vortex-surface-raised:#203140;
  --vortex-line:#3a5161;--vortex-ink:#e8f4f7;--vortex-muted:#9bb8c3;
  --vortex-focus:#74e4e7;--vortex-radius:11px}
 .vortex-user-card,.vortex-user-preview,.vortex-message-context,
