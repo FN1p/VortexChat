@@ -1519,10 +1519,19 @@
       }
       line.classList.remove('vortex-moderated-line');
       line.classList.remove('vortex-banned-line');
+      line.querySelector(':scope > .vortex-moderation-status')?.remove();
       return;
     }
     line.classList.add('vortex-moderated-line');
     line.classList.toggle('vortex-banned-line', line.dataset.vortexBanned === 'true');
+    let status = line.querySelector(':scope > .vortex-moderation-status');
+    if (!status) {
+      status = document.createElement('span');
+      status.className = 'vortex-moderation-status';
+      line.prepend(status);
+    }
+    status.textContent = line.dataset.vortexBanned === 'true' ? 'Пользователь заблокирован' : 'Сообщение удалено';
+    status.title = 'Статус модерации Twitch';
     const placeholder = line.querySelector('[data-a-target="chat-deleted-message-placeholder"], [data-a-target="chat-deleted-message"]');
     if (line.querySelector('.vortex-restored-message')) return;
     const saved = key && originalMessages.get(key);

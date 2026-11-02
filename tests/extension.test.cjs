@@ -648,3 +648,13 @@ test('moderated messages keep a bounded local pre-deletion body snapshot', () =>
  assert.match(bridge,/recentChatBodies\.get\(message\.id\) \|\| originalBody/);
  assert.match(content,/else line\.appendChild\(restored\)/);
 });
+
+test('moderation state has a visible label and is removed if message is restored', () => {
+ const script=fs.readFileSync(path.join(__dirname,'../extension/content.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../extension/content.css'),'utf8');
+ assert.match(script,/vortex-moderation-status/);
+ assert.match(script,/Пользователь заблокирован/);
+ assert.match(script,/Сообщение удалено/);
+ assert.match(script,/status\.textContent = line\.dataset\.vortexBanned/);
+ assert.match(css,/\.vortex-chat-line \.vortex-moderation-status/);
+});
