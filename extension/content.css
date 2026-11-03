@@ -937,3 +937,72 @@ html[data-vortex-stretch-chat] [data-a-target="right-column"]{
 .vortex-zw-stack.vortex-emote-wide{transform:scaleX(1.8);transform-origin:center}
 .vortex-zw-stack.vortex-emote-flip-x{transform:scaleX(-1)}
 .vortex-zw-stack.vortex-emote-flip-y{transform:scaleY(-1)}
+
+/* One responsive layout for Vortex dialogs and utility surfaces. */
+.seventv-settings-modal{
+  width:min(720px,calc(100vw - 24px));
+  height:min(500px,calc(100dvh - 24px));
+  min-width:0;
+  min-height:0;
+}
+.seventv-settings-main,.seventv-main-body{min-width:0;min-height:0}
+.seventv-main-body{overflow-x:hidden;overscroll-behavior:contain}
+.seventv-main-header{gap:12px}
+.seventv-main-header>span{min-width:0;overflow-wrap:anywhere}
+#seventv-settings-close,#seventv-card-close{min-width:36px;min-height:36px;flex:none;border-radius:7px}
+#seventv-settings-close:hover,#seventv-card-close:hover{background:#28465a!important;color:#fff!important}
+.seventv-setting-row>div{flex:1 1 auto;min-width:0}
+.seventv-setting-row>.vortex-switch{margin-left:auto}
+.seventv-setting-row>input,.seventv-setting-row>select{min-width:0;max-width:100%}
+.seventv-card-overlay{box-sizing:border-box;padding:12px;overflow-y:auto;overscroll-behavior:contain}
+.seventv-emote-card{
+  box-sizing:border-box;width:min(380px,100%);max-width:100%;
+  max-height:calc(100dvh - 24px);overflow-y:auto;overflow-x:hidden
+}
+.seventv-card-header{gap:10px}
+.seventv-card-header>div{min-width:0}
+.seventv-card-sizes{flex-wrap:wrap;gap:clamp(6px,2vw,16px);padding:12px 8px}
+.seventv-size-col{min-width:0;flex:1 1 46px}
+.seventv-size-col img{max-width:100%;object-fit:contain}
+.seventv-card-actions{display:flex;flex-wrap:wrap;align-items:stretch}
+.seventv-card-actions>*{min-width:0;flex:1 1 104px;justify-content:center;text-align:center;white-space:normal}
+.vortex-toast{
+  box-sizing:border-box;max-width:calc(100vw - 24px);overflow-wrap:anywhere;
+  right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))
+}
+.vortex-pause-toolbar{flex-wrap:wrap}
+.vortex-quick-panel{box-sizing:border-box;max-height:calc(100dvh - 16px);overflow-x:hidden}
+.vortex-quick-row{min-width:0;flex-wrap:wrap}
+.vortex-quick-row select{min-width:0;max-width:100%}
+@media(max-width:700px){
+  .seventv-settings-overlay{padding:8px}
+  .seventv-settings-modal{
+    width:100%;height:min(720px,calc(100dvh - 16px));
+    max-width:100%;max-height:calc(100dvh - 16px);
+    display:flex;flex-direction:column;overflow:hidden
+  }
+  .seventv-settings-sidebar{
+    box-sizing:border-box;width:100%;min-width:0;flex:0 0 auto;
+    display:flex;flex-direction:row;gap:5px;overflow-x:auto;overflow-y:hidden;
+    overscroll-behavior-x:contain;scrollbar-width:thin;
+    padding:8px;border-right:0;border-bottom:1px solid #34485b
+  }
+  .seventv-sidebar-brand{display:none}
+  .seventv-settings-sidebar>.seventv-nav-btn{
+    box-sizing:border-box;flex:0 0 auto;width:auto;margin:0;
+    padding:9px 11px;white-space:nowrap
+  }
+  .seventv-settings-main{flex:1 1 auto;min-height:0}
+  .seventv-main-header{padding:10px 12px}
+  .seventv-main-body{padding:12px}
+  .seventv-setting-group{padding:4px 10px}
+}
+@media(max-width:480px){
+  .seventv-setting-row{flex-wrap:wrap;align-items:flex-start}
+  .seventv-setting-row>div{flex:1 1 calc(100% - 55px)}
+  .seventv-setting-row>label:not(.vortex-switch){flex:1 1 100%}
+  .seventv-setting-row>input:not([type=checkbox]):not([type=color]),
+  .seventv-setting-row>select{flex:1 1 100%;width:100%}
+  .seventv-setting-row>.vortex-switch{flex:0 0 36px}
+  .seventv-card-sizes{gap:6px}
+}
