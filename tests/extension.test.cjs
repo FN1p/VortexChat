@@ -815,3 +815,15 @@ test('settings and emote cards fit narrow chat viewports without nested dialog s
   assert.match(js, /class="seventv-card-actions"/);
   assert.match(js, /aria-label="Закрыть карточку смайла"/);
 });
+
+test('extension popup prevents long status labels from pushing controls out', () => {
+  const css = fs.readFileSync(path.join(__dirname, '../extension/popup.css'), 'utf8');
+  assert.match(css, /\.channel strong\{min-width:0;flex:1 1 auto;white-space:nowrap\}/);
+  assert.match(css, /\.actions,\.update-row\{flex-wrap:wrap\}/);
+  assert.match(css, /#update-status\{min-width:0;flex:1 1 150px;overflow-wrap:anywhere\}/);
+});
+
+test('Chrome extension version label agrees with manifest version', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../extension/manifest.json'), 'utf8'));
+  assert.match(manifest.version_name, new RegExp('^' + manifest.version.replace(/\./g, '\\.') + ' Beta '));
+});
