@@ -1444,7 +1444,7 @@
             ${SEVEN_TV_LOGO_SVG}
             <span style="font-weight:700; font-size:13px;">Карточка смайлика ${escapeHTML(emote.provider)}</span>
           </div>
-          <button id="seventv-card-close" style="background:none; border:none; color:#adadb8; cursor:pointer; font-size:16px;">✕</button>
+          <button type="button" id="seventv-card-close" aria-label="Закрыть карточку смайла" style="background:none; border:none; color:#adadb8; cursor:pointer; font-size:16px;">✕</button>
         </div>
 
         <div class="seventv-card-sizes">
@@ -1478,7 +1478,7 @@
           </div>
 
           <button id="vortex-card-favorite" class="vortex-tool-button" style="margin-top:14px;" aria-pressed="${isFavorite(emote)}">${isFavorite(emote) ? '★ В избранном' : '☆ В избранное'}</button>
-          <div style="display:flex; gap:6px; margin-top:14px;">
+          <div class="seventv-card-actions" style="display:flex; gap:6px; margin-top:14px;">
             <button id="seventv-card-insert" style="flex:1; padding:8px; border-radius:6px; border:none; background:#29b6f6; color:#000; font-weight:700; font-size:11.5px; cursor:pointer;">Вставить в чат</button>
             <button id="seventv-card-copy" style="flex:1; padding:8px; border-radius:6px; border:1px solid #2f2f35; background:#26262c; color:#efeff1; font-weight:600; font-size:11.5px; cursor:pointer;">Копировать код</button>
             ${is7TV ? `<a href="https://7tv.app/emotes/${encodeURIComponent(base7tvId)}" target="_blank" rel="noreferrer" style="padding:8px 10px; border-radius:6px; border:1px solid #2f2f35; background:#1f1f23; color:#29b6f6; font-weight:700; font-size:11.5px; text-decoration:none; display:inline-flex; align-items:center;">7tv.app ↗</a>` : ''}
@@ -1956,26 +1956,26 @@
 
     overlay.innerHTML = `
       <div class="seventv-settings-modal">
-        <div class="seventv-settings-sidebar">
+        <div class="seventv-settings-sidebar" role="group" aria-label="Разделы настроек">
           <div class="seventv-sidebar-brand">
             ${VORTEX_LOGO_SVG}
             <div>
               <div style="font-weight:800; font-size:14px; color:#fff;">VortexChat</div>
-              <div style="font-size:10px; color:#adadb8;">VortexChat v4.1.0</div>
+              <div style="font-size:10px; color:#adadb8;">VortexChat v${escapeHTML(chrome.runtime.getManifest().version)}</div>
             </div>
           </div>
 
-          <button class="seventv-nav-btn active" data-tab="general">⚙️ Общие</button>
-          <button class="seventv-nav-btn" data-tab="emotes">😊 Смайлики и Меню</button>
-          <button class="seventv-nav-btn" data-tab="chat">💬 Чат и Ввод</button>
-          <button class="seventv-nav-btn" data-tab="interface">✨ Интерфейс</button>
-          <button class="seventv-nav-btn" data-tab="status">📡 Статус EventAPI</button>
+          <button type="button" class="seventv-nav-btn active" data-tab="general">⚙️ Общие</button>
+          <button type="button" class="seventv-nav-btn" data-tab="emotes">😊 Смайлики и Меню</button>
+          <button type="button" class="seventv-nav-btn" data-tab="chat">💬 Чат и Ввод</button>
+          <button type="button" class="seventv-nav-btn" data-tab="interface">✨ Интерфейс</button>
+          <button type="button" class="seventv-nav-btn" data-tab="status">📡 Статус EventAPI</button>
         </div>
 
         <div class="seventv-settings-main">
           <div class="seventv-main-header">
             <span id="seventv-tab-heading" style="font-weight:800; font-size:15px;">Настройки VortexChat</span>
-            <button id="seventv-settings-close" style="background:none; border:none; color:#adadb8; font-size:18px; cursor:pointer;">✕</button>
+            <button type="button" id="seventv-settings-close" aria-label="Закрыть настройки" style="background:none; border:none; color:#adadb8; font-size:18px; cursor:pointer;">✕</button>
           </div>
           <div class="seventv-main-body" id="seventv-main-body"></div>
         </div>
@@ -1989,12 +1989,22 @@
     overlay.onclick = (e) => { if (e.target === overlay) closeDialog(); };
 
     const navBtns = overlay.querySelectorAll('.seventv-nav-btn');
+    const updateActiveTab = () => {
+      navBtns.forEach(btn => {
+        const active = btn.dataset.tab === (state.activeSettingsTab || 'general');
+        btn.classList.toggle('active', active);
+        if (active) btn.setAttribute('aria-current', 'page');
+        else btn.removeAttribute('aria-current');
+      });
+    };
+    updateActiveTab();
     navBtns.forEach(btn => {
       btn.onclick = () => {
-        navBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.activeSettingsTab = btn.getAttribute('data-tab');
+        state.activeSettingsTab = btn.dataset.tab;
+        updateActiveTab();
         render7TVSettingsTab(overlay);
+        const mainBody = overlay.querySelector('#seventv-main-body');
+        if (mainBody) mainBody.scrollTop = 0;
       };
     });
 
