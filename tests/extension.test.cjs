@@ -789,3 +789,29 @@ test('video and YouTube chat integrations release timers and observers on pagehi
  assert.match(youtube,/disposed = true/);
  assert.match(youtube,/if \(!document\.hidden\) startChat\(\)/);
 });
+
+test('settings navigation reflects the selected tab and current extension version', () => {
+  const js = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
+  assert.match(js, /chrome\.runtime\.getManifest\(\)\.version/);
+  assert.doesNotMatch(js, /VortexChat v4\.1\.0/);
+  assert.match(js, /const updateActiveTab = \(\) =>/);
+  assert.match(js, /btn\.setAttribute\('aria-current', 'page'\)/);
+  assert.match(js, /btn\.removeAttribute\('aria-current'\)/);
+  assert.match(js, /if \(mainBody\) mainBody\.scrollTop = 0/);
+  assert.match(js, /aria-label="Закрыть настройки"/);
+});
+
+test('settings and emote cards fit narrow chat viewports without nested dialog scroll', () => {
+  const css = fs.readFileSync(path.join(__dirname, '../extension/content.css'), 'utf8');
+  const js = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
+  assert.match(css, /\/\* One responsive layout for Vortex dialogs and utility surfaces\. \*\//);
+  assert.match(css, /@media\(max-width:700px\)\{/);
+  assert.match(css, /\.seventv-settings-sidebar\s*\{[^}]*flex-direction:row;[^}]*overflow-x:auto/s);
+  assert.match(css, /\.seventv-settings-modal\s*\{[^}]*overflow:hidden/s);
+  assert.match(css, /\.seventv-settings-main,\.seventv-main-body\{min-width:0;min-height:0\}/);
+  assert.match(css, /\.seventv-emote-card\s*\{[^}]*max-height:calc\(100dvh - 24px\)/s);
+  assert.match(css, /\.seventv-card-actions\{display:flex;flex-wrap:wrap/);
+  assert.match(css, /\.vortex-toast\s*\{[^}]*max-width:calc\(100vw - 24px\)/s);
+  assert.match(js, /class="seventv-card-actions"/);
+  assert.match(js, /aria-label="Закрыть карточку смайла"/);
+});
