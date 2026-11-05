@@ -78,10 +78,9 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## Расширение VortexChat 4.4.15 Beta 18
-            - В релиз включены исправления настроек, карточек смайлов и переходов между страницами.
-            - При ошибке записи обновлятор пытается восстановить прежние файлы.
-            - Номер расширения повышен, чтобы обновление было доступно установленной версии 4.4.14.
+            ## VortexChat 4.4.16 Beta 19
+            - Improved popup layout for narrow windows and larger display scaling.
+            - Controls, labels and buttons wrap without overlapping; popup uses a single scroll area.
 
             ## Загрузки
             - `VortexChat-7TV-Extension.zip` — расширение для Chrome.

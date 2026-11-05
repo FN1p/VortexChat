@@ -59,5 +59,17 @@ frame.addEventListener('load', async () => {
   await importText('{"wrong":"format"}');
   saved = await win.chrome.storage.local.get('vortexSettings');
   check('Invalid imports leave current settings untouched', saved.vortexSettings.fontSize === 21 && doc.getElementById('toast').textContent.includes('Не удалось импортировать'));
-  document.getElementById('summary').textContent = `${7 - failures}/7 passed`;
+  frame.style.width = '200px';
+  await wait();
+  const main = doc.querySelector('main');
+  const label = doc.querySelector('.font-row label').getBoundingClientRect();
+  const value = doc.querySelector('.font-row output').getBoundingClientRect();
+  const buttons = [...doc.querySelectorAll('.actions button')].filter(button => button.offsetWidth);
+  const overlap = buttons.some((button, i) => buttons.slice(i + 1).some(other => {
+    const a = button.getBoundingClientRect(), b = other.getBoundingClientRect();
+    return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+  }));
+  check('Narrow popup keeps controls within bounds without overlap', main.scrollWidth <= main.clientWidth &&
+    !(label.left < value.right && value.left < label.right && label.top < value.bottom && value.top < label.bottom) && !overlap);
+  document.getElementById('summary').textContent = `${8 - failures}/8 passed`;
 });
