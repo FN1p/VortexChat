@@ -761,7 +761,10 @@
       document.querySelector('.stream-chat-header') ||
       document.querySelector('[data-a-target="chat-header"]') ||
       document.querySelector('.chat-room__content');
-    if (!chatHeader || document.getElementById('vortex-header-group')) return;
+    if (!chatHeader) return;
+    const existingGroup = document.getElementById('vortex-header-group');
+    if (existingGroup && (existingGroup.previousElementSibling === chatHeader || existingGroup.parentElement === chatHeader)) return;
+    existingGroup?.remove();
 
     const group = document.createElement('div');
     group.id = 'vortex-header-group';
@@ -798,7 +801,8 @@
     });
     group.appendChild(quickButton);
     chatTools?.mountHeader(group);
-    chatHeader.prepend(group);
+    if (chatHeader.matches('.chat-room__content')) chatHeader.prepend(group);
+    else chatHeader.insertAdjacentElement('afterend', group);
   }
 
   // =========================================================================

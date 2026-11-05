@@ -78,8 +78,8 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## VortexChat 4.4.19 Beta 22
-            - Use one scroll area in the extension popup.
+            ## VortexChat 4.4.20 Beta 23
+            - Place Vortex chat controls in a separate row and show player delay beside viewers when available.
             - Controls, labels and buttons wrap without overlapping; popup uses a single scroll area.
 
             ## Загрузки

@@ -23,6 +23,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     return node;
   }
   await wait();
+  const header = document.querySelector('.stream-chat-header');
+  const controls = document.getElementById('vortex-header-group');
+  check('Extension controls occupy a separate row after the Twitch header', controls?.previousElementSibling === header && !header.contains(controls));
+  const viewer = document.createElement('span');
+  viewer.dataset.aTarget = 'animated-channel-viewers-count';
+  viewer.textContent = '100';
+  document.body.append(viewer);
+  const delayVideo = document.createElement('video');
+  delayVideo.getBoundingClientRect = () => ({ width: 800, height: 450, right: 800, bottom: 450 });
+  Object.defineProperty(delayVideo, 'seekable', { value: { length: 1, end: () => 110 } });
+  Object.defineProperty(delayVideo, 'currentTime', { value: 100, writable: true });
+  document.body.append(delayVideo);
+  await wait(1400);
+  check('Player delay appears beside viewer count', viewer.nextElementSibling?.id === 'vortex-live-delay' && viewer.nextElementSibling.textContent.includes('10'));
+  delayVideo.remove(); viewer.remove();
+  await wait(1300);
+  check('Player delay disappears when live delayVideo is unavailable', !document.getElementById('vortex-live-delay'));
   const wrapper = document.createElement('div');
   const first = line('alice', 'Привет TestEmote Overlay');
   const second = line('alice', 'Привет TestEmote Overlay');

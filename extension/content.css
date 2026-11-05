@@ -5,10 +5,15 @@
 
 /* 1. 7TV Chat Header Icon Button (Native Twitch Icon Button Style) */
 .vortex-header-group {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 4px;
-  margin-right: 4px;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  background: var(--color-background-base, #18181b);
+  border-bottom: 1px solid var(--color-border-base, #323238);
 }
 
 .seventv-header-btn {

@@ -90,7 +90,7 @@
   function syncQuickLinks() {
     let menu = document.getElementById('vortex-channel-links');
     const name = channel();
-    const header = document.querySelector('.stream-chat-header');
+    const header = document.getElementById('vortex-header-group');
     if (!settings.channelQuickLinks || !name || !header) { menu?.remove(); return; }
     if (!menu) {
       menu = document.createElement('details');
@@ -110,6 +110,20 @@
     }
   }
 
+  function syncLiveDelay(delay) {
+    let badge = document.getElementById('vortex-live-delay');
+    const viewer = document.querySelector('[data-a-target="animated-channel-viewers-count"], [data-a-target="channel-viewers-count"]');
+    if (!viewer || delay === null || !settings.liveControls) { badge?.remove(); return; }
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'vortex-live-delay';
+      badge.title = 'Отставание плеера от доступного края эфира; не включает задержку трансляции до Twitch.';
+    }
+    if (badge.previousElementSibling !== viewer) viewer.insertAdjacentElement('afterend', badge);
+    badge.textContent = ` · ${Math.round(delay)} с`;
+    badge.setAttribute('aria-label', `Отставание плеера ${Math.round(delay)} секунд`);
+  }
+
   function syncLiveButton() {
     let button = document.getElementById('vortex-back-to-live');
     const name = channel();
@@ -122,12 +136,13 @@
       catchupVideo = null;
     };
     if ((!settings.liveControls && !settings.autoCatchup) || !name || !video || /\/(videos|clip)\//.test(location.pathname) || !video.seekable?.length) {
-      restoreRate(); button?.remove(); return;
+      restoreRate(); button?.remove(); syncLiveDelay(null); return;
     }
     let end;
-    try { end = video.seekable.end(video.seekable.length - 1); } catch { restoreRate(); button?.remove(); return; }
+    try { end = video.seekable.end(video.seekable.length - 1); } catch { restoreRate(); button?.remove(); syncLiveDelay(null); return; }
     const delay = VortexCore.liveDelay(video.currentTime, end);
-    if (delay === null) { restoreRate(); button?.remove(); return; }
+    if (delay === null) { restoreRate(); button?.remove(); syncLiveDelay(null); return; }
+    syncLiveDelay(delay);
     if (catchupVideo && (catchupVideo !== video || !settings.autoCatchup || !Number.isFinite(delay) || delay <= 3 || video.playbackRate !== 1.05)) restoreRate();
     if (settings.autoCatchup && delay > 6 && !catchupVideo && video.playbackRate === 1) {
       try { video.playbackRate = 1.05; catchupVideo = video; } catch { /* Some players lock playback speed. */ }

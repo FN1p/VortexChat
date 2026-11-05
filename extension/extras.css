@@ -12,3 +12,5 @@
 #vortex-sidebar-preview img { display: block; width: 320px; height: 180px; object-fit: cover; border-radius: 5px; }
 #vortex-sidebar-preview strong { display: block; padding: 6px 2px 1px; }
 @media (prefers-reduced-motion: reduce) { #vortex-back-to-live { transition: none; } }
+
+#vortex-live-delay { color: var(--color-text-alt-2, #adadb8); font-size: 12px; white-space: nowrap; margin-left: 4px; }
