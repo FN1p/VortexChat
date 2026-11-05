@@ -1012,3 +1012,7 @@ html[data-vortex-stretch-chat] [data-a-target="right-column"]{
   .seventv-setting-row>.vortex-switch{flex:0 0 36px}
   .seventv-card-sizes{gap:6px}
 }
+
+.vortex-nav-icon { width: 18px; height: 18px; flex: 0 0 18px; color: #73d9ef; }
+.seventv-nav-btn { display: flex; align-items: center; gap: 10px; }
+.seventv-nav-btn.active .vortex-nav-icon { color: #a6eaff; }

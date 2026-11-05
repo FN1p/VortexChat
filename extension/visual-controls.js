@@ -127,7 +127,7 @@ function initButton(){
  if(!player)return;
  if(settingsButton?.isConnected)return;
  settingsButton=document.createElement('button');settingsButton.type='button';settingsButton.className='vortex-yt-settings';
- settingsButton.textContent='✦ Vortex';settingsButton.title='Настройки VortexChat';
+ settingsButton.textContent='Vortex';settingsButton.title='Настройки VortexChat';
  Object.assign(settingsButton.style,{position:'absolute',right:'15px',top:'15px',padding:'8px 12px',zIndex:'2147483645'});
  // Synchronize our button with the YouTube player control fade state.
  function syncControlsVisibility(){
@@ -146,7 +146,7 @@ function initButton(){
 }
 function openPanel(player){
  panel=document.createElement('section');panel.className='vortex-yt-panel';panel.setAttribute('aria-label','VortexChat — настройки YouTube');
- panel.innerHTML=`<strong style="color:#39d8d0;font-size:16px">✦ VortexChat Beta</strong>
+ panel.innerHTML=`<strong style="color:#39d8d0;font-size:16px">VortexChat Beta</strong>
  <label>Ambilight <input type="checkbox" data-setting="youtubeAmbientEnabled"></label>
  <label>Интенсивность <input type="range" min="0" max="100" data-setting="visualAmbilightIntensity"></label>
  <output>50%</output>

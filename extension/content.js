@@ -793,7 +793,7 @@
     quickButton.title = 'Быстрые настройки чата';
     quickButton.setAttribute('aria-label', 'Быстрые настройки чата');
     quickButton.setAttribute('aria-expanded', 'false');
-    quickButton.textContent = '☷';
+    quickButton.innerHTML = '<svg class="vortex-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="1.6" fill="currentColor"/><circle cx="15" cy="12" r="1.6" fill="currentColor"/><circle cx="9" cy="18" r="1.6" fill="currentColor"/></svg>'; 
     quickButton.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
@@ -1969,11 +1969,11 @@
             </div>
           </div>
 
-          <button type="button" class="seventv-nav-btn active" data-tab="general">⚙️ Общие</button>
-          <button type="button" class="seventv-nav-btn" data-tab="emotes">😊 Смайлики и Меню</button>
-          <button type="button" class="seventv-nav-btn" data-tab="chat">💬 Чат и Ввод</button>
-          <button type="button" class="seventv-nav-btn" data-tab="interface">✨ Интерфейс</button>
-          <button type="button" class="seventv-nav-btn" data-tab="status">📡 Статус EventAPI</button>
+          <button type="button" class="seventv-nav-btn active" data-tab="general"><svg class="vortex-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/><circle cx="12" cy="12" r="8"/></svg><span>Общие</span></button>
+          <button type="button" class="seventv-nav-btn" data-tab="emotes"><svg class="vortex-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 3 7 3 8 0M9 9h.01M15 9h.01"/></svg><span>Смайлики и Меню</span></button>
+          <button type="button" class="seventv-nav-btn" data-tab="chat"><svg class="vortex-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v12H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span>Чат и Ввод</span></button>
+          <button type="button" class="seventv-nav-btn" data-tab="interface"><svg class="vortex-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg><span>Интерфейс</span></button>
+          <button type="button" class="seventv-nav-btn" data-tab="status"><svg class="vortex-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7m7-7a5 5 0 0 1 0 7M5.5 5.5a9 9 0 0 0 0 13m13-13a9 9 0 0 1 0 13"/></svg><span>Статус EventAPI</span></button>
         </div>
 
         <div class="seventv-settings-main">
@@ -2184,7 +2184,7 @@
           <div class="seventv-setting-row"><div><div class="seventv-setting-title">Тема VortexChat на Twitch</div><div class="seventv-setting-desc">Оформление навигации, чата, полей ввода и окон расширения. Можно выключить в любой момент.</div></div><label class="vortex-switch"><input type="checkbox" data-key="themeEnabled" ${state.settings.themeEnabled ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
           <div class="seventv-setting-row"><label for="vortex-theme-preset">Цветовая палитра</label><select id="vortex-theme-preset" class="vortex-setting-input" data-key="themePreset"><option value="aurora">Аврора · бирюзовый и фиолетовый</option><option value="graphite">Графит · спокойный тёмный</option><option value="orchid">Орхидея · фиолетовый и розовый</option></select></div>
           <div class="seventv-setting-row"><label for="vortex-chat-density">Плотность сообщений</label><select id="vortex-chat-density" class="vortex-setting-input" data-key="chatDensity"><option value="comfortable">Обычная</option><option value="compact">Компактная</option></select></div>
-          <div class="seventv-setting-row"><div><div class="seventv-setting-title">Ambilight вокруг плеера</div><div class="seventv-setting-desc">Кнопка ✦ в плеере. Цвета берутся из текущего кадра, если браузер разрешает чтение видео.</div></div><label class="vortex-switch"><input type="checkbox" data-key="ambilightEnabled" ${state.settings.ambilightEnabled ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
+          <div class="seventv-setting-row"><div><div class="seventv-setting-title">Ambilight вокруг плеера</div><div class="seventv-setting-desc">Кнопка подсветки в плеере. Цвета берутся из текущего кадра, если браузер разрешает чтение видео.</div></div><label class="vortex-switch"><input type="checkbox" data-key="ambilightEnabled" ${state.settings.ambilightEnabled ? 'checked' : ''} /><span class="vortex-slider"></span></label></div>
           <div class="seventv-setting-row"><label for="vortex-ambilight-brightness">Яркость Ambilight</label><input id="vortex-ambilight-brightness" type="range" min="0" max="100" data-key="ambilightBrightness" value="${state.settings.ambilightBrightness}" /></div>
           <div class="seventv-setting-row"><label for="vortex-ambilight-spread">Размах свечения</label><input id="vortex-ambilight-spread" type="range" min="0" max="100" data-key="ambilightSpread" value="${state.settings.ambilightSpread}" /></div>
           <div class="seventv-setting-row"><label for="vortex-ambilight-response">Отклик Ambilight</label><input id="vortex-ambilight-response" type="range" min="0" max="100" data-key="ambilightResponse" value="${state.settings.ambilightResponse}" /></div>

@@ -159,7 +159,7 @@
     button = document.createElement('button');
     button.type = 'button';
     button.className = 'vortex-ambilight-button';
-    button.textContent = '✦';
+    button.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></svg>'; 
     button.setAttribute('aria-label', 'Включить или выключить Ambilight');
     button.addEventListener('click', () => save({ ambilightEnabled: !settings.ambilightEnabled }));
     bars = Array.from({ length: 4 }, () => {
