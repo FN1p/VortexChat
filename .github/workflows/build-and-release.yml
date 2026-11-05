@@ -78,8 +78,8 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## VortexChat 4.4.17 Beta 20
-            - Restore popup sizing in Chrome and retain narrow layout fixes.
+            ## VortexChat 4.4.18 Beta 21
+            - Fix collapsed Chrome popup width at startup.
             - Controls, labels and buttons wrap without overlapping; popup uses a single scroll area.
 
             ## Загрузки

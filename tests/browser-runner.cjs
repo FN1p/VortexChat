@@ -56,6 +56,20 @@ const contentTypes = { '.js': 'text/javascript', '.css': 'text/css', '.png': 'im
       failed ||= failures.length > 0 || errors.length > 0 || summary.includes('Running');
       await page.close();
     }
+    // Chrome can initially size an extension popup from a very narrow viewport.
+    const popup = await browser.newPage({ viewport: { width: 150, height: 600 } });
+    await popup.route('**/*', route => {
+      const requestPath = new URL(route.request().url()).pathname;
+      const localPath = requestPath === '/popup-preview' ? '/extension/popup.html' : requestPath;
+      const file = path.resolve(root, `.${localPath}`);
+      if (!file.startsWith(root + path.sep) || !fs.existsSync(file)) return route.abort();
+      return route.fulfill({ body: fs.readFileSync(file), contentType: contentTypes[path.extname(file)] || 'application/octet-stream' });
+    });
+    await popup.goto('http://vortex-fixture.test/extension/popup.html');
+    const width = await popup.evaluate(() => document.documentElement.getBoundingClientRect().width);
+    console.log(`popup intrinsic width: ${width}px`);
+    if (width < 380) failed = true;
+    await popup.close();
   } finally { await browser.close(); }
   if (failed) process.exitCode = 1;
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -87,7 +87,8 @@ html[data-vortex-preset="orchid"] .card { background: #261c35; border-color: #58
 html[data-vortex-preset="orchid"] #btn-open-settings { background: linear-gradient(115deg, #8553ba, #b24f94); }
 
 /* Popup layout safeguards for long channel names, statuses and localized labels. */
-body{max-width:100vw}
+html { width: 380px; min-width: 380px; }
+body { width: 380px; }
 .brand,.channel,.row,.actions,.update-row{min-width:0}
 .brand>div{min-width:0}
 .channel strong{min-width:0;flex:1 1 auto;white-space:nowrap}
