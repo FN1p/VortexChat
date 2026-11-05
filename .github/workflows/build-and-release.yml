@@ -78,8 +78,8 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## VortexChat 4.4.16 Beta 19
-            - Improved popup layout for narrow windows and larger display scaling.
+            ## VortexChat 4.4.17 Beta 20
+            - Restore popup sizing in Chrome and retain narrow layout fixes.
             - Controls, labels and buttons wrap without overlapping; popup uses a single scroll area.
 
             ## Загрузки
