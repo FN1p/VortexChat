@@ -1950,7 +1950,7 @@
   function open7TVSettingsModal() {
     const existing = document.getElementById('seventv-settings-overlay');
     if (existing) {
-      existing.dispatchEvent(new Event('vortex-close-dialog'));
+      existing.querySelector('#seventv-settings-close')?.focus();
       return;
     }
 
@@ -1986,7 +1986,7 @@
       </div>
     `;
 
-    document.body.appendChild(overlay);
+    (document.fullscreenElement || document.body).appendChild(overlay);
     const closeDialog = VortexChatTools.enhanceDialog(overlay, 'Настройки VortexChat');
 
     overlay.querySelector('#seventv-settings-close').onclick = () => closeDialog();

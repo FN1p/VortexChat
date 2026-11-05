@@ -106,7 +106,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   $('btn-open-settings').addEventListener('click', async () => {
     try {
-      await chrome.tabs.sendMessage(tabId, { action: 'OPEN_VORTEXCHAT_MODAL' });
+      const response = await chrome.tabs.sendMessage(tabId, { action: 'OPEN_VORTEXCHAT_MODAL' });
+      if (!response?.ok) return toast('Не удалось открыть настройки. Обнови вкладку Twitch.');
       window.close();
     } catch { toast('Обнови вкладку Twitch и попробуй снова'); }
   });
