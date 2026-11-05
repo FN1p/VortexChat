@@ -14,6 +14,7 @@
   let previewTimer;
   let preview;
   let mentionScanFrame = 0;
+  const pendingMentions = new Set();
   let mentionsInitialized = false;
   let catchupVideo = null;
 
@@ -43,10 +44,11 @@
       tone.stop(audioContext.currentTime + 0.19);
     } catch { /* Browsers may block sound until the user interacts with the page. */ }
   }
-  function scanMentions(notify = true) {
+  function scanMentions(notify = true, lines = null) {
     const name = settings.mentionName;
     const expression = name ? new RegExp(`(^|[^a-z0-9_])@${name}(?![a-z0-9_])`, 'i') : null;
-    document.querySelectorAll('.chat-line__message, [data-a-target="chat-line-message"]').forEach(line => {
+    (lines || document.querySelectorAll('.chat-line__message, [data-a-target="chat-line-message"]')).forEach(line => {
+      if (!line.isConnected) return;
       const key = `${channel()}:${line.dataset.vortexMessageId || line.getAttribute('data-id') || ''}:${name}`;
       const firstSeen = !seenMentions.has(line);
       const ownName = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username')?.textContent?.trim().toLowerCase();
@@ -212,20 +214,29 @@
   });
   const chatLineSelector = '.chat-line__message, [data-a-target="chat-line-message"]';
   const observer = new MutationObserver(records => {
-    // Twitch changes the rest of the page frequently; only rescan when chat changes.
-    const chatChanged = records.some(record => {
+    if (!settings.mentionName) return;
+    for (const record of records) {
       const target = record.target.nodeType === 1 ? record.target : record.target.parentElement;
-      if (target?.closest?.(chatLineSelector)) return true;
-      return [...record.addedNodes].some(node => node.nodeType === 1 &&
-        (node.matches(chatLineSelector) || node.querySelector(chatLineSelector)));
+      const line = target?.closest?.(chatLineSelector);
+      if (line) pendingMentions.add(line);
+      for (const node of record.addedNodes) {
+        if (node.nodeType !== 1) continue;
+        if (node.matches(chatLineSelector)) pendingMentions.add(node);
+        node.querySelectorAll(chatLineSelector).forEach(item => pendingMentions.add(item));
+      }
+    }
+    if (!pendingMentions.size || mentionScanFrame) return;
+    mentionScanFrame = requestAnimationFrame(() => {
+      mentionScanFrame = 0;
+      const lines = [...pendingMentions];
+      pendingMentions.clear();
+      scanMentions(true, lines);
     });
-    if (!chatChanged || mentionScanFrame) return;
-    mentionScanFrame = requestAnimationFrame(() => { mentionScanFrame = 0; scanMentions(); });
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
   setInterval(() => { syncQuickLinks(); syncLiveButton(); }, 1200);
   addEventListener('pagehide', () => {
-    observer.disconnect(); cancelAnimationFrame(mentionScanFrame); clearTimeout(previewTimer); audioContext?.close();
+    observer.disconnect(); cancelAnimationFrame(mentionScanFrame); pendingMentions.clear(); clearTimeout(previewTimer); audioContext?.close();
     if (catchupVideo?.playbackRate === 1.05) catchupVideo.playbackRate = 1;
   }, { once: true });
 })();

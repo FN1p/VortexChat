@@ -70,9 +70,9 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## VortexChat 1.3.17 / extension 4.5.0
+            ## VortexChat 1.3.18 / extension 4.5.1
             - Stable release of the Twitch and YouTube extension and Windows chat application.
-            - Chat emotes, cosmetics, reading controls, player glow and clip overlay.
+            - Reduce repeated processing of chat messages and mentions.
             - If the browser or Windows blocks an extension update, download the ZIP and install it manually.
             - Windows login requires a Twitch Client ID. The desktop application checks for updates and opens GitHub.
 

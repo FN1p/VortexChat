@@ -340,11 +340,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   await wait();
   check('Highlighting a user marks their messages without matching message text', cosmeticLine.classList.contains('vortex-highlight-line'));
   await fixtureSettings({ mentionName: 'fnip', mentionColor: '#ff8800' });
+  let fullMentionScans = 0;
+  document.querySelectorAll = function(selector) {
+    if (selector === '.chat-line__message, [data-a-target="chat-line-message"]' && new Error().stack.includes('scanMentions')) fullMentionScans++;
+    return originalQueryAll(selector);
+  };
   const namedMention = line('somebody', 'Hello @fnip!');
   chat.appendChild(namedMention);
   await wait(180);
   check('Named mentions are highlighted with the selected color',
     namedMention.classList.contains('vortex-named-mention') && namedMention.style.getPropertyValue('--vortex-mention-color') === '#ff8800');
+  document.querySelectorAll = originalQueryAll;
+  check('A new mention is processed without scanning the whole chat', fullMentionScans === 0);
   await fixtureSettings({ mentionIgnoreUsers: 'somebody' });
   await wait();
   check('Mention exclusions suppress named users', !namedMention.classList.contains('vortex-named-mention'));

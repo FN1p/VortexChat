@@ -1683,8 +1683,8 @@
     const counts = new Map();
     lines.forEach((line, index) => {
       line.classList.toggle('vortex-alt-row-even', state.settings.alternatingRows && index % 2 === 1);
-      const username = line.querySelector('[data-a-target="chat-message-username"], .chat-line__username')?.textContent || '';
-      const text = messageText(line);
+      const username = state.settings.collapseSpam ? (line.querySelector('[data-a-target="chat-message-username"], .chat-line__username')?.textContent || '') : '';
+      const text = state.settings.collapseSpam ? messageText(line) : '';
       const duplicate = Boolean(state.settings.collapseSpam && username && text && previous &&
         previousUser === username && VortexCore.sameSpamMessage(previousText, text, state.settings.fuzzySpam));
       line.classList.toggle('vortex-duplicate-line', duplicate);
