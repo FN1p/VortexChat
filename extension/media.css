@@ -15,6 +15,12 @@
   z-index: 92;
   width: 32px;
   height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0;
+  line-height: 1;
   border: 1px solid #7778;
   border-radius: 7px;
   background: #15151dcc;
@@ -71,3 +77,5 @@ html[data-vortex-ambilight] .stream-chat{filter:none!important}
 @media(max-width:700px){
  .vortex-ambilight-light{box-shadow:none!important}
 }
+
+.vortex-ambilight-button svg { display: block; flex: 0 0 auto; pointer-events: none; }

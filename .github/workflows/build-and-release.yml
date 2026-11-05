@@ -78,8 +78,8 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## VortexChat 4.4.21 Beta 24
-            - Replace settings emoji and player controls with consistent icons.
+            ## VortexChat 4.4.22 Beta 25
+            - Center the Ambilight icon inside its player button.
             - Controls, labels and buttons wrap without overlapping; popup uses a single scroll area.
 
             ## Загрузки

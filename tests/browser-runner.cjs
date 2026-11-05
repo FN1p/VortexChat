@@ -70,6 +70,18 @@ const contentTypes = { '.js': 'text/javascript', '.css': 'text/css', '.png': 'im
     console.log(`popup intrinsic width: ${width}px`);
     if (width < 380) failed = true;
     await popup.close();
+    const iconPage = await browser.newPage();
+    await iconPage.setContent('<button class="vortex-ambilight-button"><svg width="18" height="18"></svg></button>');
+    await iconPage.addStyleTag({ content: fs.readFileSync(path.join(root, 'extension/media.css'), 'utf8') });
+    const centered = await iconPage.evaluate(() => {
+      const button = document.querySelector('button').getBoundingClientRect();
+      const icon = document.querySelector('svg').getBoundingClientRect();
+      return Math.abs((button.left + button.right) / 2 - (icon.left + icon.right) / 2) < 1 &&
+        Math.abs((button.top + button.bottom) / 2 - (icon.top + icon.bottom) / 2) < 1;
+    });
+    console.log(`Ambilight icon centered: ${centered}`);
+    if (!centered) failed = true;
+    await iconPage.close();
   } finally { await browser.close(); }
   if (failed) process.exitCode = 1;
 })().catch(error => { console.error(error); process.exitCode = 1; });
