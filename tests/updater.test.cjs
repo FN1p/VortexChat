@@ -16,9 +16,9 @@ function memoryFolder(files = {}) {
       return value;
     },
     async getFileHandle(name, options) {
-      if (!entries.has(name) && !options?.create) throw new Error('Missing file');
+      if (!entries.has(name) && !options?.create) throw Object.assign(new Error('Missing file'), { name: 'NotFoundError' });
       return {
-        async getFile() { return { text: async () => String(entries.get(name)) }; },
+        async getFile() { const value = entries.get(name); return { text: async () => String(value) }; },
         async createWritable() {
           return { async write(bytes) { entries.set(name, bytes); writes.push(name); },
             async close() {}, async abort() {} };
@@ -70,4 +70,26 @@ test('updater verifies downloaded bytes against Git blob hashes before writing',
   const result = await updater.downloadFiles('v1.3.14-beta.14', [entry], fetcher);
   assert.equal(result[0].path, 'manifest.json');
   await assert.rejects(updater.downloadFiles('v1.3.14-beta.14', [{ ...entry, sha: '0'.repeat(40) }], fetcher), /Проверка файла/);
+});
+
+ test('updater restores earlier files if an installation write fails', async () => {
+  const folder = memoryFolder({ 'content.js': 'old code', 'manifest.json': 'old manifest' });
+  const getHandle = folder.getFileHandle.bind(folder);
+  let failed = false;
+  folder.getFileHandle = async (name, options) => {
+    const handle = await getHandle(name, options);
+    if (name === 'manifest.json') {
+      const create = handle.createWritable;
+      handle.createWritable = async () => {
+        if (!failed) { failed = true; throw new Error('disk error'); }
+        return create();
+      };
+    }
+    return handle;
+  };
+  await assert.rejects(updater.writeFiles(folder, [
+    { path: 'content.js', bytes: new Uint8Array([1]) },
+    { path: 'manifest.json', bytes: new Uint8Array([2]) }
+  ]), /disk error/);
+  assert.equal(await folder.entries.get('content.js').text(), 'old code');
 });

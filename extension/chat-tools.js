@@ -692,12 +692,16 @@
       const line = event.target.closest?.(LINE);
       if (!line || !line.closest('body') || window.getSelection()?.toString()) return;
       if (event.target.closest?.('a, input, textarea, [contenteditable="true"]')) return;
-      if (showMessageMenu(line, event)) { event.preventDefault(); event.stopPropagation(); }
-      const user = (username.getAttribute('data-a-user') || username.getAttribute('data-user') || username.textContent || '').trim();
-      if (/^[a-z0-9_]{1,25}$/i.test(user) && options.insertText(`@${user} `)) {
-        event.preventDefault();
-        event.stopPropagation();
+      const username = event.target.closest?.(USER);
+      if (username) {
+        const user = (username.getAttribute('data-a-user') || username.getAttribute('data-user') || username.textContent || '').trim();
+        if (/^[a-z0-9_]{1,25}$/i.test(user) && options.insertText(`@${user} `)) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        return;
       }
+      if (showMessageMenu(line, event)) { event.preventDefault(); event.stopPropagation(); }
     }, true);
 
     // Clicking a Twitch username opens Vortex's full profile card.

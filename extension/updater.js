@@ -94,17 +94,49 @@
   }
   async function writeFiles(folder, files, onProgress = () => {}) {
     const sorted = [...files].sort((a, b) => (a.path === 'manifest.json') - (b.path === 'manifest.json'));
-    for (let index = 0; index < sorted.length; index++) {
-      const item = sorted[index];
+    const prepared = [];
+    // Save originals before changing anything, so an interrupted write can be rolled back.
+    for (const item of sorted) {
       const parts = item.path.split('/');
-      if (!parts.length || parts.some(part => !/^[A-Za-z0-9_.-]+$/.test(part) || part === '..'))
+      if (!parts.length || parts.some(part => !/^[A-Za-z0-9_.-]+$/.test(part) || part === '..' || part === '.'))
         throw new Error('Некорректный путь файла обновления');
       let directory = folder;
       for (const part of parts.slice(0, -1)) directory = await directory.getDirectoryHandle(part, { create: true });
-      const writable = await (await directory.getFileHandle(parts.at(-1), { create: true })).createWritable();
-      try { await writable.write(item.bytes); await writable.close(); }
-      catch (error) { await writable.abort().catch(() => {}); throw error; }
-      onProgress(index + 1, sorted.length);
+      const name = parts.at(-1);
+      let handle, original = null;
+      try {
+        handle = await directory.getFileHandle(name);
+        original = await handle.getFile();
+      } catch (error) {
+        if (error.name !== 'NotFoundError') throw error;
+        handle = await directory.getFileHandle(name, { create: true });
+      }
+      prepared.push({ item, directory, name, handle, original });
+    }
+    const changed = [];
+    try {
+      for (const entry of prepared) {
+        changed.push(entry);
+        const writable = await entry.handle.createWritable();
+        try { await writable.write(entry.item.bytes); await writable.close(); }
+        catch (error) { await writable.abort().catch(() => {}); throw error; }
+        onProgress(changed.length, prepared.length);
+      }
+    } catch (error) {
+      let restoreFailed = false;
+      for (const entry of changed.reverse()) {
+        try {
+          if (entry.original === null) await entry.directory.removeEntry(entry.name);
+          else {
+            const writable = await entry.handle.createWritable();
+            try { await writable.write(entry.original); await writable.close(); }
+            catch (restoreError) { await writable.abort().catch(() => {}); throw restoreError; }
+          }
+        } catch { restoreFailed = true; }
+      }
+      throw new Error(restoreFailed
+        ? 'Ошибка установки: не удалось восстановить все файлы. Установи расширение из ZIP заново.'
+        : 'Ошибка установки. Прежние файлы восстановлены: ' + (error.message || 'неизвестная ошибка'));
     }
   }
   const api = { newerVersion, releaseTag, rawUrl, latestRelease, filesFromTree, releaseFiles,

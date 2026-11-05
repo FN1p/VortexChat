@@ -6,7 +6,7 @@ window.fixtureWrites = writes;
 window.fakeFiles = fakeFiles;
 const folder = {
   async getFileHandle(name, options) {
-    if (!fakeFiles.has(name) && !options?.create) throw new Error('File missing');
+    if (!fakeFiles.has(name) && !options?.create) throw new DOMException('File missing', 'NotFoundError');
     return {
       async getFile() { return { text: async () => String(fakeFiles.get(name)) }; },
       async createWritable() {
