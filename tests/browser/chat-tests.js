@@ -23,6 +23,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     return node;
   }
   await wait();
+  const originalQueryAll = document.querySelectorAll.bind(document);
+  let mentionScans = 0;
+  document.querySelectorAll = function(selector) {
+    if (selector === '.chat-line__message, [data-a-target="chat-line-message"]') mentionScans++;
+    return originalQueryAll(selector);
+  };
+  const unrelated = document.createElement('div');
+  unrelated.textContent = 'Unrelated page update';
+  document.body.append(unrelated);
+  await wait(120);
+  check('Unrelated page changes do not trigger mention scans', mentionScans === 0);
+  document.querySelectorAll = originalQueryAll;
+  unrelated.remove();
   const header = document.querySelector('.stream-chat-header');
   const controls = document.getElementById('vortex-header-group');
   check('Extension controls occupy a separate row after the Twitch header', controls?.previousElementSibling === header && !header.contains(controls));

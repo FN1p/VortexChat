@@ -54,7 +54,7 @@
   }
 
   function positionOverlays() {
-    if (!video?.isConnected || !light || !button) return;
+    if (document.hidden || !video?.isConnected || !light || !button) return;
     const rect = video.getBoundingClientRect();
     const onScreen = rect.width >= 300 && rect.height >= 150 &&
       rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth;

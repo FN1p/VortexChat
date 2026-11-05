@@ -210,8 +210,16 @@
     syncQuickLinks();
     if (!settings.sidebarPreview) { preview?.remove(); preview = null; }
   });
-  const observer = new MutationObserver(() => {
-    if (mentionScanFrame) return;
+  const chatLineSelector = '.chat-line__message, [data-a-target="chat-line-message"]';
+  const observer = new MutationObserver(records => {
+    // Twitch changes the rest of the page frequently; only rescan when chat changes.
+    const chatChanged = records.some(record => {
+      const target = record.target.nodeType === 1 ? record.target : record.target.parentElement;
+      if (target?.closest?.(chatLineSelector)) return true;
+      return [...record.addedNodes].some(node => node.nodeType === 1 &&
+        (node.matches(chatLineSelector) || node.querySelector(chatLineSelector)));
+    });
+    if (!chatChanged || mentionScanFrame) return;
     mentionScanFrame = requestAnimationFrame(() => { mentionScanFrame = 0; scanMentions(); });
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
