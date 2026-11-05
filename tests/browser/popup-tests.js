@@ -71,5 +71,11 @@ frame.addEventListener('load', async () => {
   }));
   check('Narrow popup keeps controls within bounds without overlap', main.scrollWidth <= main.clientWidth &&
     !(label.left < value.right && value.left < label.right && label.top < value.bottom && value.top < label.bottom) && !overlap);
-  document.getElementById('summary').textContent = `${8 - failures}/8 passed`;
+  frame.style.width = '400px';
+  win.scrollTo(0, doc.documentElement.scrollHeight);
+  await wait();
+  const footer = doc.querySelector('footer').getBoundingClientRect();
+  check('Popup has one scroll area and reaches the footer', main.scrollHeight === main.clientHeight &&
+    win.scrollY > 0 && footer.bottom <= win.innerHeight + 1);
+  document.getElementById('summary').textContent = `${9 - failures}/9 passed`;
 });
