@@ -35,6 +35,7 @@ test('updater compares versions and chooses a published extension release', () =
   assert.equal(updater.newerVersion('invalid', '4.4.11'), false);
   assert.equal(updater.releaseTag([
     { draft: true, tag_name: 'v9.9.9', assets: [{ name: 'VortexChat-7TV-Extension.zip' }] },
+    { prerelease: true, tag_name: 'v9.9.8-beta', assets: [{ name: 'VortexChat-7TV-Extension.zip' }] },
     { draft: false, tag_name: 'v1.3.14-beta.14', assets: [{ name: 'VortexChat-7TV-Extension.zip' }] }
   ]), 'v1.3.14-beta.14');
 });

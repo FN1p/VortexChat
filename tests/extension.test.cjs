@@ -825,5 +825,5 @@ test('extension popup prevents long status labels from pushing controls out', ()
 
 test('Chrome extension version label agrees with manifest version', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../extension/manifest.json'), 'utf8'));
-  assert.match(manifest.version_name, new RegExp('^' + manifest.version.replace(/\./g, '\\.') + ' Beta '));
+  assert.equal(manifest.version_name, manifest.version);
 });

@@ -52,7 +52,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       status(`Версия ${release.version} установлена. Перезапускаю расширение…`);
       setTimeout(() => chrome.runtime.reload(), 800);
     } catch (error) {
-      status(error.message || 'Обновление не удалось. Попробуй ещё раз.', true);
+      const detail = error.message || '';
+      status(/security policy|безопасности/i.test(detail)
+        ? 'Windows или браузер заблокировали запись файлов. Скачай архив и установи обновление вручную. Если восстановление не удалось, установи расширение заново.'
+        : (detail || 'Обновление не удалось. Скачай архив и установи его вручную.'), true);
       $('install').disabled = false;
       $('fallback').hidden = false;
     }

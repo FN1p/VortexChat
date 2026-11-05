@@ -18,7 +18,7 @@
     return false;
   }
   function releaseTag(releases) {
-    const release = releases?.find(item => !item.draft &&
+    const release = releases?.find(item => !item.draft && !item.prerelease &&
       item.assets?.some(asset => asset.name === 'VortexChat-7TV-Extension.zip') &&
       /^v[\w.-]{1,60}$/.test(item.tag_name || ''));
     return release?.tag_name || '';

@@ -58,14 +58,6 @@ jobs:
             desktop-app/dist/VortexChat-Portable-*.exe
             desktop-app/dist/VortexChat-7TV-Extension.zip
 
-      - name: Publish Beta after tested main build
-        if: github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release VortexChat Beta v1.3.16')
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create v1.3.16-beta.17 ./desktop-app/dist/VortexChat-7TV-Extension.zip ./desktop-app/dist/VortexChat-Setup-1.3.16.exe ./desktop-app/dist/VortexChat-Portable-1.3.16.exe --repo "${{ github.repository }}" --target "${{ github.sha }}" --prerelease --title "VortexChat v1.3.16-beta.17 (PFT Studio)" --notes "Beta 17: YouTube Live global 7TV emotes, BTTV wide/flip/stack modifiers and updated PFT chat controls."
-
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -78,12 +70,14 @@ jobs:
             desktop-app/dist/VortexChat-7TV-Extension.zip
           name: VortexChat ${{ github.ref_name }} (PFT Studio)
           body: |
-            ## VortexChat 4.4.22 Beta 25
-            - Center the Ambilight icon inside its player button.
-            - Controls, labels and buttons wrap without overlapping; popup uses a single scroll area.
+            ## VortexChat 1.3.17 / extension 4.5.0
+            - Stable release of the Twitch and YouTube extension and Windows chat application.
+            - Chat emotes, cosmetics, reading controls, player glow and clip overlay.
+            - If the browser or Windows blocks an extension update, download the ZIP and install it manually.
+            - Windows login requires a Twitch Client ID. The desktop application checks for updates and opens GitHub.
 
-            ## Загрузки
-            - `VortexChat-7TV-Extension.zip` — расширение для Chrome.
-            - `VortexChat-Setup-*.exe` и `VortexChat-Portable-*.exe` — приложение для Windows.
+            ## Downloads
+            - `VortexChat-7TV-Extension.zip` — unpack and load via `chrome://extensions`.
+            - `VortexChat-Setup-*.exe` — Windows installer; `VortexChat-Portable-*.exe` — portable application.
           draft: false
           prerelease: ${{ contains(github.ref_name, '-beta') }}

@@ -1,4 +1,4 @@
-/* VortexChat Beta visual layer: video-only effects; never reads chat messages. */
+/* VortexChat visual layer: video-only effects; never reads chat messages. */
 (() => {
 'use strict';
 if(globalThis.__vortexVisualControls)return;
@@ -146,7 +146,7 @@ function initButton(){
 }
 function openPanel(player){
  panel=document.createElement('section');panel.className='vortex-yt-panel';panel.setAttribute('aria-label','VortexChat — настройки YouTube');
- panel.innerHTML=`<strong style="color:#39d8d0;font-size:16px">VortexChat Beta</strong>
+ panel.innerHTML=`<strong style="color:#39d8d0;font-size:16px">VortexChat</strong>
  <label>Ambilight <input type="checkbox" data-setting="youtubeAmbientEnabled"></label>
  <label>Интенсивность <input type="range" min="0" max="100" data-setting="visualAmbilightIntensity"></label>
  <output>50%</output>

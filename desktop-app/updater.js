@@ -15,7 +15,7 @@ async function check(installed) {
  try {
   const releases=await read(API);
   if(!Array.isArray(releases))throw Error('invalid response');
-  const available=releases.filter(r=>!r.draft&&newer(r.tag_name,installed)&&r.assets?.some(a=>/^VortexChat-Setup-.*\.exe$/i.test(a.name)));
+  const available=releases.filter(r=>!r.draft&&!r.prerelease&&newer(r.tag_name,installed)&&r.assets?.some(a=>/^VortexChat-Setup-.*\.exe$/i.test(a.name)));
   available.sort((a,b)=>{const x=version(a.tag_name),y=version(b.tag_name);for(let i=0;i<3;i++)if(x[i]!==y[i])return y[i]-x[i];return 0;});
   if(!available.length)return {status:'current',installed};
   const r=available[0];return {status:'available',installed,version:r.tag_name,url:r.html_url,prerelease:r.prerelease};
