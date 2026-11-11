@@ -35,6 +35,7 @@
       "index.html",
       "style.css",
       "twitch.js",
+      "irc-reconnect.js",
       "overlay.html",
       "assets/**/*",
       "node_modules/**/*"
