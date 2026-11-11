@@ -19,6 +19,23 @@ class VortexChatDesktopClient {
     this.isPinned = false;
     this.reconnectTimer = null;
     this.pingTimer = null;
+    this.connectTimer = null;
+    this.reconnectAttempt = 0;
+    this.connectionGeneration = 0;
+    this.lastIrcActivityAt = 0;
+    this.closed = false;
+    window.addEventListener('online', () => this.initTwitchIRC());
+    window.addEventListener('offline', () => {
+      this.updateConnectionStatus('● Нет интернета', false);
+      this.ws?.close();
+    });
+    window.addEventListener('pagehide', () => {
+      this.closed = true;
+      clearTimeout(this.reconnectTimer);
+      clearTimeout(this.connectTimer);
+      clearInterval(this.pingTimer);
+      this.ws?.close();
+    });
 
     this.globalBadges = {
       broadcaster: { title: 'Стример', url: 'https://static-cdn.jtvnw.net/badges/v1/5527c08c-d341-4003-9691-e2b3003c4221/2' },
@@ -388,41 +405,97 @@ class VortexChatDesktopClient {
     }
   }
 
-  initTwitchIRC() {
+  updateConnectionStatus(label, connected = false) {
+    const status = document.getElementById('connection-status');
+    if (!status) return;
+    status.textContent = label;
+    status.classList.toggle('connected', connected);
+  }
+
+  scheduleReconnect() {
     clearTimeout(this.reconnectTimer);
-    this.ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+    if (this.closed || !navigator.onLine) {
+      this.updateConnectionStatus('● Нет интернета', false);
+      return;
+    }
+    const seconds = Math.ceil(VortexIRC.reconnectDelay(this.reconnectAttempt++) / 1000);
+    this.updateConnectionStatus(`● Повтор через ${seconds} с…`, false);
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      this.initTwitchIRC();
+    }, seconds * 1000);
+  }
 
-    this.ws.onopen = () => {
-      const status = document.getElementById('connection-status');
-      status.textContent = '● Чат подключён';
-      status.classList.add('connected');
-      this.ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership');
-      this.ws.send('PASS SCHMOOPIIE');
-      this.ws.send(`NICK justinfan${Math.floor(10000 + Math.random() * 89999)}`);
+  initTwitchIRC() {
+    if (this.closed) return;
+    if (!navigator.onLine) {
+      this.updateConnectionStatus('● Нет интернета', false);
+      return;
+    }
+    if (this.ws && (this.ws.readyState === WebSocket.CONNECTING ||
+        this.ws.readyState === WebSocket.OPEN)) return;
+    clearTimeout(this.reconnectTimer);
+    clearTimeout(this.connectTimer);
+    clearInterval(this.pingTimer);
+    this.reconnectTimer = this.connectTimer = this.pingTimer = null;
+    const generation = ++this.connectionGeneration;
+    this.updateConnectionStatus('● Подключение к Twitch…', false);
+    let socket;
+    try { socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443'); }
+    catch {
+      this.scheduleReconnect();
+      return;
+    }
+    this.ws = socket;
+    this.connectTimer = setTimeout(() => {
+      if (this.closed || generation !== this.connectionGeneration) return;
+      if (socket.readyState === WebSocket.CONNECTING) socket.close();
+    }, VortexIRC.CONNECT_TIMEOUT_MS);
 
-      this.channels.forEach((chan) => {
+    socket.onopen = () => {
+      if (this.closed || generation !== this.connectionGeneration) return;
+      clearTimeout(this.connectTimer);
+      this.connectTimer = null;
+      this.reconnectAttempt = 0;
+      this.lastIrcActivityAt = Date.now();
+      this.updateConnectionStatus('● Чат подключён', true);
+      socket.send('CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership');
+      socket.send('PASS SCHMOOPIIE');
+      socket.send(`NICK justinfan${Math.floor(10000 + Math.random() * 89999)}`);
+      this.channels.forEach(chan => {
         this.joinChannel(chan);
         this.loadChannelEmotes(chan);
       });
-
-      clearInterval(this.pingTimer);
       this.pingTimer = setInterval(() => {
-        if (this.ws.readyState === WebSocket.OPEN) {
-          this.ws.send('PING :tmi.twitch.tv');
+        if (this.closed || generation !== this.connectionGeneration ||
+            socket.readyState !== WebSocket.OPEN) return;
+        if (Date.now() - this.lastIrcActivityAt > VortexIRC.IDLE_TIMEOUT_MS) {
+          socket.close();
+          return;
         }
+        socket.send('PING :tmi.twitch.tv');
       }, 60000);
     };
 
-    this.ws.onmessage = (event) => {
+    socket.onmessage = event => {
+      if (this.closed || generation !== this.connectionGeneration) return;
+      this.lastIrcActivityAt = Date.now();
       this.parseIrcMessages(event.data);
     };
 
-    this.ws.onclose = () => {
-      const status = document.getElementById('connection-status');
-      status.textContent = '● Переподключение…';
-      status.classList.remove('connected');
+    socket.onerror = () => {
+      if (this.closed || generation !== this.connectionGeneration) return;
+      this.updateConnectionStatus('● Ошибка соединения', false);
+      try { socket.close(); } catch { /* onclose will retry when possible. */ }
+    };
+
+    socket.onclose = () => {
+      if (generation !== this.connectionGeneration) return;
+      clearTimeout(this.connectTimer);
       clearInterval(this.pingTimer);
-      this.reconnectTimer = setTimeout(() => this.initTwitchIRC(), 3000);
+      this.connectTimer = this.pingTimer = null;
+      if (this.ws === socket) this.ws = null;
+      if (!this.closed) this.scheduleReconnect();
     };
   }
 
