@@ -22,7 +22,8 @@ test('desktop IRC connection handles offline and teardown without duplicate live
   const js = fs.readFileSync(path.join(__dirname, '../desktop-app/twitch.js'), 'utf8');
   const html = fs.readFileSync(path.join(__dirname, '../desktop-app/index.html'), 'utf8');
   const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../desktop-app/package.json'), 'utf8'));
-  assert.ok(html.indexOf('irc-reconnect.js') < html.indexOf('twitch.js'));
+  assert.ok(html.indexOf('<script src="irc-reconnect.js"></script>') >= 0 &&
+    html.indexOf('<script src="irc-reconnect.js"></script>') < html.indexOf('<script src="twitch.js"></script>'));
   assert.ok(pkg.build.files.includes('irc-reconnect.js'));
   assert.match(js, /socket\.onerror\s*=/);
   assert.match(js, /socket\.onclose\s*=/);
